@@ -1,0 +1,12 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^README.Rmd$
+^man-roxygen$
+^docs$
+^_pkgdown.yml$
+^.travis.yml$
+^codecov\.yml$
+^appveyor\.yml$
+^pkgdown$
+^LICENSE\.md$
+^\.github$

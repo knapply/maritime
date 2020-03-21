@@ -1,0 +1,7 @@
+destination: docs
+
+url: https://knapply.github.io/maritime
+
+template:
+  params:
+    bootswatch: cerulean

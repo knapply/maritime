@@ -1,0 +1,3 @@
+CXX_STD      = CXX14
+PKG_CPPFLAGS = -I../inst/include/ -DSTRICT_R_HEADERS
+PKG_LIBS     = -L. -lz -lpthread -pthread
