@@ -16,9 +16,54 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// body_to_mmsi
+int body_to_mmsi(const std::string& bod);
+RcppExport SEXP _maritime_body_to_mmsi(SEXP bodSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::string& >::type bod(bodSEXP);
+    rcpp_result_gen = Rcpp::wrap(body_to_mmsi(bod));
+    return rcpp_result_gen;
+END_RCPP
+}
+// libais_version
+Rcpp::List libais_version();
+RcppExport SEXP _maritime_libais_version() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(libais_version());
+    return rcpp_result_gen;
+END_RCPP
+}
+// libais_version_major
+int libais_version_major();
+RcppExport SEXP _maritime_libais_version_major() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(libais_version_major());
+    return rcpp_result_gen;
+END_RCPP
+}
+// libais_version_minor
+int libais_version_minor();
+RcppExport SEXP _maritime_libais_version_minor() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(libais_version_minor());
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_maritime_timesTwo", (DL_FUNC) &_maritime_timesTwo, 1},
+    {"_maritime_body_to_mmsi", (DL_FUNC) &_maritime_body_to_mmsi, 1},
+    {"_maritime_libais_version", (DL_FUNC) &_maritime_libais_version, 0},
+    {"_maritime_libais_version_major", (DL_FUNC) &_maritime_libais_version_major, 0},
+    {"_maritime_libais_version_minor", (DL_FUNC) &_maritime_libais_version_minor, 0},
     {NULL, NULL, 0}
 };
 
