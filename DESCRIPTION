@@ -1,6 +1,6 @@
 Package: maritime
 Title: Routines for Maritime Data
-Version: 0.1
+Version: 0.0.9
 Authors@R: 
     c(
         person("Brendan", "Knapp", 
