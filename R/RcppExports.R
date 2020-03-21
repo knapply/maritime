@@ -5,3 +5,7 @@ timesTwo <- function(x) {
     .Call(`_maritime_timesTwo`, x)
 }
 
+test <- function() {
+    invisible(.Call(`_maritime_test`))
+}
+

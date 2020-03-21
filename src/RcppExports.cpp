@@ -16,9 +16,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// test
+void test();
+RcppExport SEXP _maritime_test() {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    test();
+    return R_NilValue;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_maritime_timesTwo", (DL_FUNC) &_maritime_timesTwo, 1},
+    {"_maritime_test", (DL_FUNC) &_maritime_test, 0},
     {NULL, NULL, 0}
 };
 
