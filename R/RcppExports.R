@@ -5,7 +5,33 @@ timesTwo <- function(x) {
     .Call(`_maritime_timesTwo`, x)
 }
 
-test <- function() {
-    invisible(.Call(`_maritime_test`))
+body_to_mmsi <- function(bod = "K8VSqb9LdU28WP7h") {
+    .Call(`_maritime_body_to_mmsi`, bod)
+}
+
+#' `libais` Version Information
+#'
+#' @examples
+#' libais_version()
+#' libais_version_major()
+#' libais_version_minor()
+#'
+#' @export
+libais_version <- function() {
+    .Call(`_maritime_libais_version`)
+}
+
+#' @rdname libais_version
+#'
+#' @export
+libais_version_major <- function() {
+    .Call(`_maritime_libais_version_major`)
+}
+
+#' @rdname libais_version
+#'
+#' @export
+libais_version_minor <- function() {
+    .Call(`_maritime_libais_version_minor`)
 }
 
