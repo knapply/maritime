@@ -2,14 +2,20 @@ Package: maritime
 Title: Routines for Maritime Data
 Version: 0.1
 Authors@R: 
-    person("Brendan", "Knapp", 
-           email = "brendan.g.knapp@nps.edu", 
-           role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0003-3284-4972"))
+    c(
+        person("Brendan", "Knapp", 
+               email = "brendan.g.knapp@nps.edu", 
+               role = c("aut", "cre"),
+               comment = c(ORCID = "0000-0003-3284-4972"))
+        ,
+        person(given = "Christopher", family = "Callaghan",
+               role = "aut",
+               email = "cjcallag@nps.edu")
+    )
 Description: 
     Routines for maritime data.
 License: GPL-3 + file LICENSE
-Depends: R (>= 3.3)
+Depends: R (>= 3.6)
 SystemRequirements: zlib, C++11
 LinkingTo:
     Rcpp,
