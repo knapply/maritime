@@ -9,6 +9,10 @@ body_to_mmsi <- function(bod = "K8VSqb9LdU28WP7h") {
     .Call(`_maritime_body_to_mmsi`, bod)
 }
 
+decode_file <- function(file_path) {
+    .Call(`_maritime_decode_file`, file_path)
+}
+
 #' `libais` Version Information
 #'
 #' @examples

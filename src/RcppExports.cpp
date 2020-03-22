@@ -27,6 +27,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// decode_file
+SEXP decode_file(const std::string& file_path);
+RcppExport SEXP _maritime_decode_file(SEXP file_pathSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::string& >::type file_path(file_pathSEXP);
+    rcpp_result_gen = Rcpp::wrap(decode_file(file_path));
+    return rcpp_result_gen;
+END_RCPP
+}
 // libais_version
 Rcpp::List libais_version();
 RcppExport SEXP _maritime_libais_version() {
@@ -61,6 +72,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_maritime_timesTwo", (DL_FUNC) &_maritime_timesTwo, 1},
     {"_maritime_body_to_mmsi", (DL_FUNC) &_maritime_body_to_mmsi, 1},
+    {"_maritime_decode_file", (DL_FUNC) &_maritime_decode_file, 1},
     {"_maritime_libais_version", (DL_FUNC) &_maritime_libais_version, 0},
     {"_maritime_libais_version_major", (DL_FUNC) &_maritime_libais_version_major, 0},
     {"_maritime_libais_version_minor", (DL_FUNC) &_maritime_libais_version_minor, 0},
