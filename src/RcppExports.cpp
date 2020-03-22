@@ -6,12 +6,12 @@
 using namespace Rcpp;
 
 // timesTwo
-NumericVector timesTwo(NumericVector x);
+Rcpp::NumericVector timesTwo(Rcpp::NumericVector x);
 RcppExport SEXP _maritime_timesTwo(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type x(xSEXP);
     rcpp_result_gen = Rcpp::wrap(timesTwo(x));
     return rcpp_result_gen;
 END_RCPP
@@ -28,13 +28,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // decode_file
-SEXP decode_file(const std::string& file_path);
-RcppExport SEXP _maritime_decode_file(SEXP file_pathSEXP) {
+SEXP decode_file(const std::string& file_path, const bool verbose);
+RcppExport SEXP _maritime_decode_file(SEXP file_pathSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const std::string& >::type file_path(file_pathSEXP);
-    rcpp_result_gen = Rcpp::wrap(decode_file(file_path));
+    Rcpp::traits::input_parameter< const bool >::type verbose(verboseSEXP);
+    rcpp_result_gen = Rcpp::wrap(decode_file(file_path, verbose));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -72,7 +73,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_maritime_timesTwo", (DL_FUNC) &_maritime_timesTwo, 1},
     {"_maritime_body_to_mmsi", (DL_FUNC) &_maritime_body_to_mmsi, 1},
-    {"_maritime_decode_file", (DL_FUNC) &_maritime_decode_file, 1},
+    {"_maritime_decode_file", (DL_FUNC) &_maritime_decode_file, 2},
     {"_maritime_libais_version", (DL_FUNC) &_maritime_libais_version, 0},
     {"_maritime_libais_version_major", (DL_FUNC) &_maritime_libais_version_major, 0},
     {"_maritime_libais_version_minor", (DL_FUNC) &_maritime_libais_version_minor, 0},

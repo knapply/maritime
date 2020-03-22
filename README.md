@@ -4,6 +4,7 @@
   - [Introduction](#introduction)
   - [Installation](#installation)
   - [Usage](#usage)
+  - [Shout Outs](#shout-outs)
 
 <!-- README.Rmd generates README.md. -->
 
@@ -47,3 +48,10 @@ remotes::install_github("knapply/maritime")
 ``` r
 library(maritime)
 ```
+
+# Shout Outs
+
+  - The AIS decoding routines rely on [Kurt
+    Schwehr](http://schwehr.org/blog)’s
+    [**libais**](https://github.com/schwehr/libais) and its richly
+    detailed comments.

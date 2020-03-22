@@ -60,4 +60,8 @@ remotes::install_github("knapply/maritime")
 library(maritime)
 ```
 
+# Shout Outs
+
+* The AIS decoding routines rely on [Kurt Schwehr](http://schwehr.org/blog)'s [__libais__](https://github.com/schwehr/libais) and its richly detailed comments.
+
 

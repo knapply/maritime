@@ -5,6 +5,8 @@
 
 #include <fstream>
 
+#include <progress.hpp>
+
 enum class MSG_TYPE { msg_1_2_3, msg_4_11, msg_5 };
 
 std::size_t count_lines(const std::string& file_path) {
@@ -168,14 +170,6 @@ SEXP decode_msg<MSG_TYPE::msg_5>(const std::string& nmea_payload,
 
 SEXP decode_line(const char* line, const std::size_t pad = 0) {
   const auto bod = libais::GetBody(line);
-  // const auto msg = libais::CreateAisMsg(bod, 0);
-
-  // if (!msg || msg->had_error()) {
-  // return R_NilValue;
-  // }
-
-  // Rcpp::Rcout << bod << std::endl;
-  // Rcpp::Rcout << msg.get() << std::endl;
 
   switch (bod[0]) {
     case '1':  // class A position
@@ -196,7 +190,7 @@ SEXP decode_line(const char* line, const std::size_t pad = 0) {
 }
 
 // [[Rcpp::export]]
-SEXP decode_file(const std::string& file_path) {
+SEXP decode_file(const std::string& file_path, const bool verbose = true) {
   const auto n_lines = count_lines(file_path);
 
   Rcpp::List out(n_lines);
@@ -205,8 +199,11 @@ SEXP decode_file(const std::string& file_path) {
   in_file.open(file_path.c_str());
   std::string line_string;
 
+  Progress progress(n_lines, verbose);
   int i = 0;
   while (std::getline(in_file, line_string)) {
+    progress.increment();
+
     if (line_string.empty()) {
       continue;
     }
