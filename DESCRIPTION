@@ -19,14 +19,10 @@ Depends: R (>= 3.6)
 SystemRequirements: zlib, C++11
 LinkingTo:
     Rcpp,
-    RcppProgress,
+    RcppProgress
 Imports:
     data.table (>= 1.12.4),
-    jsonify,
-    magrittr,
-    Rcpp,
-    stringi,
-    utils
+    Rcpp
 Suggests:
     covr,
     knitr,

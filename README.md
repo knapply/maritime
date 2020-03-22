@@ -4,6 +4,7 @@
   - [Introduction](#introduction)
   - [Installation](#installation)
   - [Usage](#usage)
+  - [Shout Outs](#shout-outs)
 
 <!-- README.Rmd generates README.md. -->
 
@@ -47,3 +48,15 @@ remotes::install_github("knapply/maritime")
 ``` r
 library(maritime)
 ```
+
+# Shout Outs
+
+  - The AIS decoding routines rely on [Kurt
+    Schwehr](http://schwehr.org/blog)’s
+    [**libais**](https://github.com/schwehr/libais) and its richly
+    detailed comments. **libais** uses the [Apache 2.0
+    License](http://www.apache.org/licenses/LICENSE-2.0). Kurt Schwehr’s
+    License is available
+    [here](https://raw.githubusercontent.com/schwehr/libais/master/LICENSE)
+    and a copy of the Apache 2.0 license is available in this repository
+    [here](LICENSE-2.0.txt).

@@ -11,3 +11,6 @@
 ^LICENSE\.md$
 ^\.github$
 ^playground$
+^\.vscode$
+^LICENSE-2\.0.txt$
+^inst/example-data/big-files$
