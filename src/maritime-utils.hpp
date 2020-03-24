@@ -1,6 +1,7 @@
 #ifndef MARITIME_UTILS_HPP
 #define MARITIME_UTILS_HPP
 
+
 namespace maritime {
 
 static inline void rstrip(std::string& s) {
@@ -81,9 +82,8 @@ inline int count_digits(const int x) {
 inline void finalize_df(Rcpp::List& x, const int& n_rows) {
   const int n_digits = count_digits(n_rows);
 
-  std::vector<const char*> row_names(n_rows);
+  vec_chr row_names(n_rows);
   if (n_rows > 0) {
-#pragma omp parallel for simd
     for (int i = 0; i < n_rows; ++i) {
       char name[n_digits];
       sprintf(&(name[0]), "%d", i);
@@ -96,12 +96,15 @@ inline void finalize_df(Rcpp::List& x, const int& n_rows) {
   x.attr("class") = vec_chr{"data.frame"};
 }
 
-template <class msg_T>
+
+template<class msg_T>
 inline Rcpp::List as_df(msg_T& ais_msg) {
   auto out = ais_msg.as_list();
   finalize_df(out, ais_msg.common_row_index);
   return out;
 }
+
+
 
 // void finalize_df2(Rcpp::List& x, const int& n_rows) {
 //   const int n_digits = count_digits(n_rows);
@@ -117,6 +120,7 @@ inline Rcpp::List as_df(msg_T& ais_msg) {
 //   x.attr("class") = vec_chr{"data.frame"};
 // }
 
-}  // namespace maritime
+
+} // namespace maritime
 
 #endif
