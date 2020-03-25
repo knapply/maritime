@@ -37,8 +37,8 @@ void handle_error(const std::error_code& error) {
   Rcpp::stop("error mapping file: %s, exiting...\n", errmsg.c_str());
 }
 
-// [[Rcpp::export]]
-Rcpp::List ais_decode_nmea(const Rcpp::CharacterVector& x) {
+// [[Rcpp::export(.ais_decode_strings)]]
+Rcpp::List ais_decode_strings(const Rcpp::CharacterVector& x) {
   const std::size_t n(x.size());
   std::vector<std::string> bodies(n);
   std::vector<maritime::ais::MSG_TYPE> msg_types(n);
@@ -67,8 +67,8 @@ Rcpp::List ais_decode_nmea(const Rcpp::CharacterVector& x) {
   return out;
 }
 
-// [[Rcpp::export]]
-SEXP msg_test(const std::string& file_path, const bool verbose = true) {
+// [[Rcpp::export(.ais_decode_file)]]
+SEXP ais_decode_file(const std::string& file_path, const bool verbose = true) {
   constexpr char delim = '\n';
   //   constexpr int pad = 0;
   constexpr int init_line_size = 70;

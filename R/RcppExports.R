@@ -13,11 +13,11 @@ ais_version <- function() {
     .Call(`_maritime_ais_version`)
 }
 
-ais_decode_nmea <- function(x) {
-    .Call(`_maritime_ais_decode_nmea`, x)
+.ais_decode_strings <- function(x) {
+    .Call(`_maritime_ais_decode_strings`, x)
 }
 
-msg_test <- function(file_path, verbose = TRUE) {
-    .Call(`_maritime_msg_test`, file_path, verbose)
+.ais_decode_file <- function(file_path, verbose = TRUE) {
+    .Call(`_maritime_ais_decode_file`, file_path, verbose)
 }
 
