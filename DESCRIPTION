@@ -11,6 +11,10 @@ Authors@R:
         person(given = "Christopher", family = "Callaghan",
                role = "aut",
                email = "cjcallag@nps.edu")
+        ,
+        person("Kurt", "Schwehr",
+               role = "cph",
+               comment = "libais library")
     )
 Description: 
     Routines for maritime data.

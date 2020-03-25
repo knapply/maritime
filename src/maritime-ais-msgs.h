@@ -1,7 +1,7 @@
 #ifndef MARITIME_AIS_MSGS_HPP
 #define MARITIME_AIS_MSGS_HPP
 
-#include "ais.h"
+#include <libais.hpp>
 #include "maritime-typedefs.h"
 #include "maritime-utils.h"
 

@@ -3,6 +3,8 @@
 // #include <maritime/libais.hpp>
 
 // #include "ais.h"
+// #include <libais/src/libais/ais.h>
+#include <libais.hpp>
 #include "maritime-ais-msgs.h"
 #include "maritime-ais.h"
 

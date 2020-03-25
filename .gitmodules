@@ -1,0 +1,3 @@
+[submodule "inst/include/libais"]
+	path = inst/include/libais
+	url = https://github.com/schwehr/libais

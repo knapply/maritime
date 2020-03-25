@@ -2,6 +2,15 @@
 #PKG_CPPFLAGS = -I../inst/include/ -DSTRICT_R_HEADERS $(SHLIB_OPENMP_CFLAGS)
 #PKG_LIBS     = -L. -lz -lpthread -pthread  $(SHLIB_OPENMP_CFLAGS)
 
-CXX_STD = CXX11
-PKG_CXXFLAGS = -DNDEBUG $(SHLIB_OPENMP_CXXFLAGS) 
-PKG_LIBS = $(SHLIB_OPENMP_CXXFLAGS)
+CXX_STD      = CXX11
+PKG_CXXFLAGS = -I. -I../inst/include/ -DNDEBUG $(SHLIB_OPENMP_CXXFLAGS) 
+PKG_LIBS     = $(SHLIB_OPENMP_CXXFLAGS)
+
+SOURCES      = libais-versions.cpp RcppExports.cpp ../inst/include/libais/src/libais/ais.cpp ../inst/include/libais/src/libais/ais10.cpp ../inst/include/libais/src/libais/ais12.cpp ../inst/include/libais/src/libais/ais14.cpp ../inst/include/libais/src/libais/ais15.cpp ../inst/include/libais/src/libais/ais16.cpp ../inst/include/libais/src/libais/ais17.cpp ../inst/include/libais/src/libais/ais18.cpp ../inst/include/libais/src/libais/ais19.cpp ../inst/include/libais/src/libais/ais1_2_3.cpp ../inst/include/libais/src/libais/ais20.cpp ../inst/include/libais/src/libais/ais21.cpp ../inst/include/libais/src/libais/ais22.cpp ../inst/include/libais/src/libais/ais23.cpp ../inst/include/libais/src/libais/ais24.cpp ../inst/include/libais/src/libais/ais25.cpp ../inst/include/libais/src/libais/ais26.cpp ../inst/include/libais/src/libais/ais27.cpp ../inst/include/libais/src/libais/ais4_11.cpp ../inst/include/libais/src/libais/ais5.cpp ../inst/include/libais/src/libais/ais6.cpp ../inst/include/libais/src/libais/ais7_13.cpp ../inst/include/libais/src/libais/ais8.cpp ../inst/include/libais/src/libais/ais8_1_22.cpp ../inst/include/libais/src/libais/ais8_1_26.cpp ../inst/include/libais/src/libais/ais8_200.cpp ../inst/include/libais/src/libais/ais8_366.cpp ../inst/include/libais/src/libais/ais8_366_22.cpp ../inst/include/libais/src/libais/ais8_367.cpp ../inst/include/libais/src/libais/ais9.cpp ../inst/include/libais/src/libais/ais_bitset.cpp ../inst/include/libais/src/libais/decode_body.cpp ../inst/include/libais/src/libais/vdm.cpp 
+
+OBJECTS = $(SOURCES:.cpp=.o) 
+
+all: $(SHLIB)
+
+clean:
+	@rm -f $(OBJECTS)

@@ -1,0 +1,4 @@
+#!/bin/sh
+# make R CMD check happy
+rm -f src/Makevars
+rm -f src/Makevars.win

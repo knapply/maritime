@@ -66,3 +66,11 @@ library(maritime)
 * AIS decoding routines are built on top of [Kurt Schwehr](https://twitter.com/kurtschwehr)'s [__libais__](https://github.com/schwehr/libais).
 
 
+
+# Dev Notes
+
+# __libais__ Submodule
+
+```sh
+git submodule add https://github.com/schwehr/libais inst/include/libais
+```
