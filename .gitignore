@@ -7,4 +7,3 @@ inst/example-data/big-files
 *.so
 *.dll
 autom4te.cache
-autom4te.cache
