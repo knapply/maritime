@@ -27,7 +27,7 @@ RoxygenNote: 7.1.0
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
 Depends: R (>= 3.6)
-SystemRequirements: git, C++11
+SystemRequirements: C++11
 LinkingTo:
     Rcpp,
     RcppProgress,
