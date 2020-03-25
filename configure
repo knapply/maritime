@@ -1683,7 +1683,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-ALL_SOURCES="$(rm -f inst/include/libais/src/libais/*.o && cd src/ && ls ../inst/include/libais/src/libais/*.cpp | grep -v ais_decode_normed | grep -v ais_py | tr '\n' ' ')"
+ALL_SOURCES="$(cd src/ && ls ../inst/include/libais/src/libais/*.cpp | grep -v ais_decode_normed | grep -v ais_py | tr '\n' ' ')"
 
 
 ac_config_files="$ac_config_files src/Makevars"
