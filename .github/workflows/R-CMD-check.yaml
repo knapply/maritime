@@ -2,6 +2,7 @@ on:
   push:
     branches:
       - dev
+      - libais-submodule
       - master
   pull_request:
     branches:
