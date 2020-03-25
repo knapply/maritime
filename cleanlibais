@@ -1,0 +1,3 @@
+#!/bin/sh
+
+rm -f inst/include/libais/src/libais/*.o

@@ -17,6 +17,8 @@
 ^autom4te\.cache$
 ^autoscan\.log$
 
+^cleanlibais$
+
 ^inst/include/libais/\.travis\.yml$
 ^inst/include/libais/\.codeclimate\.yml$
 ^inst/include/libais/\.git$
