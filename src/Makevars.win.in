@@ -2,8 +2,8 @@ CXX_STD      = CXX11
 PKG_CXXFLAGS = -I. -I../inst/include -DWIN32_LEAN_AND_MEAN -DNDEBUG $(SHLIB_OPENMP_CXXFLAGS) 
 PKG_LIBS     = $(SHLIB_OPENMP_CXXFLAGS)
 
-#SOURCES      = libais-versions.cpp RcppExports.cpp @ALL_SOURCES@
-SOURCES      = libais-versions.cpp RcppExports.cpp $(shell "$(@ALL_SOURCES@)")
+SOURCES      = libais-versions.cpp RcppExports.cpp @ALL_SOURCES@
+#SOURCES      = libais-versions.cpp RcppExports.cpp $(shell "$(@ALL_SOURCES@)")
 
 OBJECTS = $(SOURCES:.cpp=.dll) 
 
