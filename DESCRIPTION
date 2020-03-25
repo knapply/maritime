@@ -16,20 +16,7 @@ Description:
     Routines for maritime data.
 License: GPL-3 + file LICENSE
 Depends: R (>= 3.6)
-SystemRequirements: zlib, C++11
-LinkingTo:
-    Rcpp,
-    RcppProgress
-Imports:
-    data.table (>= 1.12.4),
-    Rcpp
-Suggests:
-    covr,
-    knitr,
-    sf,
-    testthat (>= 2.1.0),
-    tibble,
-    rmarkdown
+SystemRequirements: C++11
 URL: https://github.com/knapply/maritime, https://knapply.github.io/maritime
 BugReports: https://github.com/knapply/maritime/issues
 Encoding: UTF-8
@@ -37,3 +24,16 @@ LazyData: yes
 RoxygenNote: 7.1.0
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
+LinkingTo:
+    Rcpp,
+    RcppProgress,
+    rmio
+Imports:
+    Rcpp
+Suggests:
+    covr,
+    knitr,
+    testthat (>= 2.1.0),
+    rmarkdown
+Remotes:
+    RcppCore/Rcpp

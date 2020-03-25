@@ -2,22 +2,14 @@
 % Please edit documentation in R/RcppExports.R
 \name{libais_version}
 \alias{libais_version}
-\alias{libais_version_major}
-\alias{libais_version_minor}
 \title{\code{libais} Version Information}
 \usage{
 libais_version()
-
-libais_version_major()
-
-libais_version_minor()
 }
 \description{
 \code{libais} Version Information
 }
 \examples{
 libais_version()
-libais_version_major()
-libais_version_minor()
 
 }

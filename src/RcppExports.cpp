@@ -5,40 +5,6 @@
 
 using namespace Rcpp;
 
-// timesTwo
-Rcpp::NumericVector timesTwo(Rcpp::NumericVector x);
-RcppExport SEXP _maritime_timesTwo(SEXP xSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(timesTwo(x));
-    return rcpp_result_gen;
-END_RCPP
-}
-// body_to_mmsi
-int body_to_mmsi(const std::string& bod);
-RcppExport SEXP _maritime_body_to_mmsi(SEXP bodSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const std::string& >::type bod(bodSEXP);
-    rcpp_result_gen = Rcpp::wrap(body_to_mmsi(bod));
-    return rcpp_result_gen;
-END_RCPP
-}
-// decode_file
-SEXP decode_file(const std::string& file_path, const bool verbose);
-RcppExport SEXP _maritime_decode_file(SEXP file_pathSEXP, SEXP verboseSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const std::string& >::type file_path(file_pathSEXP);
-    Rcpp::traits::input_parameter< const bool >::type verbose(verboseSEXP);
-    rcpp_result_gen = Rcpp::wrap(decode_file(file_path, verbose));
-    return rcpp_result_gen;
-END_RCPP
-}
 // libais_version
 Rcpp::List libais_version();
 RcppExport SEXP _maritime_libais_version() {
@@ -49,34 +15,34 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// libais_version_major
-int libais_version_major();
-RcppExport SEXP _maritime_libais_version_major() {
+// ais_decode_nmea
+Rcpp::List ais_decode_nmea(const Rcpp::CharacterVector& x);
+RcppExport SEXP _maritime_ais_decode_nmea(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(libais_version_major());
+    Rcpp::traits::input_parameter< const Rcpp::CharacterVector& >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(ais_decode_nmea(x));
     return rcpp_result_gen;
 END_RCPP
 }
-// libais_version_minor
-int libais_version_minor();
-RcppExport SEXP _maritime_libais_version_minor() {
+// msg_test
+SEXP msg_test(const std::string& file_path, const bool verbose);
+RcppExport SEXP _maritime_msg_test(SEXP file_pathSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(libais_version_minor());
+    Rcpp::traits::input_parameter< const std::string& >::type file_path(file_pathSEXP);
+    Rcpp::traits::input_parameter< const bool >::type verbose(verboseSEXP);
+    rcpp_result_gen = Rcpp::wrap(msg_test(file_path, verbose));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_maritime_timesTwo", (DL_FUNC) &_maritime_timesTwo, 1},
-    {"_maritime_body_to_mmsi", (DL_FUNC) &_maritime_body_to_mmsi, 1},
-    {"_maritime_decode_file", (DL_FUNC) &_maritime_decode_file, 2},
     {"_maritime_libais_version", (DL_FUNC) &_maritime_libais_version, 0},
-    {"_maritime_libais_version_major", (DL_FUNC) &_maritime_libais_version_major, 0},
-    {"_maritime_libais_version_minor", (DL_FUNC) &_maritime_libais_version_minor, 0},
+    {"_maritime_ais_decode_nmea", (DL_FUNC) &_maritime_ais_decode_nmea, 1},
+    {"_maritime_msg_test", (DL_FUNC) &_maritime_msg_test, 2},
     {NULL, NULL, 0}
 };
 
