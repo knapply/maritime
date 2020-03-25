@@ -5,12 +5,3 @@
 CXX_STD      = CXX11
 PKG_CXXFLAGS = -I. -I../inst/include/ -DNDEBUG $(SHLIB_OPENMP_CXXFLAGS) 
 PKG_LIBS     = $(SHLIB_OPENMP_CXXFLAGS)
-
-SOURCES      = libais-versions.cpp RcppExports.cpp @ALL_SOURCES@
-
-OBJECTS = $(SOURCES:.cpp=.o) 
-
-all: $(SHLIB)
-
-clean:
-	@rm -f $(OBJECTS)
