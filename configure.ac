@@ -10,4 +10,4 @@ ALL_SOURCES="$(cd src/ && ls ../inst/include/libais/src/libais/*.cpp | grep -v a
 AC_SUBST(ALL_SOURCES)
 
 AC_OUTPUT(src/Makevars)
-AC_OUTPUT(src/Makevars.win)
+#AC_OUTPUT(src/Makevars.win)
