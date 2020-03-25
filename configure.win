@@ -15,9 +15,6 @@ ALL_SOURCES="$(cd src/ && ls ../inst/include/libais/src/libais/*.cpp | grep -v a
 
 
 sed "
-s#@PKG_SOURCES@#$PKG_SOURCES#;
-s#@OPENMP_CFLAGS@##;
-s#@PKG_LIBS@#$PKG_LIBS#;
-s#@PKG_CPPFLAGS@#$PKG_CPPFLAGS#" \
+s#@ALL_SOURCES@#$ALL_SOURCES#; \
 src/Makevars.in >src/Makevars.win
 
