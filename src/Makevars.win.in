@@ -1,9 +1,5 @@
-#CXX_STD      = CXX14
-#PKG_CPPFLAGS = -I../inst/include/ -DSTRICT_R_HEADERS $(SHLIB_OPENMP_CFLAGS)
-#PKG_LIBS     = -L. -lz -lpthread -pthread  $(SHLIB_OPENMP_CFLAGS)
-
 CXX_STD      = CXX11
-PKG_CXXFLAGS = -I../inst/include -DWIN32_LEAN_AND_MEAN -DNDEBUG $(SHLIB_OPENMP_CXXFLAGS) 
+PKG_CXXFLAGS = -I. -I../inst/include -DWIN32_LEAN_AND_MEAN -DNDEBUG $(SHLIB_OPENMP_CXXFLAGS) 
 PKG_LIBS     = $(SHLIB_OPENMP_CXXFLAGS)
 
 #SOURCES      = libais-versions.cpp RcppExports.cpp @ALL_SOURCES@
