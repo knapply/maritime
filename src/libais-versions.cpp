@@ -3,8 +3,8 @@
 // #include <maritime/libais.hpp>
 
 // #include "ais.h"
-#include "maritime-ais-msgs.hpp"
-#include "maritime-ais.hpp"
+#include "maritime-ais-msgs.h"
+#include "maritime-ais.h"
 
 #include <fstream>
 
@@ -67,7 +67,9 @@ SEXP msg_test(const std::string& file_path, const bool verbose = true) {
   std::vector<std::string> bodies(n_lines);
   std::vector<maritime::ais::MSG_TYPE> msg_types(n_lines);
 
+#ifdef _OPENMP
 #pragma omp parallel for simd
+#endif
   for (std::size_t i = 0; i < n_lines; ++i) {
     const std::string line(mmap.begin() + offsets[i],
                            mmap.begin() + offsets[i + 1] - 1);
@@ -82,7 +84,9 @@ SEXP msg_test(const std::string& file_path, const bool verbose = true) {
   mmap.unmap();
 
   std::size_t n_msgs_1_2_3 = 0;
+#ifdef _OPENMP
 #pragma omp parallel for simd reduction(+ : n_msgs_1_2_3)
+#endif
   for (std::size_t i = 0; i < n_lines; ++i) {
     switch (msg_types[i]) {
       case maritime::ais::MSG_TYPE::msg_1_2_3:
@@ -96,7 +100,6 @@ SEXP msg_test(const std::string& file_path, const bool verbose = true) {
 
   Progress progress(n_lines, verbose);
   maritime::ais::Msgs_1_2_3 out_1_2_3(n_msgs_1_2_3);
-#pragma omp simd
   for (std::size_t i = 0; i < n_lines; ++i) {
     progress.increment();
 

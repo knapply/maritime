@@ -2,8 +2,8 @@
 #define MARITIME_AIS_HPP
 
 
-#include "maritime-typedefs.hpp"
-#include "maritime-utils.hpp"
+#include "maritime-typedefs.h"
+#include "maritime-utils.h"
 
 namespace maritime {
 namespace ais {

@@ -2,8 +2,8 @@
 #define MARITIME_AIS_MSGS_HPP
 
 #include "ais.h"
-#include "maritime-typedefs.hpp"
-#include "maritime-utils.hpp"
+#include "maritime-typedefs.h"
+#include "maritime-utils.h"
 
 namespace maritime {
 namespace ais {
@@ -51,7 +51,6 @@ class AIS_Msgs {
   void set_seq_out() {
     // vec_int seq_out(this->common_row_index);
     std::vector<int> seq_out(this->common_row_index);
-#pragma omp parallel for simd
     for (int i = 0; i < this->common_row_index; ++i) {
       seq_out[i] = i;
     }
