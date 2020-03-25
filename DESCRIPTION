@@ -22,14 +22,11 @@ LinkingTo:
     RcppProgress,
     rmio
 Imports:
-    data.table (>= 1.12.4),
     Rcpp
 Suggests:
     covr,
     knitr,
-    sf,
     testthat (>= 2.1.0),
-    tibble,
     rmarkdown
 URL: https://github.com/knapply/maritime, https://knapply.github.io/maritime
 BugReports: https://github.com/knapply/maritime/issues
