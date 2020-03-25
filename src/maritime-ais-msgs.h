@@ -151,6 +151,13 @@ class Msgs_1_2_3 : public AIS_Msgs<libais::Ais1_2_3> {
         slots_to_allocate(n, NA_INTEGER),
         keep_flag(n, NA_LOGICAL){};
 
+  static Msgs_1_2_3 from_nmea(const std::string& nmea) {
+    auto out = Msgs_1_2_3(1);
+    const libais::Ais1_2_3 msg(nmea.c_str(), 0);
+    out.push(msg);
+    return out;
+  };
+
   void push(  // const std::string& line_string,
               // const std::string& body,
       const libais::Ais1_2_3& msg) {
@@ -215,12 +222,11 @@ class Msgs_1_2_3 : public AIS_Msgs<libais::Ais1_2_3> {
     return out;
   };
 
-  // Rcpp::List as_df() {
-  //   auto out = this->as_list();
-  //   finalize_df(out, AIS_Msgs::common_row_index);
-
-  //   return out;
-  // };
+  Rcpp::List as_df() {
+    auto out = this->as_list();
+    finalize_df(out, this->common_row_index);
+    return out;
+  };
 };
 
 }  // namespace ais

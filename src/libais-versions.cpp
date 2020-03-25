@@ -36,6 +36,37 @@ void handle_error(const std::error_code& error) {
 }
 
 // [[Rcpp::export]]
+Rcpp::List ais_decode_nmea(const Rcpp::CharacterVector& x) {
+  const std::size_t n(x.size());
+  std::vector<std::string> bodies(n);
+  std::vector<maritime::ais::MSG_TYPE> msg_types(n);
+
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+  for (std::size_t i = 0; i < n; ++i) {
+    bodies[i] = maritime::ais::get_body((char*)x[i]);
+    msg_types[i] = maritime::ais::get_msg_type(bodies[i]);
+  }
+
+  Rcpp::List out(n);
+
+  for (std::size_t i = 0; i < n; ++i) {
+    switch (msg_types[i]) {
+      case maritime::ais::MSG_TYPE::msg_1_2_3:
+        out[i] = maritime::ais::Msgs_1_2_3::from_nmea(bodies[i]).as_df();
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  return out;
+
+}
+
+// [[Rcpp::export]]
 SEXP msg_test(const std::string& file_path, const bool verbose = true) {
   constexpr char delim = '\n';
   //   constexpr int pad = 0;

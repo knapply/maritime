@@ -11,6 +11,10 @@ libais_version <- function() {
     .Call(`_maritime_libais_version`)
 }
 
+ais_decode_nmea <- function(x) {
+    .Call(`_maritime_ais_decode_nmea`, x)
+}
+
 msg_test <- function(file_path, verbose = TRUE) {
     .Call(`_maritime_msg_test`, file_path, verbose)
 }
