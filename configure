@@ -1683,6 +1683,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
+# ALL_SOURCES="$(cd src/ && ls ../inst/include/libais/src/libais/*.cpp | grep -v ais_decode_normed | grep -v ais_py | tr '\n' ' ')"
 ALL_SOURCES="$(cd src/ && ls ../inst/include/libais/src/libais/*.cpp | grep -v ais_decode_normed | grep -v ais_py | tr '\n' ' ')"
 
 
