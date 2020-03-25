@@ -18,12 +18,14 @@
 
 //' `libais` Version Information
 //'
+//' Version info for [libais](https://github.com/schwehr/libais).
+//'
 //' @examples
 //' libais_version()
 //'
 //' @export
 // [[Rcpp::export]]
-Rcpp::List libais_version() {
+Rcpp::List ais_version() {
   auto out = Rcpp::List::create(
       Rcpp::IntegerVector({LIBAIS_VERSION_MAJOR, LIBAIS_VERSION_MINOR}));
   out.attr("class") = "numeric_version";
@@ -63,7 +65,6 @@ Rcpp::List ais_decode_nmea(const Rcpp::CharacterVector& x) {
   }
 
   return out;
-
 }
 
 // [[Rcpp::export]]

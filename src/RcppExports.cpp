@@ -5,13 +5,13 @@
 
 using namespace Rcpp;
 
-// libais_version
-Rcpp::List libais_version();
-RcppExport SEXP _maritime_libais_version() {
+// ais_version
+Rcpp::List ais_version();
+RcppExport SEXP _maritime_ais_version() {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(libais_version());
+    rcpp_result_gen = Rcpp::wrap(ais_version());
     return rcpp_result_gen;
 END_RCPP
 }
@@ -40,7 +40,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_maritime_libais_version", (DL_FUNC) &_maritime_libais_version, 0},
+    {"_maritime_ais_version", (DL_FUNC) &_maritime_ais_version, 0},
     {"_maritime_ais_decode_nmea", (DL_FUNC) &_maritime_ais_decode_nmea, 1},
     {"_maritime_msg_test", (DL_FUNC) &_maritime_msg_test, 2},
     {NULL, NULL, 0}

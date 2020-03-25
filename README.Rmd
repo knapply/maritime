@@ -1,5 +1,5 @@
 ---
-title: "`{maritime}`"
+title: "`{maritime}` ⚓ 🚢 ⛵ 🛥️"
 output:
   github_document:
     html_preview: true

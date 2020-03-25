@@ -3,12 +3,14 @@
 
 #' `libais` Version Information
 #'
+#' Version info for [libais](https://github.com/schwehr/libais).
+#'
 #' @examples
 #' libais_version()
 #'
 #' @export
-libais_version <- function() {
-    .Call(`_maritime_libais_version`)
+ais_version <- function() {
+    .Call(`_maritime_ais_version`)
 }
 
 ais_decode_nmea <- function(x) {

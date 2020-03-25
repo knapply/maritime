@@ -1,4 +1,4 @@
-`{maritime}`
+`{maritime}` ⚓ 🚢 ⛵ 🛥️
 ================
 
   - [Introduction](#introduction)
