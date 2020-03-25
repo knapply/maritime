@@ -1,0 +1,34 @@
+autoscan: warning: missing AC_CHECK_HEADER_STDBOOL wanted by: 
+	src/RcppExports.cpp:30
+	src/RcppExports.cpp:36
+	src/maritime-ais-msgs.h:34
+	src/libais-versions.cpp:70
+	src/maritime-typedefs.h:10
+	src/libais-versions.cpp:70
+autoscan: warning: missing AC_C_INLINE wanted by: 
+	src/maritime-utils.h:7
+	src/maritime-utils.h:14
+	src/maritime-utils.h:82
+	src/maritime-utils.h:101
+autoscan: warning: missing AC_PROG_CC wanted by: 
+	src/maritime-utils.h
+	src/maritime-ais.h
+	src/maritime-ais-msgs.h
+	src/maritime-typedefs.h
+autoscan: warning: missing AC_PROG_CXX wanted by: 
+	src/RcppExports.cpp
+	src/libais-versions.cpp
+autoscan: warning: missing AC_TYPE_SIZE_T wanted by: 
+	src/maritime-ais.h:12
+	src/maritime-ais.h:18
+	src/maritime-ais.h:19
+	src/maritime-ais.h:20
+	src/libais-versions.cpp:40
+	src/libais-versions.cpp:47
+	src/libais-versions.cpp:54
+	src/libais-versions.cpp:84
+	src/libais-versions.cpp:87
+	src/libais-versions.cpp:104
+	src/libais-versions.cpp:117
+	src/libais-versions.cpp:121
+	src/libais-versions.cpp:134

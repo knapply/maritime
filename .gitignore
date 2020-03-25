@@ -7,7 +7,4 @@ inst/example-data/big-files
 *.so
 *.dll
 autom4te.cache
-autoscan.log
 autom4te.cache
-config.log
-config.status
