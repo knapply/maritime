@@ -81,8 +81,8 @@ jobs:
       - name: Install dependencies
         run: |
           library(remotes)
-          deps <- readRDS("depends.Rds")
-          deps[["installed"]] <- vapply(deps[["package"]], remotes:::local_sha, character(1))
+          # deps <- readRDS("depends.Rds")
+          # deps[["installed"]] <- vapply(deps[["package"]], remotes:::local_sha, character(1))
           # update(deps)
           remotes::install_cran("rcmdcheck")
         shell: Rscript {0}
