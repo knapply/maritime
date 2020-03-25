@@ -1,0 +1,20 @@
+echo -n "checking sed... "
+if type sed >/dev/null 2>&1 ; then
+  echo "yes"
+else
+  echo "no"
+  echo "Please install Rtools and make sure it's in the PATH." >&2
+  exit 1
+fi
+
+
+ALL_SOURCES="$(cd src/ && ls ../inst/include/libais/src/libais/*.cpp | grep -v ais_decode_normed | grep -v ais_py | tr '\n' ' ')"
+
+
+sed "
+s#@PKG_SOURCES@#$PKG_SOURCES#;
+s#@OPENMP_CFLAGS@##;
+s#@PKG_LIBS@#$PKG_LIBS#;
+s#@PKG_CPPFLAGS@#$PKG_CPPFLAGS#" \
+src/Makevars.in >src/Makevars.win
+
