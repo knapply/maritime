@@ -5,3 +5,19 @@ url: https://knapply.github.io/maritime
 template:
   params:
     bootswatch: cerulean
+
+reference:
+    - title: AIS
+      contents:
+      - ais_decode_nmea
+      - ais_version
+    
+    - title: Options
+      contents:
+      - maritime_options
+     
+    - title: Miscellaneous
+      contents:
+      - example_nmea_file
+    
+     

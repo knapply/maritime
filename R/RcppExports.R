@@ -6,18 +6,18 @@
 #' Version info for [libais](https://github.com/schwehr/libais).
 #'
 #' @examples
-#' libais_version()
+#' ais_version()
 #'
 #' @export
 ais_version <- function() {
     .Call(`_maritime_ais_version`)
 }
 
-.ais_decode_strings <- function(x) {
-    .Call(`_maritime_ais_decode_strings`, x)
+.ais_decode_strings <- function(x, as_df, verbose) {
+    .Call(`_maritime_ais_decode_strings`, x, as_df, verbose)
 }
 
-.ais_decode_file <- function(file_path, verbose = TRUE) {
-    .Call(`_maritime_ais_decode_file`, file_path, verbose)
+.ais_decode_file <- function(file_path, as_df, verbose) {
+    .Call(`_maritime_ais_decode_file`, file_path, as_df, verbose)
 }
 

@@ -21,7 +21,7 @@
 //' Version info for [libais](https://github.com/schwehr/libais).
 //'
 //' @examples
-//' libais_version()
+//' ais_version()
 //'
 //' @export
 // [[Rcpp::export]]
@@ -38,7 +38,9 @@ void handle_error(const std::error_code& error) {
 }
 
 // [[Rcpp::export(.ais_decode_strings)]]
-Rcpp::List ais_decode_strings(const Rcpp::CharacterVector& x) {
+Rcpp::List ais_decode_strings(const Rcpp::CharacterVector& x,
+                              const bool as_df,
+                              const bool verbose) {
   const std::size_t n(x.size());
   std::vector<std::string> bodies(n);
   std::vector<maritime::ais::MSG_TYPE> msg_types(n);
@@ -51,12 +53,15 @@ Rcpp::List ais_decode_strings(const Rcpp::CharacterVector& x) {
     msg_types[i] = maritime::ais::get_msg_type(bodies[i]);
   }
 
+  Progress progress(n, verbose);
   Rcpp::List out(n);
-
   for (std::size_t i = 0; i < n; ++i) {
+    progress.increment();
     switch (msg_types[i]) {
       case maritime::ais::MSG_TYPE::msg_1_2_3:
-        out[i] = maritime::ais::Msgs_1_2_3::from_nmea(bodies[i]).as_df();
+        out[i] =
+            as_df ? maritime::ais::Msgs_1_2_3::from_nmea(bodies[i]).as_df()
+                  : maritime::ais::Msgs_1_2_3::from_nmea(bodies[i]).as_list();
         break;
 
       default:
@@ -68,7 +73,9 @@ Rcpp::List ais_decode_strings(const Rcpp::CharacterVector& x) {
 }
 
 // [[Rcpp::export(.ais_decode_file)]]
-SEXP ais_decode_file(const std::string& file_path, const bool verbose = true) {
+SEXP ais_decode_file(const std::string& file_path,
+                     const bool as_df,
+                     const bool verbose) {
   constexpr char delim = '\n';
   //   constexpr int pad = 0;
   constexpr int init_line_size = 70;
@@ -92,10 +99,6 @@ SEXP ais_decode_file(const std::string& file_path, const bool verbose = true) {
   }
 
   const auto n_lines = offsets.size() - 1;
-
-  //   std::string line_template;
-  //   line_template.reserve(init_line_size);
-  //   std::vector<std::string> lines(n_lines);
   std::vector<std::string> bodies(n_lines);
   std::vector<maritime::ais::MSG_TYPE> msg_types(n_lines);
 
@@ -108,7 +111,6 @@ SEXP ais_decode_file(const std::string& file_path, const bool verbose = true) {
     auto body = maritime::ais::get_body(line);
 
     maritime::rstrip(body);
-    // lines[i] = line;
     bodies[i] = body;
     msg_types[i] = maritime::ais::get_msg_type(body);
   }
@@ -146,5 +148,5 @@ SEXP ais_decode_file(const std::string& file_path, const bool verbose = true) {
     }
   }
 
-  return maritime::as_df(out_1_2_3);
+  return as_df ? maritime::as_df(out_1_2_3) : out_1_2_3.as_list();
 }

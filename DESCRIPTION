@@ -38,6 +38,8 @@ Suggests:
     covr,
     knitr,
     testthat (>= 2.1.0),
-    rmarkdown
+    rmarkdown,
+    sf,
+    tibble
 Remotes:
     RcppCore/Rcpp

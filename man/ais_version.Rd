@@ -10,6 +10,6 @@ ais_version()
 Version info for \href{https://github.com/schwehr/libais}{libais}.
 }
 \examples{
-libais_version()
+ais_version()
 
 }

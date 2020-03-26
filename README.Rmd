@@ -56,8 +56,25 @@ remotes::install_github("knapply/maritime")
 
 # Usage
 
-```{r, eval=FALSE}
+```{r}
 library(maritime)
+```
+
+
+# Performance
+
+```{r}
+nmea_file <- "inst/example-data/big-files/20181210.log"
+paste(round(file.size(nmea_file) / 1e9, 2L), "GB")
+
+bench_mark <- bench::mark(
+  file = decoded <- ais_decode_nmea(nmea_file),
+  iterations = 1,
+  check = FALSE
+)
+
+bench_mark
+decoded
 ```
 
 
