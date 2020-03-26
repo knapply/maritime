@@ -1,10 +1,14 @@
 #ifndef MARITIME_UTILS_HPP
 #define MARITIME_UTILS_HPP
 
-
 namespace maritime {
 
-static inline void rstrip(std::string& s) {
+inline void handle_mmap_error(const std::error_code& error) {
+  const auto& errmsg = error.message();
+  Rcpp::stop("error mapping file: %s, exiting...\n", errmsg.c_str());
+}
+
+inline void rstrip(std::string& s) {
   s.erase(std::find_if(s.rbegin(), s.rend(),
                        std::not1(std::ptr_fun<int, int>(std::isspace)))
               .base(),
@@ -79,32 +83,107 @@ inline int count_digits(const int x) {
   // }
 }
 
-inline void finalize_df(Rcpp::List& x, const int& n_rows) {
-  const int n_digits = count_digits(n_rows);
+inline void _as_sf(Rcpp::List& x) {
+  const vec_dbl lng = x["lng_deg"];
+  const vec_dbl lat = x["lat_deg"];
+  const std::size_t n_rows = lng.size();
 
-  vec_chr row_names(n_rows);
-  if (n_rows > 0) {
-    for (int i = 0; i < n_rows; ++i) {
-      char name[n_digits];
-      sprintf(&(name[0]), "%d", i);
-      row_names[i] = name;
-    }
+  using Rcpp::_;
+  auto crs = Rcpp::List::create(
+      _["epsg"] = 4326,
+      _["proj4string"] = "+proj=longlat +datum=WGS84 +no_defs");
+  crs.attr("class") = "crs";
+
+  const auto sf_point_class = vec_chr{"XY", "POINT", "sfg"};
+  auto sfc = Rcpp::List(lng.size(), vec_dbl{NA_REAL, NA_REAL});
+  vec_int bbox = {-180, -90, 180, 90};
+  bbox.attr("names") = vec_chr{"xmin", "ymin", "xmax", "ymax"};
+
+#pragma omp for simd
+  for (std::size_t i = 0; i < n_rows; ++i) {
+    const auto longitude = lng[i];
+    const auto latitude = lat[i];
+
+    bbox[0] = bbox[0] < longitude ? bbox[0] : longitude;
+    bbox[1] = bbox[1] > longitude ? bbox[1] : longitude;
+    bbox[2] = bbox[2] < latitude ? bbox[2] : latitude;
+    bbox[3] = bbox[3] > latitude ? bbox[3] : latitude;
+
+    auto sf_point = vec_dbl{longitude, latitude};
+    sf_point.attr("class") = sf_point_class;
+
+    sfc[i] = sf_point;
   }
 
-  //   x.attr("names") = col_names;
-  x.attr("row.names") = row_names;
-  x.attr("class") = vec_chr{"data.frame"};
+  sfc.attr("n_empty") = 0;
+  sfc.attr("precision") = 0;
+  sfc.attr("crs") = crs;
+  sfc.attr("bbox") = bbox;
+  sfc.attr("class") = vec_chr{"sfc_POINT", "sfc"};
+
+  // vec_chr col_names = x.attr("names");
+  // col_names.push_back("geometry");
+  // x.attr("names") = col_names;
+  // x.push_back(geometry);
+  auto agr_attr= vec_int(x.size(), NA_INTEGER);
+  agr_attr.attr(".Label") = vec_chr{"constant", "aggregate", "identity"};
+  agr_attr.attr("class") = "factor";
+  x.attr("agr") = agr_attr;
+
+  x["geometry"] = sfc;
+  x.attr("sf_column") = "geometry";
+
+
+  // const vec_chr old_class = x.attr("class");
+  // vec_chr new_class(old_class.size() + 1);
+  // new_class[0] = "sf";
+  // for (int i = 1; i < old_class.size(); ++i) {
+  //   new_class[i] = old_class[i - 1];
+  // }
+
+  // x.attr("class") = new_class;
 }
 
+inline void finalize_df(Rcpp::List& x,
+                        // const int n_rows,
+                        const vec_int seq_out,
+                        const bool as_tibble,
+                        const bool as_sf = false) {
+  // const int n_digits = count_digits(n_rows);
 
-template<class msg_T>
-inline Rcpp::List as_df(msg_T& ais_msg) {
+  // vec_chr row_names(n_rows);
+  // if (n_rows > 0) {
+  //   for (int i = 0; i < n_rows; ++i) {
+  //     char name[n_digits];
+  //     sprintf(&(name[0]), "%d", i);
+  //     row_names[i] = name;
+  //   }
+  // }
+
+  if (as_sf) {
+    _as_sf(x);
+    if (as_tibble) {
+      x.attr("class") = vec_chr{"sf", "tbl_df", "tbl", "data.frame"};
+    } else {
+      x.attr("class") = vec_chr{"sf", "data.frame"};
+    }
+  } else if (as_tibble) {
+    x.attr("class") = vec_chr{"tbl_df", "tbl", "data.frame"};
+  } else {
+    x.attr("class") = "data.frame";
+  }
+
+  x.attr("row.names") = seq_out;
+}
+
+template <class msg_T>
+inline Rcpp::List as_df(msg_T& ais_msg,
+                        const bool as_tibble,
+                        const bool as_sf) {
   auto out = ais_msg.as_list();
-  finalize_df(out, ais_msg.common_row_index);
+  finalize_df(out, ais_msg.common_row_index, as_tibble, as_sf);
   return out;
 }
-
-
 
 // void finalize_df2(Rcpp::List& x, const int& n_rows) {
 //   const int n_digits = count_digits(n_rows);
@@ -120,7 +199,6 @@ inline Rcpp::List as_df(msg_T& ais_msg) {
 //   x.attr("class") = vec_chr{"data.frame"};
 // }
 
-
-} // namespace maritime
+}  // namespace maritime
 
 #endif

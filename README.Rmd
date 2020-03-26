@@ -66,11 +66,56 @@ library(maritime)
 ```{r}
 nmea_file <- "inst/example-data/big-files/20181210.log"
 paste(round(file.size(nmea_file) / 1e9, 2L), "GB")
+```
+
+```{r}
+options(maritime_verbose = FALSE)
+
+library(sf)
+library(tibble)
+
+warm_ups <- bench::mark(
+  warm_up1 = maritime:::.ais_decode_filter_file_impl(nmea_file, msg_type = ais_msgs$msg_1_2_3, as_sf = FALSE, as_tibble = FALSE, verbose = FALSE),
+  warm_up2 = maritime:::.ais_decode_filter_file_impl(nmea_file, msg_type = ais_msgs$msg_1_2_3, as_sf = FALSE, as_tibble = FALSE, verbose = FALSE)
+  ,
+  iterations = 1,
+  check = FALSE
+)
+
+bench_marks <- bench::mark(
+  `plain data.frame` = ais_df <- ais_decode_filter(nmea_file, as_sf = FALSE, as_tibble = FALSE),
+  `sf data.frame` = ais_sf_df <- ais_decode_filter(nmea_file, as_tibble = FALSE),
+  `tibble` = ais_tbl <- ais_decode_filter(nmea_file, as_sf = FALSE),
+  `sf tibble` = ais_sf_tbl <- ais_decode_filter(nmea_file)
+  ,
+  `tibble::as_tibble()` = as_tibble(ais_decode_filter(nmea_file, as_sf = FALSE, as_tibble = FALSE)),
+  `sf::st_as_sf(tibble::as_tibble())` = st_as_sf(as_tibble(ais_decode_filter(nmea_file, as_sf = FALSE, as_tibble = FALSE)), coords = c("lng_deg", "lat_deg"), crs = 4326L),
+  `sf::st_as_sf()` = st_as_sf(ais_decode_filter(nmea_file, as_sf = FALSE, as_tibble = FALSE), coords = c("lng_deg", "lat_deg"), crs = 4326L)
+  ,
+  iterations = 1,
+  check = FALSE,
+  filter_gc = FALSE
+)
+
+rbind(warm_ups, bench_marks)
+```
+
+```{r}
+ais_sf_tbl
+```
+
+
+```{r, eval=FALSE, echo=FALSE}
+library(maritime)
+nmea_file <- "inst/example-data/big-files/20181210.log"
+paste(round(file.size(nmea_file) / 1e9, 2L), "GB")
+
+test <- ais_decode_filter(nmea_file, msg_type = ais_msgs$msg_4_11)
 
 bench_mark <- bench::mark(
-  file = decoded <- ais_decode_nmea(nmea_file, as_tibble = FALSE, 
+  file = decoded <- ais_decode_filter(nmea_file, as_tibble = FALSE, 
                                     as_sf = FALSE, verbose = FALSE),
-  iterations = 3,
+  iterations = 1,
   check = FALSE
 )
 
@@ -83,4 +128,13 @@ tibble::as_tibble(decoded)
 
 * AIS decoding routines are built on top of [Kurt Schwehr](https://twitter.com/kurtschwehr)'s [__libais__](https://github.com/schwehr/libais).
 
+
+
+# Dev Notes
+
+Message 5, single line
+
+```
+!BSVDM,2,1,9,A,53KPtl01pv8`tTtR22050thhtr2222222222220l1`A916Vh0;20DPSmD`0D,0*21
+```
 

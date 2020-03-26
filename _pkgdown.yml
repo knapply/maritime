@@ -9,7 +9,8 @@ template:
 reference:
     - title: AIS
       contents:
-      - ais_decode_nmea
+      - ais_decode_filter
+      - ais_msgs
       - ais_version
     
     - title: Options

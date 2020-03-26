@@ -1,14 +1,12 @@
-#ifndef MARITIME_AIS_HPP
-#define MARITIME_AIS_HPP
+#ifndef MARITIME_AIS_H
+#define MARITIME_AIS_H
 
-
-#include "maritime-typedefs.h"
-#include "maritime-utils.h"
+#include "maritime.h"
 
 namespace maritime {
 namespace ais {
 
-std::string get_nth_field(const std::string& x,
+inline std::string get_nth_field(const std::string& x,
                           const std::size_t n,
                           const std::string& delim_str) {
   if (x.empty()) {
@@ -31,7 +29,8 @@ std::string get_nth_field(const std::string& x,
   return "";
 }
 
-std::string get_body(const std::string& nmea_string) {
+
+inline std::string get_body(const std::string& nmea_string) {
   auto out = get_nth_field(nmea_string, 5, ",");
   maritime::rstrip(out);
   return out;
@@ -65,10 +64,7 @@ enum class MSG_TYPE {
   msg_27 = 24
 };
 
-MSG_TYPE get_msg_type(const std::string& body) {
-  // const auto bod = get_body(line);
-  // const auto bod = libais::GetBody(line);
-  // const auto first_char = body.c_str()[0];
+inline MSG_TYPE get_msg_type(const std::string& body) {
   if (body.empty()) {
     return MSG_TYPE::unknown;
   }
@@ -160,7 +156,14 @@ MSG_TYPE get_msg_type(const std::string& body) {
   }
 }
 
+
+
+
+
 }  // namespace ais
 }  // namespace maritime
+
+
+
 
 #endif

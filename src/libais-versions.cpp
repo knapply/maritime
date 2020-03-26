@@ -1,20 +1,5 @@
-// #include <Rcpp.h>
+#include "maritime.h"
 
-// #include <maritime/libais.hpp>
-
-// #include "ais.h"
-#include "maritime-ais-msgs.h"
-#include "maritime-ais.h"
-
-#include <fstream>
-
-#include <mio/mmap.hpp>
-
-#include <progress.hpp>
-
-#ifdef _OPENMP
-#include <omp.h>
-#endif
 
 //' `libais` Version Information
 //'
@@ -32,121 +17,116 @@ Rcpp::List ais_version() {
   return out;
 }
 
-void handle_error(const std::error_code& error) {
-  const auto& errmsg = error.message();
-  Rcpp::stop("error mapping file: %s, exiting...\n", errmsg.c_str());
-}
 
-// [[Rcpp::export(.ais_decode_strings)]]
-Rcpp::List ais_decode_strings(const Rcpp::CharacterVector& x,
-                              const bool as_df,
-                              const bool verbose) {
-  const std::size_t n(x.size());
-  std::vector<std::string> bodies(n);
-  std::vector<maritime::ais::MSG_TYPE> msg_types(n);
 
-#ifdef _OPENMP
-#pragma omp parallel for
-#endif
-  for (std::size_t i = 0; i < n; ++i) {
-    bodies[i] = maritime::ais::get_body((char*)x[i]);
-    msg_types[i] = maritime::ais::get_msg_type(bodies[i]);
-  }
 
-  Progress progress(n, verbose);
-  Rcpp::List out(n);
-  for (std::size_t i = 0; i < n; ++i) {
-    progress.increment();
-    switch (msg_types[i]) {
-      case maritime::ais::MSG_TYPE::msg_1_2_3:
-        out[i] =
-            as_df ? maritime::ais::Msgs_1_2_3::from_nmea(bodies[i]).as_df()
-                  : maritime::ais::Msgs_1_2_3::from_nmea(bodies[i]).as_list();
-        break;
+// // void handle_error(const std::error_code& error) {
+// //   const auto& errmsg = error.message();
+// //   Rcpp::stop("error mapping file: %s, exiting...\n", errmsg.c_str());
+// // }
 
-      default:
-        break;
-    }
-  }
+////ffff [[Rcpp::export(.ais_decode_strings)]]
+// Rcpp::List ais_decode_strings(const Rcpp::CharacterVector& x,
+//                               const bool as_df,
+//                               const bool verbose) {
+//   const std::size_t n(x.size());
+//   std::vector<std::string> bodies(n);
+//   std::vector<maritime::ais::MSG_TYPE> msg_types(n);
 
-  return out;
-}
+// #pragma omp parallel for
+//   for (std::size_t i = 0; i < n; ++i) {
+//     bodies[i] = maritime::ais::get_body((char*)x[i]);
+//     msg_types[i] = maritime::ais::get_msg_type(bodies[i]);
+//   }
 
-// [[Rcpp::export(.ais_decode_file)]]
-SEXP ais_decode_file(const std::string& file_path,
-                     const bool as_df,
-                     const bool verbose) {
-  constexpr char delim = '\n';
-  //   constexpr int pad = 0;
-  constexpr int init_line_size = 70;
+//   Progress progress(n, verbose);
+//   Rcpp::List out(n);
+//   for (std::size_t i = 0; i < n; ++i) {
+//     progress.increment();
+//     switch (msg_types[i]) {
+//       case maritime::ais::MSG_TYPE::msg_1_2_3:
+//         out[i] =
+//             as_df ? maritime::ais::Msgs_1_2_3::from_nmea(bodies[i]).as_df()
+//                   : maritime::ais::Msgs_1_2_3::from_nmea(bodies[i]).as_list();
+//         break;
 
-  std::error_code error;
-  mio::mmap_source mmap;
-  mmap.map(file_path, error);
-  if (error) {
-    handle_error(error);
-  }
+//       default:
+//         break;
+//     }
+//   }
 
-  const auto file_size = mmap.size();
+//   return out;
+// }
 
-  std::vector<std::size_t> offsets;
-  offsets.reserve(file_size / init_line_size);
-  offsets.push_back(0);
-  for (std::size_t i = 0; i < file_size; ++i) {
-    if (mmap[i] == delim) {
-      offsets.push_back(i + 1);
-    }
-  }
+// fff// [[Rcpp::export(.ais_decode_file)]]
+// SEXP ais_decode_file(const std::string& file_path,
+//                      const bool as_df,
+//                      const bool verbose) {
+//   constexpr char delim = '\n';
+//   //   constexpr int pad = 0;
+//   constexpr int init_line_size = 70;
 
-  const auto n_lines = offsets.size() - 1;
-  std::vector<std::string> bodies(n_lines);
-  std::vector<maritime::ais::MSG_TYPE> msg_types(n_lines);
+//   std::error_code error;
+//   mio::mmap_source mmap;
+//   mmap.map(file_path, error);
+//   if (error) {
+//     handle_error(error);
+//   }
 
-#ifdef _OPENMP
-#pragma omp parallel for simd
-#endif
-  for (std::size_t i = 0; i < n_lines; ++i) {
-    const std::string line(mmap.begin() + offsets[i],
-                           mmap.begin() + offsets[i + 1] - 1);
-    auto body = maritime::ais::get_body(line);
+//   const auto file_size = mmap.size();
 
-    maritime::rstrip(body);
-    bodies[i] = body;
-    msg_types[i] = maritime::ais::get_msg_type(body);
-  }
+//   std::vector<std::size_t> offsets{0};
+//   offsets.reserve(file_size / init_line_size);
+//   for (std::size_t i = 0; i < file_size; ++i) {
+//     if (mmap[i] == delim) {
+//       offsets.push_back(i + 1);
+//     }
+//   }
 
-  mmap.unmap();
+//   const auto n_lines = offsets.size() - 1;
+//   std::vector<std::string> bodies(n_lines);
+//   std::vector<maritime::ais::MSG_TYPE> msg_types(n_lines);
 
-  std::size_t n_msgs_1_2_3 = 0;
-#ifdef _OPENMP
-#pragma omp parallel for simd reduction(+ : n_msgs_1_2_3)
-#endif
-  for (std::size_t i = 0; i < n_lines; ++i) {
-    switch (msg_types[i]) {
-      case maritime::ais::MSG_TYPE::msg_1_2_3:
-        n_msgs_1_2_3++;
-        break;
+// #pragma omp parallel for
+//   for (std::size_t i = 0; i < n_lines; ++i) {
+//     const std::string line(mmap.begin() + offsets[i],
+//                            mmap.begin() + offsets[i + 1] - 1);
+//     auto body = maritime::ais::get_body(line);
 
-      default:
-        break;
-    }
-  }
+//     maritime::rstrip(body);
+//     bodies[i] = body;
+//     msg_types[i] = maritime::ais::get_msg_type(body);
+//   }
 
-  Progress progress(n_lines, verbose);
-  maritime::ais::Msgs_1_2_3 out_1_2_3(n_msgs_1_2_3);
-  for (std::size_t i = 0; i < n_lines; ++i) {
-    progress.increment();
+//   mmap.unmap();
 
-    switch (msg_types[i]) {
-      case maritime::ais::MSG_TYPE::msg_1_2_3:
-        out_1_2_3.push(  // lines[i], bodies[i],
-            libais::Ais1_2_3(bodies[i].c_str(), 0));
-        break;
+//   std::size_t n_msgs_1_2_3 = 0;
+// #pragma omp parallel for reduction(+ : n_msgs_1_2_3)
+//   for (std::size_t i = 0; i < n_lines; ++i) {
+//     switch (msg_types[i]) {
+//       case maritime::ais::MSG_TYPE::msg_1_2_3:
+//         n_msgs_1_2_3++;
+//         break;
 
-      default:
-        break;
-    }
-  }
+//       default:
+//         break;
+//     }
+//   }
 
-  return as_df ? maritime::as_df(out_1_2_3) : out_1_2_3.as_list();
-}
+//   Progress progress(n_lines, verbose);
+//   maritime::ais::Msgs_1_2_3 out_1_2_3(n_msgs_1_2_3);
+//   for (std::size_t i = 0; i < n_lines; ++i) {
+//     progress.increment();
+
+//     switch (msg_types[i]) {
+//       case maritime::ais::MSG_TYPE::msg_1_2_3:
+//         out_1_2_3.push(libais::Ais1_2_3(bodies[i].c_str(), 0));
+//         break;
+
+//       default:
+//         break;
+//     }
+//   }
+
+//   return as_df ? maritime::as_df(out_1_2_3) : out_1_2_3.as_list();
+// }
