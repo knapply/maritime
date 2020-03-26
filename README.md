@@ -61,7 +61,7 @@ paste(round(file.size(nmea_file) / 1e9, 2L), "GB")
 
 ``` r
 bench_mark <- bench::mark(
-  file = decoded <- ais_decode_nmea(nmea_file),
+  file = decoded <- ais_decode_nmea(nmea_file, as_tibble = FALSE, as_sf = FALSE),
   iterations = 1,
   check = FALSE
 )
@@ -72,19 +72,13 @@ bench_mark
     #> # A tibble: 1 x 6
     #>   expression      min   median `itr/sec` mem_alloc `gc/sec`
     #>   <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-    #> 1 file          10.9s    10.9s    0.0919    1.65GB    0.367
+    #> 1 file          6.86s    6.86s     0.146    1.29GB    0.292
 
 ``` r
-decoded
+tibble::as_tibble(decoded)
 ```
 
-    #> Simple feature collection with 5139027 features and 26 fields
-    #> geometry type:  POINT
-    #> dimension:      XY
-    #> bbox:           xmin: -223.6962 ymin: -109.8786 xmax: 220.1447 ymax: 98.20709
-    #> epsg (SRID):    4326
-    #> proj4string:    +proj=longlat +datum=WGS84 +no_defs
-    #> # A tibble: 5,139,027 x 27
+    #> # A tibble: 5,139,027 x 26
     #>    message_id repeat_indicator   mmsi rot_over_range   rot    sog position_accura… lng_deg lat_deg   cog true_heading timestamp special_manoeuv… spare
     #>         <int>            <int>  <int> <lgl>          <dbl>  <dbl>            <int>   <dbl>   <dbl> <dbl>        <int>     <int>            <int> <int>
     #>  1          1                0 3.10e8 FALSE             0  11.2                  1  -82.9     27.6 266.           267        56                0     2
@@ -97,9 +91,8 @@ decoded
     #>  8          1                0 2.57e8 TRUE           -731.  0                    1    7.60    63.1 360            511        58                0     0
     #>  9          3                0 2.73e8 FALSE             0   0                    0   19.0     69.7  63.1          230        57                0     0
     #> 10          1                0 3.67e8 TRUE           -731.  0                    0  -89.6     40.7 222.           511        58                0     0
-    #> # … with 5,139,017 more rows, and 13 more variables: raim <lgl>, sync_state <int>, slot_timeout <int>, received_stations <int>, slot_number <int>,
-    #> #   utc_hour <int>, utc_min <int>, utc_spare <int>, slot_offset <int>, slot_increment <int>, slots_to_allocate <int>, keep_flag <lgl>,
-    #> #   geometry <POINT [°]>
+    #> # … with 5,139,017 more rows, and 12 more variables: raim <lgl>, sync_state <int>, slot_timeout <int>, received_stations <int>, slot_number <int>,
+    #> #   utc_hour <int>, utc_min <int>, utc_spare <int>, slot_offset <int>, slot_increment <int>, slots_to_allocate <int>, keep_flag <lgl>
 
 # Credits
 
