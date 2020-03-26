@@ -68,8 +68,9 @@ nmea_file <- "inst/example-data/big-files/20181210.log"
 paste(round(file.size(nmea_file) / 1e9, 2L), "GB")
 
 bench_mark <- bench::mark(
-  file = decoded <- ais_decode_nmea(nmea_file, as_tibble = FALSE, as_sf = FALSE),
-  iterations = 1,
+  file = decoded <- ais_decode_nmea(nmea_file, as_tibble = FALSE, 
+                                    as_sf = FALSE, verbose = FALSE),
+  iterations = 3,
   check = FALSE
 )
 

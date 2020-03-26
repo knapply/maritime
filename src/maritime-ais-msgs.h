@@ -14,10 +14,8 @@ class AIS_Msgs {
   int common_row_index = 0;
   vec_int seq_out;
 
-  const vec_chr common_field_names{//"line",
-                                   "message_id", "repeat_indicator", "mmsi"};
+  const vec_chr common_field_names{"message_id", "repeat_indicator", "mmsi"};
 
-  // vec_chr line;
   vec_int message_id;
   vec_int repeat_indicator;
   vec_int mmsi;
@@ -26,18 +24,14 @@ class AIS_Msgs {
   AIS_Msgs(){};
 
   AIS_Msgs(const int n)
-      :  // line(n, NA_STRING),
-        message_id(n, NA_INTEGER),
+      : message_id(n, NA_INTEGER),
         repeat_indicator(n, NA_INTEGER),
         mmsi(n, NA_INTEGER){};
 
-  bool push(  // const std::string& line_string,
-              // const std::string& body,
-      const msg_T& msg) {
+  bool push(const msg_T& msg) {
     const auto success = !msg.had_error();
 
     if (success) {
-      // this->line[common_row_index] = line_string;
       this->message_id[common_row_index] = msg.message_id;
       this->repeat_indicator[common_row_index] = msg.repeat_indicator;
       this->mmsi[common_row_index] = msg.mmsi;
@@ -49,12 +43,10 @@ class AIS_Msgs {
   };
 
   void set_seq_out() {
-    // vec_int seq_out(this->common_row_index);
     std::vector<int> seq_out(this->common_row_index);
     for (int i = 0; i < this->common_row_index; ++i) {
       seq_out[i] = i;
     }
-    // std::iota(std::begin(seq_out), std::end(seq_out), 0);
     this->seq_out = seq_out;
   }
 
@@ -64,7 +56,6 @@ class AIS_Msgs {
     Rcpp::List out(common_field_names.size());
     out.attr("names") = common_field_names;
 
-    // out["line"] = this->line[this->seq_out];
     out["message_id"] = this->message_id[this->seq_out];
     out["repeat_indicator"] = this->repeat_indicator[this->seq_out];
     out["mmsi"] = this->mmsi[this->seq_out];
@@ -158,38 +149,37 @@ class Msgs_1_2_3 : public AIS_Msgs<libais::Ais1_2_3> {
     return out;
   };
 
-  void push(  // const std::string& line_string,
-              // const std::string& body,
-      const libais::Ais1_2_3& msg) {
+  void push(const libais::Ais1_2_3& msg) {
     const auto row_index = AIS_Msgs::common_row_index;
-    const auto push_success = AIS_Msgs::push(  // line_string, body,
-        msg);
+    const auto push_success = AIS_Msgs::push(msg);
 
-    if (push_success) {
-      this->rot_over_range[row_index] = msg.rot_over_range;
-      this->rot[row_index] = msg.rot;
-      this->sog[row_index] = msg.sog;
-      this->position_accuracy[row_index] = msg.position_accuracy;
-      this->lng_deg[row_index] = msg.position.lng_deg;
-      this->lat_deg[row_index] = msg.position.lat_deg;
-      this->cog[row_index] = msg.cog;
-      this->true_heading[row_index] = msg.true_heading;
-      this->timestamp[row_index] = msg.timestamp;
-      this->special_manoeuvre[row_index] = msg.special_manoeuvre;
-      this->spare[row_index] = msg.spare;
-      this->raim[row_index] = msg.raim;
-      this->sync_state[row_index] = msg.sync_state;
-      this->slot_timeout[row_index] = msg.slot_timeout;
-      this->received_stations[row_index] = msg.received_stations;
-      this->slot_number[row_index] = msg.slot_number;
-      this->utc_hour[row_index] = msg.utc_hour;
-      this->utc_min[row_index] = msg.utc_min;
-      this->utc_spare[row_index] = msg.utc_spare;
-      this->slot_offset[row_index] = msg.slot_offset;
-      this->slot_increment[row_index] = msg.slot_increment;
-      this->slots_to_allocate[row_index] = msg.slots_to_allocate;
-      this->keep_flag[row_index] = msg.keep_flag;
+    if (!push_success) {
+      return;
     }
+
+    this->rot_over_range[row_index] = msg.rot_over_range;
+    this->rot[row_index] = msg.rot;
+    this->sog[row_index] = msg.sog;
+    this->position_accuracy[row_index] = msg.position_accuracy;
+    this->lng_deg[row_index] = msg.position.lng_deg;
+    this->lat_deg[row_index] = msg.position.lat_deg;
+    this->cog[row_index] = msg.cog;
+    this->true_heading[row_index] = msg.true_heading;
+    this->timestamp[row_index] = msg.timestamp;
+    this->special_manoeuvre[row_index] = msg.special_manoeuvre;
+    this->spare[row_index] = msg.spare;
+    this->raim[row_index] = msg.raim;
+    this->sync_state[row_index] = msg.sync_state;
+    this->slot_timeout[row_index] = msg.slot_timeout;
+    this->received_stations[row_index] = msg.received_stations;
+    this->slot_number[row_index] = msg.slot_number;
+    this->utc_hour[row_index] = msg.utc_hour;
+    this->utc_min[row_index] = msg.utc_min;
+    this->utc_spare[row_index] = msg.utc_spare;
+    this->slot_offset[row_index] = msg.slot_offset;
+    this->slot_increment[row_index] = msg.slot_increment;
+    this->slots_to_allocate[row_index] = msg.slots_to_allocate;
+    this->keep_flag[row_index] = msg.keep_flag;
   };
 
   Rcpp::List as_list() {

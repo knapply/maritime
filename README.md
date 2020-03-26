@@ -61,8 +61,9 @@ paste(round(file.size(nmea_file) / 1e9, 2L), "GB")
 
 ``` r
 bench_mark <- bench::mark(
-  file = decoded <- ais_decode_nmea(nmea_file, as_tibble = FALSE, as_sf = FALSE),
-  iterations = 1,
+  file = decoded <- ais_decode_nmea(nmea_file, as_tibble = FALSE, 
+                                    as_sf = FALSE, verbose = FALSE),
+  iterations = 3,
   check = FALSE
 )
 
@@ -72,7 +73,7 @@ bench_mark
     #> # A tibble: 1 x 6
     #>   expression      min   median `itr/sec` mem_alloc `gc/sec`
     #>   <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-    #> 1 file          6.86s    6.86s     0.146    1.29GB    0.292
+    #> 1 file          6.14s    6.64s     0.151    1.29GB    0.251
 
 ``` r
 tibble::as_tibble(decoded)
