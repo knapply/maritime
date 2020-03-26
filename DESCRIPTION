@@ -5,18 +5,20 @@ Authors@R:
     c(
         person("Brendan", "Knapp", 
                email = "brendan.g.knapp@nps.edu", 
-               role = c("aut", "cre"),
+               role = c("aut", "cre", "cph"),
                comment = c(ORCID = "0000-0003-3284-4972"))
         ,
         person(given = "Christopher", family = "Callaghan",
                role = "aut",
                email = "cjcallag@nps.edu")
+        ,
+        person("Kurt", "Schwehr",
+               role = "cph",
+               comment = "libais library")
     )
 Description: 
     Routines for maritime data.
 License: GPL-3 + file LICENSE
-Depends: R (>= 3.6)
-SystemRequirements: C++11
 URL: https://github.com/knapply/maritime, https://knapply.github.io/maritime
 BugReports: https://github.com/knapply/maritime/issues
 Encoding: UTF-8
@@ -24,6 +26,8 @@ LazyData: yes
 RoxygenNote: 7.1.0
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
+Depends: R (>= 3.6)
+SystemRequirements: C++11
 LinkingTo:
     Rcpp,
     RcppProgress,
@@ -34,6 +38,8 @@ Suggests:
     covr,
     knitr,
     testthat (>= 2.1.0),
-    rmarkdown
+    rmarkdown,
+    sf,
+    tibble
 Remotes:
     RcppCore/Rcpp
