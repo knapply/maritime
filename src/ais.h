@@ -9,8 +9,8 @@
 #include <bitset>
 #include <cassert>
 #include <cstring>
-#include <string>
 #include <iostream>
+#include <string>
 #include <vector>
 
 using std::bitset;
@@ -31,16 +31,15 @@ namespace libais {
 
 // Returns the text in the nth field starting with the first field being 0.
 // Empty delim_str is not allowed.
-string GetNthField(const string &str, const size_t n, const string &delim_str);
+string GetNthField(const string& str, const size_t n, const string& delim_str);
 
 // Returns the number of pad bits in an AIS AIVDM NMEA string.
 // Returns -1 if there is an error.
-int GetPad(const string &nmea_str);
+int GetPad(const string& nmea_str);
 
 // Returns the armored payload of an AIS AIVDM NMEA string.
 // Returns an empty string if there was an error.
-string GetBody(const string &nmea_str);
-
+string GetBody(const string& nmea_str);
 
 // Note: Needs to be kept in sync with AIS_STATUS_STRINGS list in ais.cpp.
 enum AIS_STATUS {
@@ -60,7 +59,7 @@ enum AIS_STATUS {
   AIS_STATUS_NUM_CODES
 };
 
-extern const char *const AIS_STATUS_STRINGS[AIS_STATUS_NUM_CODES];
+extern const char* const AIS_STATUS_STRINGS[AIS_STATUS_NUM_CODES];
 
 // Designated Area Codes (DAC) / Maritime Identification Digits define
 // which country controls a subset of the submessage spaces within
@@ -373,7 +372,7 @@ class AisPoint {
   AisPoint();
   AisPoint(double lng_deg_, double lat_deg_);
 };
-ostream& operator<< (ostream &o, const AisPoint &position);
+ostream& operator<<(ostream& o, const AisPoint& position);
 
 //////////////////////////////////////////////////////////////////////
 // Support class for decoding
@@ -384,7 +383,7 @@ class AisBitset : protected bitset<MAX_BITS> {
  public:
   AisBitset();
 
-  AIS_STATUS ParseNmeaPayload(const char *nmea_payload, int pad);
+  AIS_STATUS ParseNmeaPayload(const char* nmea_payload, int pad);
 
   int GetNumBits() const { return num_bits; }
   int GetNumChars() const { return num_chars; }
@@ -403,7 +402,7 @@ class AisBitset : protected bitset<MAX_BITS> {
   const AisPoint ToAisPoint(const size_t start, const size_t point_size) const;
 
   // Visible for testing.
-  static bitset<6> Reverse(const bitset<6> &bits);
+  static bitset<6> Reverse(const bitset<6>& bits);
 
  protected:
   int num_bits;
@@ -435,19 +434,19 @@ class AisMsg {
   int mmsi;
 
   // TODO(schwehr): make status private and have accessors.
-  bool had_error() const {  return status != AIS_OK;  }
+  bool had_error() const { return status != AIS_OK; }
   AIS_STATUS get_error() const { return status; }
 
   virtual ~AisMsg() {}
 
  protected:
   AIS_STATUS status;  // AIS_OK or error code
-  int num_chars;  // Number of characters in the nmea_payload.
-  size_t num_bits;  // Number of bits in the nmea_payload.
+  int num_chars;      // Number of characters in the nmea_payload.
+  size_t num_bits;    // Number of bits in the nmea_payload.
   AisBitset bits;  // The bitset that was constructed out of the nmea_payload.
 
   AisMsg() : status(AIS_UNINITIALIZED), num_chars(0), num_bits(0), bits() {}
-  AisMsg(const char *nmea_payload, const size_t pad);
+  AisMsg(const char* nmea_payload, const size_t pad);
 
   // Returns true if the msg is in a good state "so far", i.e. either AIS_OK or
   // AIS_UNINITIALIZED.
@@ -502,9 +501,9 @@ class Ais1_2_3 : public AisMsg {
   bool keep_flag_valid;
   bool keep_flag;  // 3.3.7.3.2 Annex 2 ITDMA.  Table 20
 
-  Ais1_2_3(const char *nmea_payload, const size_t pad);
+  Ais1_2_3(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais1_2_3 &msg);
+ostream& operator<<(ostream& o, const Ais1_2_3& msg);
 
 // 4 bsreport and 11 utc date response
 class Ais4_11 : public AisMsg {
@@ -542,9 +541,9 @@ class Ais4_11 : public AisMsg {
   int slot_offset;
 
   // **NO** ITDMA
-  Ais4_11(const char *nmea_payload, const size_t pad);
+  Ais4_11(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais4_11 &msg);
+ostream& operator<<(ostream& o, const Ais4_11& msg);
 
 class Ais5 : public AisMsg {
  public:
@@ -567,9 +566,9 @@ class Ais5 : public AisMsg {
   int dte;
   int spare;
 
-  Ais5(const char *nmea_payload, const size_t pad);
+  Ais5(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais5 &msg);
+ostream& operator<<(ostream& o, const Ais5& msg);
 
 // AIS Binary Broadcast message ... parent to many
 class Ais6 : public AisMsg {
@@ -582,12 +581,12 @@ class Ais6 : public AisMsg {
   int fi;
 
   // TODO(schwehr): how to make Ais6 protected?
-  Ais6(const char *nmea_payload, const size_t pad);
+  Ais6(const char* nmea_payload, const size_t pad);
 
  protected:
   Ais6() {}
 };
-ostream& operator<< (ostream &o, const Ais6 &msg);
+ostream& operator<<(ostream& o, const Ais6& msg);
 
 // http://www.e-navigation.nl/content/monitoring-aids-navigation
 // Zeni Lite Buoy Co., Ltd buoy status.
@@ -602,9 +601,9 @@ class Ais6_0_0 : public Ais6 {
   bool off_position;
   int spare2;
 
-  Ais6_0_0(const char *nmea_payload, const size_t pad);
+  Ais6_0_0(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais6_0_0 &msg);
+ostream& operator<<(ostream& o, const Ais6_0_0& msg);
 
 // Text message.  ITU 1371-1
 class Ais6_1_0 : public Ais6 {
@@ -614,9 +613,9 @@ class Ais6_1_0 : public Ais6 {
   string text;
   int spare2;
 
-  Ais6_1_0(const char *nmea_payload, const size_t pad);
+  Ais6_1_0(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais6_1_0 &msg);
+ostream& operator<<(ostream& o, const Ais6_1_0& msg);
 
 // Application ack.  ITU 1371-1
 class Ais6_1_1 : public Ais6 {
@@ -625,9 +624,9 @@ class Ais6_1_1 : public Ais6 {
   int msg_seq;
   int spare2;
 
-  Ais6_1_1(const char *nmea_payload, const size_t pad);
+  Ais6_1_1(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais6_1_1 &msg);
+ostream& operator<<(ostream& o, const Ais6_1_1& msg);
 
 // Interrogation for a DAC/FI.  ITU 1371-1
 class Ais6_1_2 : public Ais6 {
@@ -636,9 +635,9 @@ class Ais6_1_2 : public Ais6 {
   int req_fi;
   // TODO(schwehr): spare2?
 
-  Ais6_1_2(const char *nmea_payload, const size_t pad);
+  Ais6_1_2(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais6_1_2 &msg);
+ostream& operator<<(ostream& o, const Ais6_1_2& msg);
 
 // Capability interogation.  ITU 1371-1
 class Ais6_1_3 : public Ais6 {
@@ -648,9 +647,9 @@ class Ais6_1_3 : public Ais6 {
   unsigned int spare3;
   unsigned int spare4;
 
-  Ais6_1_3(const char *nmea_payload, const size_t pad);
+  Ais6_1_3(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais6_1_3 &msg);
+ostream& operator<<(ostream& o, const Ais6_1_3& msg);
 
 // Capability interogation reply.  ITU 1371-1
 // 5.4 International function message 4: Capability reply
@@ -665,9 +664,9 @@ class Ais6_1_4 : public Ais6 {
   int spare4;
   int spare5;
 
-  Ais6_1_4(const char *nmea_payload, const size_t pad);
+  Ais6_1_4(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais6_1_4 &msg);
+ostream& operator<<(ostream& o, const Ais6_1_4& msg);
 
 // International function message 5: Application ack to addr binary message.
 class Ais6_1_5 : public Ais6 {
@@ -681,7 +680,7 @@ class Ais6_1_5 : public Ais6 {
   int spare;
   int spare2;
 
-  Ais6_1_5(const char *nmea_payload, const size_t pad);
+  Ais6_1_5(const char* nmea_payload, const size_t pad);
 };
 
 // IMO Circ 236 Dangerous cargo indication
@@ -705,10 +704,9 @@ class Ais6_1_12 : public Ais6 {
   int value_unit;
   int spare2;
 
-  Ais6_1_12(const char *nmea_payload, const size_t pad);
+  Ais6_1_12(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais6_1_12 &msg);
-
+ostream& operator<<(ostream& o, const Ais6_1_12& msg);
 
 class Ais6_1_14_Window {
  public:
@@ -721,7 +719,6 @@ class Ais6_1_14_Window {
   float cur_speed;
 };
 
-
 // IMO Circ 236 Tidal window
 // Not to be transmitted after 2012-Jan-01
 class Ais6_1_14 : public Ais6 {
@@ -730,10 +727,9 @@ class Ais6_1_14 : public Ais6 {
   int utc_day;
   vector<Ais6_1_14_Window> windows;
 
-  Ais6_1_14(const char *nmea_payload, const size_t pad);
+  Ais6_1_14(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais6_1_14 &msg);
-
+ostream& operator<<(ostream& o, const Ais6_1_14& msg);
 
 // IMO Circ 289 Clearance time to enter port
 class Ais6_1_18 : public Ais6 {
@@ -748,10 +744,9 @@ class Ais6_1_18 : public Ais6 {
   AisPoint position;
   std::array<int, 2> spare2;  // 32 bits per spare
 
-  Ais6_1_18(const char *nmea_payload, const size_t pad);
+  Ais6_1_18(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais6_1_18 &msg);
-
+ostream& operator<<(ostream& o, const Ais6_1_18& msg);
 
 // IMO Circ 289 Berthing data
 class Ais6_1_20 : public Ais6 {
@@ -770,9 +765,9 @@ class Ais6_1_20 : public Ais6 {
   string name;
   AisPoint position;
 
-  Ais6_1_20(const char *nmea_payload, const size_t pad);
+  Ais6_1_20(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais6_1_20 &msg);
+ostream& operator<<(ostream& o, const Ais6_1_20& msg);
 
 class Ais6_1_25_Cargo {
  public:
@@ -803,9 +798,9 @@ class Ais6_1_25 : public Ais6 {
 
   vector<Ais6_1_25_Cargo> cargos;  // 0 to 17 cargo entries
 
-  Ais6_1_25(const char *nmea_payload, const size_t pad);
+  Ais6_1_25(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais6_1_25 &msg);
+ostream& operator<<(ostream& o, const Ais6_1_25& msg);
 
 // TODO(schwehr): Addressed sensor report 6_1_26.
 // TODO(schwehr): IMO Circ 289 Route information 6_1_28.
@@ -828,7 +823,6 @@ class Ais6_1_32_Window {
   Ais6_1_32_Window();
 };
 
-
 // IMO Circ 289 Tidal window
 class Ais6_1_32 : public Ais6 {
  public:
@@ -836,9 +830,9 @@ class Ais6_1_32 : public Ais6 {
   int utc_day;
   vector<Ais6_1_32_Window> windows;
 
-  Ais6_1_32(const char *nmea_payload, const size_t pad);
+  Ais6_1_32(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais6_1_32 &msg);
+ostream& operator<<(ostream& o, const Ais6_1_32& msg);
 
 // Number of persons on board.  ITU 1371-1
 class Ais6_1_40 : public Ais6 {
@@ -846,9 +840,9 @@ class Ais6_1_40 : public Ais6 {
   int persons;
   int spare2;
 
-  Ais6_1_40(const char *nmea_payload, const size_t pad);
+  Ais6_1_40(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais6_1_40 &msg);
+ostream& operator<<(ostream& o, const Ais6_1_40& msg);
 
 //////////////////////////////////////////////////////////////////////
 
@@ -860,9 +854,9 @@ class Ais7_13 : public AisMsg {
   vector<int> dest_mmsi;
   vector<int> seq_num;
 
-  Ais7_13(const char *nmea_payload, const size_t pad);
+  Ais7_13(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais7_13 &msg);
+ostream& operator<<(ostream& o, const Ais7_13& msg);
 
 // AIS Binary Broadcast message ... parent to many
 class Ais8 : public AisMsg {
@@ -873,12 +867,12 @@ class Ais8 : public AisMsg {
   int fi;
 
   // TODO(schwehr): make Ais8 protected
-  Ais8(const char *nmea_payload, const size_t pad);
+  Ais8(const char* nmea_payload, const size_t pad);
 
  protected:
   Ais8() {}
 };
-ostream& operator<< (ostream &o, const Ais8 &msg);
+ostream& operator<<(ostream& o, const Ais8& msg);
 
 // Text telegram ITU 1371-1
 class Ais8_1_0 : public Ais8 {
@@ -888,9 +882,9 @@ class Ais8_1_0 : public Ais8 {
   string text;
   int spare2;
 
-  Ais8_1_0(const char *nmea_payload, size_t pad);
+  Ais8_1_0(const char* nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais8_1_0 &msg);
+ostream& operator<<(ostream& o, const Ais8_1_0& msg);
 
 // 8_1_1 No message
 // 8_1_2 No message
@@ -905,7 +899,7 @@ class Ais8_1_11 : public Ais8 {
   int day;
   int hour;
   int minute;
-  int wind_ave;  // kts
+  int wind_ave;   // kts
   int wind_gust;  // kts
   int wind_dir;
   int wind_gust_dir;
@@ -914,17 +908,17 @@ class Ais8_1_11 : public Ais8 {
   float dew_point;
   float air_pres;
   int air_pres_trend;
-  float horz_vis;  // NM
+  float horz_vis;     // NM
   float water_level;  // m
   int water_level_trend;
   float surf_cur_speed;
   int surf_cur_dir;
   float cur_speed_2;  // kts
   int cur_dir_2;
-  int cur_depth_2;  // m
+  int cur_depth_2;    // m
   float cur_speed_3;  // kts
   int cur_dir_3;
-  int cur_depth_3;  // m
+  int cur_depth_3;    // m
   float wave_height;  // m
   int wave_period;
   int wave_dir;
@@ -935,14 +929,13 @@ class Ais8_1_11 : public Ais8 {
   float water_temp;
   int precip_type;
   float salinity;  // Part per mil (1/1000).
-  int ice;  // yes/no/undef/unknown
+  int ice;         // yes/no/undef/unknown
   int spare2;
   int extended_water_level;  // OHMEX uses this for extra water level precision
 
-  Ais8_1_11(const char *nmea_payload, size_t pad);
+  Ais8_1_11(const char* nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais8_1_11 &msg);
-
+ostream& operator<<(ostream& o, const Ais8_1_11& msg);
 
 // IMO Circ 236 Fairway closed - Not to be transmitted after 2012-Jan-01
 class Ais8_1_13 : public Ais8 {
@@ -964,9 +957,9 @@ class Ais8_1_13 : public Ais8 {
   int minute_to;
   int spare2;
 
-  Ais8_1_13(const char *nmea_payload, const size_t pad);
+  Ais8_1_13(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais8_1_13 &msg);
+ostream& operator<<(ostream& o, const Ais8_1_13& msg);
 
 // IMO Circ 236 Extended ship static and voyage data
 // Not to be transmitted after 2012-Jan-01
@@ -975,9 +968,9 @@ class Ais8_1_15 : public Ais8 {
   float air_draught;
   int spare2;
 
-  Ais8_1_15(const char *nmea_payload, const size_t pad);
+  Ais8_1_15(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais8_1_15 &msg);
+ostream& operator<<(ostream& o, const Ais8_1_15& msg);
 
 // IMO Circ 236 Number of persons on board
 class Ais8_1_16 : public Ais8 {
@@ -985,9 +978,9 @@ class Ais8_1_16 : public Ais8 {
   int persons;
   int spare2;
 
-  Ais8_1_16(const char *nmea_payload, const size_t pad);
+  Ais8_1_16(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais8_1_16 &msg);
+ostream& operator<<(ostream& o, const Ais8_1_16& msg);
 
 class Ais8_1_17_Target {
  public:
@@ -1007,9 +1000,9 @@ class Ais8_1_17 : public Ais8 {
  public:
   vector<Ais8_1_17_Target> targets;
 
-  Ais8_1_17(const char *nmea_payload, const size_t pad);
+  Ais8_1_17(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais8_1_17 &msg);
+ostream& operator<<(ostream& o, const Ais8_1_17& msg);
 
 // No 8_1_18
 
@@ -1026,9 +1019,9 @@ class Ais8_1_19 : public Ais8 {
   int next_signal;
   std::array<int, 4> spare2;
 
-  Ais8_1_19(const char *nmea_payload, const size_t pad);
+  Ais8_1_19(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais8_1_19 &msg);
+ostream& operator<<(ostream& o, const Ais8_1_19& msg);
 
 // No message 8_1_20
 
@@ -1045,14 +1038,14 @@ class Ais8_1_21 : public Ais8 {
   int utc_min;
   // wx - use wx[0]
   float horz_viz;  // nautical miles
-  int humidity;  // %
+  int humidity;    // %
   int wind_speed;  // ave knots
   int wind_dir;
   float pressure;  // hPa - float needed for type 1
   int pressure_tendency;
-  float air_temp;  // C
+  float air_temp;    // C
   float water_temp;  // C
-  int wave_period;  // s
+  int wave_period;   // s
   float wave_height;
   int wave_dir;
   float swell_height;  // m
@@ -1073,7 +1066,7 @@ class Ais8_1_21 : public Ais8 {
   // wind_dir defined in type 0
   float wind_speed_ms;  // m/s
   int wind_dir_rel;
-  float wind_speed_rel;  // m/s
+  float wind_speed_rel;   // m/s
   float wind_gust_speed;  // m/s
   int wind_gust_dir;
   int air_temp_raw;  // TODO(schwehr): Convert this to C.  Kelvin makes no sense
@@ -1105,14 +1098,13 @@ class Ais8_1_21 : public Ais8 {
   int ice_devel;
   int bearing_ice_edge;
 
-  Ais8_1_21(const char *nmea_payload, const size_t pad);
+  Ais8_1_21(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais8_1_21 &msg);
-
+ostream& operator<<(ostream& o, const Ais8_1_21& msg);
 
 const size_t AIS8_1_22_NUM_NAMES = 128;
 const size_t AIS8_1_22_SUBAREA_SIZE = 87;
-extern const char *ais8_1_22_notice_names[AIS8_1_22_NUM_NAMES];
+extern const char* ais8_1_22_notice_names[AIS8_1_22_NUM_NAMES];
 
 enum Ais8_1_22_AreaShapeEnum {
   AIS8_1_22_SHAPE_ERROR = -1,
@@ -1126,7 +1118,7 @@ enum Ais8_1_22_AreaShapeEnum {
   AIS8_1_22_SHAPE_RESERVED_7 = 7
 };
 
-extern const char *ais8_1_22_shape_names[8];
+extern const char* ais8_1_22_shape_names[8];
 
 // Sub-Areas for the Area Notice class
 
@@ -1136,9 +1128,8 @@ class Ais8_1_22_SubArea {
   virtual ~Ais8_1_22_SubArea() {}
 };
 
-Ais8_1_22_SubArea*
-ais8_1_22_subarea_factory(const AisBitset &bs,
-                          const size_t offset);
+Ais8_1_22_SubArea* ais8_1_22_subarea_factory(const AisBitset& bs,
+                                             const size_t offset);
 
 // or Point if radius is 0
 class Ais8_1_22_Circle : public Ais8_1_22_SubArea {
@@ -1149,23 +1140,23 @@ class Ais8_1_22_Circle : public Ais8_1_22_SubArea {
   int radius_m;
   unsigned int spare;  // 18 bits.
 
-  Ais8_1_22_Circle(const AisBitset &bs, const size_t offset);
+  Ais8_1_22_Circle(const AisBitset& bs, const size_t offset);
   ~Ais8_1_22_Circle() {}
-  Ais8_1_22_AreaShapeEnum getType() const {return AIS8_1_22_SHAPE_CIRCLE;}
+  Ais8_1_22_AreaShapeEnum getType() const { return AIS8_1_22_SHAPE_CIRCLE; }
 };
 
 class Ais8_1_22_Rect : public Ais8_1_22_SubArea {
  public:
   AisPoint position;  // Longitude and latitude.
-  int precision;  // How many decimal places for x and y.  Useless.
-  int e_dim_m;  // East dimension in meters.
+  int precision;      // How many decimal places for x and y.  Useless.
+  int e_dim_m;        // East dimension in meters.
   int n_dim_m;
-  int orient_deg;  // Orientation in degrees from true north.
+  int orient_deg;      // Orientation in degrees from true north.
   unsigned int spare;  // 5 bits.
 
-  Ais8_1_22_Rect(const AisBitset &bs, const size_t offset);
+  Ais8_1_22_Rect(const AisBitset& bs, const size_t offset);
   ~Ais8_1_22_Rect() {}
-  Ais8_1_22_AreaShapeEnum getType() const {return AIS8_1_22_SHAPE_RECT;}
+  Ais8_1_22_AreaShapeEnum getType() const { return AIS8_1_22_SHAPE_RECT; }
 };
 
 class Ais8_1_22_Sector : public Ais8_1_22_SubArea {
@@ -1177,9 +1168,9 @@ class Ais8_1_22_Sector : public Ais8_1_22_SubArea {
   int left_bound_deg;
   int right_bound_deg;
 
-  Ais8_1_22_Sector(const AisBitset &bs, const size_t offset);
+  Ais8_1_22_Sector(const AisBitset& bs, const size_t offset);
   ~Ais8_1_22_Sector() {}
-  Ais8_1_22_AreaShapeEnum getType() const {return AIS8_1_22_SHAPE_SECTOR;}
+  Ais8_1_22_AreaShapeEnum getType() const { return AIS8_1_22_SHAPE_SECTOR; }
 };
 
 // Or Waypoint
@@ -1194,9 +1185,9 @@ class Ais8_1_22_Polyline : public Ais8_1_22_SubArea {
   vector<float> dists_m;
   unsigned int spare;  // 2 bit.
 
-  Ais8_1_22_Polyline(const AisBitset &bs, const size_t offset);
+  Ais8_1_22_Polyline(const AisBitset& bs, const size_t offset);
   ~Ais8_1_22_Polyline() {}
-  Ais8_1_22_AreaShapeEnum getType() const {return AIS8_1_22_SHAPE_POLYLINE;}
+  Ais8_1_22_AreaShapeEnum getType() const { return AIS8_1_22_SHAPE_POLYLINE; }
 };
 
 // TODO(schwehr): Bring in the prior point?  And do we fold the sub area data
@@ -1210,41 +1201,40 @@ class Ais8_1_22_Polygon : public Ais8_1_22_SubArea {
   vector<float> dists_m;
   unsigned int spare;  // 2 bit
 
-  Ais8_1_22_Polygon(const AisBitset &bs, const size_t offset);
+  Ais8_1_22_Polygon(const AisBitset& bs, const size_t offset);
   ~Ais8_1_22_Polygon() {}
-  Ais8_1_22_AreaShapeEnum getType() const {return AIS8_1_22_SHAPE_POLYGON;}
+  Ais8_1_22_AreaShapeEnum getType() const { return AIS8_1_22_SHAPE_POLYGON; }
 };
-
 
 class Ais8_1_22_Text : public Ais8_1_22_SubArea {
  public:
   string text;
   // TODO(schwehr): spare?
 
-  Ais8_1_22_Text(const AisBitset &bs, const size_t offset);
+  Ais8_1_22_Text(const AisBitset& bs, const size_t offset);
   ~Ais8_1_22_Text() {}
-  Ais8_1_22_AreaShapeEnum getType() const {return AIS8_1_22_SHAPE_TEXT;}
+  Ais8_1_22_AreaShapeEnum getType() const { return AIS8_1_22_SHAPE_TEXT; }
 };
 
 // Area Notice class
 
 class Ais8_1_22 : public Ais8 {
  public:
-  int link_id;  // 10 bit id to match up text blocks.
+  int link_id;      // 10 bit id to match up text blocks.
   int notice_type;  // Area type / Notice Description.
-  int month;  // These are in UTC.
+  int month;        // These are in UTC.
   int day;
   int hour;
   int minute;
   int duration_minutes;  // Time from the start until the notice expires.
 
   // 1 or more sub messages
-  vector<Ais8_1_22_SubArea *> sub_areas;
+  vector<Ais8_1_22_SubArea*> sub_areas;
 
-  Ais8_1_22(const char *nmea_payload, const size_t pad);
+  Ais8_1_22(const char* nmea_payload, const size_t pad);
   ~Ais8_1_22();
 };
-ostream& operator<< (ostream& o, Ais8_1_22 const& msg);
+ostream& operator<<(ostream& o, Ais8_1_22 const& msg);
 
 // No message 8_1_23
 
@@ -1271,9 +1261,9 @@ class Ais8_1_24 : public Ais8 {
   int persons;
   int spare2;
 
-  Ais8_1_24(const char *nmea_payload, const size_t pad);
+  Ais8_1_24(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais8_1_24 &msg);
+ostream& operator<<(ostream& o, const Ais8_1_24& msg);
 
 // No message 8_1_25
 
@@ -1311,9 +1301,8 @@ class Ais8_1_26_SensorReport {
   virtual ~Ais8_1_26_SensorReport() {}
 };
 
-Ais8_1_26_SensorReport*
-ais8_1_26_sensor_report_factory(const AisBitset &bs,
-                                const size_t offset);
+Ais8_1_26_SensorReport* ais8_1_26_sensor_report_factory(const AisBitset& bs,
+                                                        const size_t offset);
 
 class Ais8_1_26_Location : public Ais8_1_26_SensorReport {
  public:
@@ -1323,7 +1312,7 @@ class Ais8_1_26_Location : public Ais8_1_26_SensorReport {
   int timeout;
   int spare;
 
-  Ais8_1_26_Location(const AisBitset &bs, const size_t offset);
+  Ais8_1_26_Location(const AisBitset& bs, const size_t offset);
   Ais8_1_26_Location() {}
   Ais8_1_26_SensorEnum getType() const { return AIS8_1_26_SENSOR_LOCATION; }
 };
@@ -1333,19 +1322,19 @@ class Ais8_1_26_Station : public Ais8_1_26_SensorReport {
   string name;
   int spare;
 
-  Ais8_1_26_Station(const AisBitset &bs, const size_t offset);
+  Ais8_1_26_Station(const AisBitset& bs, const size_t offset);
   Ais8_1_26_Station() {}
-  Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_STATION;}
+  Ais8_1_26_SensorEnum getType() const { return AIS8_1_26_SENSOR_STATION; }
 };
 
 class Ais8_1_26_Wind : public Ais8_1_26_SensorReport {
  public:
   int wind_speed;  // knots
-  int wind_gust;  // knots
+  int wind_gust;   // knots
   int wind_dir;
   int wind_gust_dir;
   int sensor_type;
-  int wind_forecast;  // knots
+  int wind_forecast;       // knots
   int wind_gust_forecast;  // knots
   int wind_dir_forecast;
   int utc_day_forecast;
@@ -1354,9 +1343,9 @@ class Ais8_1_26_Wind : public Ais8_1_26_SensorReport {
   int duration;
   int spare;
 
-  Ais8_1_26_Wind(const AisBitset &bs, const size_t offset);
+  Ais8_1_26_Wind(const AisBitset& bs, const size_t offset);
   Ais8_1_26_Wind() {}
-  Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_WIND;}
+  Ais8_1_26_SensorEnum getType() const { return AIS8_1_26_SENSOR_WIND; }
 };
 
 class Ais8_1_26_WaterLevel : public Ais8_1_26_SensorReport {
@@ -1374,9 +1363,9 @@ class Ais8_1_26_WaterLevel : public Ais8_1_26_SensorReport {
   int duration;  // minutes
   int spare;
 
-  Ais8_1_26_WaterLevel(const AisBitset &bs, const size_t offset);
+  Ais8_1_26_WaterLevel(const AisBitset& bs, const size_t offset);
   Ais8_1_26_WaterLevel() {}
-  Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_WATER_LEVEL;}
+  Ais8_1_26_SensorEnum getType() const { return AIS8_1_26_SENSOR_WATER_LEVEL; }
 };
 
 class Ais8_1_26_Curr2D_Current {
@@ -1392,9 +1381,9 @@ class Ais8_1_26_Curr2D : public Ais8_1_26_SensorReport {
   int type;
   int spare;
 
-  Ais8_1_26_Curr2D(const AisBitset &bs, const size_t offset);
+  Ais8_1_26_Curr2D(const AisBitset& bs, const size_t offset);
   Ais8_1_26_Curr2D() {}
-  Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_CURR_2D;}
+  Ais8_1_26_SensorEnum getType() const { return AIS8_1_26_SENSOR_CURR_2D; }
 };
 
 class Ais8_1_26_Curr3D_Current {
@@ -1411,18 +1400,18 @@ class Ais8_1_26_Curr3D : public Ais8_1_26_SensorReport {
   int type;
   int spare;
 
-  Ais8_1_26_Curr3D(const AisBitset &bs, const size_t offset);
+  Ais8_1_26_Curr3D(const AisBitset& bs, const size_t offset);
   Ais8_1_26_Curr3D() {}
-  Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_CURR_3D;}
+  Ais8_1_26_SensorEnum getType() const { return AIS8_1_26_SENSOR_CURR_3D; }
 };
 
 class Ais8_1_26_HorzFlow_Current {
  public:
   int bearing;  // deg
-  int dist;  // m
+  int dist;     // m
   float speed;  // knots
-  int dir;  // deg
-  int level;  // m
+  int dir;      // deg
+  int level;    // m
 };
 
 class Ais8_1_26_HorzFlow : public Ais8_1_26_SensorReport {
@@ -1430,45 +1419,45 @@ class Ais8_1_26_HorzFlow : public Ais8_1_26_SensorReport {
   Ais8_1_26_HorzFlow_Current currents[2];
   int spare;
 
-  Ais8_1_26_HorzFlow(const AisBitset &bs, const size_t offset);
+  Ais8_1_26_HorzFlow(const AisBitset& bs, const size_t offset);
   Ais8_1_26_HorzFlow() {}
-  Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_HORZ_FLOW;}
+  Ais8_1_26_SensorEnum getType() const { return AIS8_1_26_SENSOR_HORZ_FLOW; }
 };
 
 class Ais8_1_26_SeaState : public Ais8_1_26_SensorReport {
  public:
   float swell_height;
   int swell_period;  // seconds
-  int swell_dir;  // deg
+  int swell_dir;     // deg
   int sea_state;
   int swell_sensor_type;
-  float water_temp;  // C
+  float water_temp;        // C
   float water_temp_depth;  // m
   int water_sensor_type;
   float wave_height;
   int wave_period;  // seconds
-  int wave_dir;  // deg
+  int wave_dir;     // deg
   int wave_sensor_type;
   float salinity;
 
-  Ais8_1_26_SeaState(const AisBitset &bs, const size_t offset);
+  Ais8_1_26_SeaState(const AisBitset& bs, const size_t offset);
   Ais8_1_26_SeaState() {}
-  Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_SEA_STATE;}
+  Ais8_1_26_SensorEnum getType() const { return AIS8_1_26_SENSOR_SEA_STATE; }
 };
 
 class Ais8_1_26_Salinity : public Ais8_1_26_SensorReport {
  public:
-  float water_temp;  // C
+  float water_temp;    // C
   float conductivity;  // siemens/m
-  float pressure;  // decibars
-  float salinity;  // 0/00 ppt
+  float pressure;      // decibars
+  float salinity;      // 0/00 ppt
   int salinity_type;
   int sensor_type;
   int spare[2];
 
-  Ais8_1_26_Salinity(const AisBitset &bs, const size_t offset);
+  Ais8_1_26_Salinity(const AisBitset& bs, const size_t offset);
   Ais8_1_26_Salinity() {}
-  Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_SALINITY;}
+  Ais8_1_26_SensorEnum getType() const { return AIS8_1_26_SENSOR_SALINITY; }
 };
 
 class Ais8_1_26_Wx : public Ais8_1_26_SensorReport {
@@ -1476,7 +1465,7 @@ class Ais8_1_26_Wx : public Ais8_1_26_SensorReport {
   float air_temp;  // C
   int air_temp_sensor_type;
   int precip;
-  float horz_vis;  // nm
+  float horz_vis;   // nm
   float dew_point;  // C
   int dew_point_type;
   float air_pressure;  // Pascals (Pa).
@@ -1485,9 +1474,9 @@ class Ais8_1_26_Wx : public Ais8_1_26_SensorReport {
   float salinity;  // 0/00 ppt
   int spare;
 
-  Ais8_1_26_Wx(const AisBitset &bs, const size_t offset);
+  Ais8_1_26_Wx(const AisBitset& bs, const size_t offset);
   Ais8_1_26_Wx() {}
-  Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_WX;}
+  Ais8_1_26_SensorEnum getType() const { return AIS8_1_26_SENSOR_WX; }
 };
 
 class Ais8_1_26_AirDraught : public Ais8_1_26_SensorReport {
@@ -1501,21 +1490,20 @@ class Ais8_1_26_AirDraught : public Ais8_1_26_SensorReport {
   int utc_min_forecast;
   int spare;
 
-  Ais8_1_26_AirDraught(const AisBitset &bs, const size_t offset);
+  Ais8_1_26_AirDraught(const AisBitset& bs, const size_t offset);
   Ais8_1_26_AirDraught() {}
-  Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_AIR_DRAUGHT;}
+  Ais8_1_26_SensorEnum getType() const { return AIS8_1_26_SENSOR_AIR_DRAUGHT; }
 };
 
 // IMO Circ 289 Environmental
 class Ais8_1_26 : public Ais8 {
  public:
-  vector<Ais8_1_26_SensorReport *> reports;
+  vector<Ais8_1_26_SensorReport*> reports;
 
-  Ais8_1_26(const char *nmea_payload, const size_t pad);
+  Ais8_1_26(const char* nmea_payload, const size_t pad);
   ~Ais8_1_26();
 };
-ostream& operator<< (ostream &o, const Ais8_1_26 &msg);
-
+ostream& operator<<(ostream& o, const Ais8_1_26& msg);
 
 // IMO Circ 289 Route information
 class Ais8_1_27 : public Ais8 {
@@ -1530,13 +1518,11 @@ class Ais8_1_27 : public Ais8 {
   int duration;
   vector<AisPoint> waypoints;
 
-  Ais8_1_27(const char *nmea_payload, const size_t pad);
+  Ais8_1_27(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais8_1_27 &msg);
-
+ostream& operator<<(ostream& o, const Ais8_1_27& msg);
 
 //  No message 8_1_28
-
 
 // IMO Circ 289 Text description
 class Ais8_1_29 : public Ais8 {
@@ -1545,10 +1531,9 @@ class Ais8_1_29 : public Ais8 {
   string text;
   int spare2;
 
-  Ais8_1_29(const char *nmea_payload, const size_t pad);
+  Ais8_1_29(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais8_1_29 &msg);
-
+ostream& operator<<(ostream& o, const Ais8_1_29& msg);
 
 // No message 8_1_30
 
@@ -1558,12 +1543,12 @@ ostream& operator<< (ostream &o, const Ais8_1_29 &msg);
 //       x,y swapped.
 class Ais8_1_31 : public Ais8 {
  public:
-  AisPoint position;  // Opposite the bit order of 8_1_11
+  AisPoint position;      // Opposite the bit order of 8_1_11
   int position_accuracy;  // New field
   int utc_day;
   int utc_hour;
   int utc_min;
-  int wind_ave;  // kts
+  int wind_ave;   // kts
   int wind_gust;  // kts
   int wind_dir;
   int wind_gust_dir;
@@ -1572,7 +1557,7 @@ class Ais8_1_31 : public Ais8 {
   float dew_point;
   float air_pres;  // Pascals (Pa).
   int air_pres_trend;
-  float horz_vis;  // NM
+  float horz_vis;     // NM
   float water_level;  // m
   int water_level_trend;
 
@@ -1580,7 +1565,7 @@ class Ais8_1_31 : public Ais8 {
   int surf_cur_dir;
   float cur_speed_2;  // kts
   int cur_dir_2;
-  int cur_depth_2;  // m
+  int cur_depth_2;    // m
   float cur_speed_3;  // kts
   int cur_dir_3;
   int cur_depth_3;  // m
@@ -1598,9 +1583,9 @@ class Ais8_1_31 : public Ais8 {
   int ice;  // yes/no/undef/unknown
   int spare2;
 
-  Ais8_1_31(const char *nmea_payload, const size_t pad);
+  Ais8_1_31(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais8_1_31 &msg);
+ostream& operator<<(ostream& o, const Ais8_1_31& msg);
 
 // TODO(schwehr): Persons on board ITU 1371-1 8_1_40.
 
@@ -1610,7 +1595,7 @@ class Ais8_200_10 : public Ais8 {
  public:
   string eu_id;  // European Vessel ID - 8 characters
   float length;  // m
-  float beam;  // m
+  float beam;    // m
   int ship_type;
   int haz_cargo;
   float draught;
@@ -1621,59 +1606,59 @@ class Ais8_200_10 : public Ais8 {
   int heading_qual;
   int spare2;
 
-  Ais8_200_10(const char *nmea_payload, const size_t pad);
+  Ais8_200_10(const char* nmea_payload, const size_t pad);
 };
 
 // http://www.ris.eu/docs/File/536/vessel_traking_and_tracing_standard_ed1-2_ccnr_23-apr_2013_en.pdf
 // ETA at lock/bridge/terminal
 class Ais8_200_21 : public Ais8 {
  public:
-  string country;         // UN country code         0 = not available = default
-  string location;        // UN location code        0 = not available = default
-  string section;         // Fairway section number  0 = not available = default
-  string terminal;        // Terminal code           0 = not available = default
-  string hectometre;      // Fairway hectometre      0 = not available = default
+  string country;     // UN country code         0 = not available = default
+  string location;    // UN location code        0 = not available = default
+  string section;     // Fairway section number  0 = not available = default
+  string terminal;    // Terminal code           0 = not available = default
+  string hectometre;  // Fairway hectometre      0 = not available = default
   // Examples for previous fields.  See:
   // http://www.ris.eu/docs/File/427/implementation_location_code_austria.pdf
 
   // ETA at lock/bridge/terminal - Estimated Time of Arrival; MMDDHHMM UTC
-  int eta_month;          // 1 - 12;  0 = not available = default
-  int eta_day;            // 1 - 31;  0 = not available = default
-  int eta_hour;           // 0 - 23; 24 = not available = default
-  int eta_minute;         // 0 - 59; 60 = not available = default
-  int tugboats;           // 0 - 6,   7 = unknown = default
+  int eta_month;   // 1 - 12;  0 = not available = default
+  int eta_day;     // 1 - 31;  0 = not available = default
+  int eta_hour;    // 0 - 23; 24 = not available = default
+  int eta_minute;  // 0 - 59; 60 = not available = default
+  int tugboats;    // 0 - 6,   7 = unknown = default
   // Maximum present static air draught 0
-  float air_draught;      // 4000 (rest not used), in 1/100m, 0 = not used
-  int spare2;             // 5 bits  Not used, should be set to zero.
+  float air_draught;  // 4000 (rest not used), in 1/100m, 0 = not used
+  int spare2;         // 5 bits  Not used, should be set to zero.
 
-  Ais8_200_21(const char *nmea_payload, const size_t pad);
+  Ais8_200_21(const char* nmea_payload, const size_t pad);
 };
 
 // vessel_traking_and_tracing_standard_ed1-2_ccnr_23-apr_2013_en.pdf
 // RTA at lock/bridge/terminal
 class Ais8_200_22 : public Ais8 {
  public:
-  string country;         // UN country code         0 = not available
-  string location;        // UN location code        0 = not available
-  string section;         // Fairway section number  0 = not available
-  string terminal;        // Terminal code           0 = not available
-  string hectometre;      // Fairway hectometre      0 = not available
+  string country;     // UN country code         0 = not available
+  string location;    // UN location code        0 = not available
+  string section;     // Fairway section number  0 = not available
+  string terminal;    // Terminal code           0 = not available
+  string hectometre;  // Fairway hectometre      0 = not available
   // Examples for previous fields.  See:
   // http://www.ris.eu/docs/File/427/implementation_location_code_austria.pdf
 
   // RTA at lock/bridge/terminal - Recommended Time of Arrival; MMDDHHMM UTC
-  int rta_month;          //  0 = not available
-  int rta_day;            //  0 = not available
-  int rta_hour;           // 24 = not available
-  int rta_minute;         // 60 = not available
-  int lock_status;        // Lock/bridge/terminal status
-                          // 0 = operational
-                          // 1 = limited operation
-                          // 2 = out of order
-                          // 3 = not available
-  int spare2;             // Spare
+  int rta_month;    //  0 = not available
+  int rta_day;      //  0 = not available
+  int rta_hour;     // 24 = not available
+  int rta_minute;   // 60 = not available
+  int lock_status;  // Lock/bridge/terminal status
+                    // 0 = operational
+                    // 1 = limited operation
+                    // 2 = out of order
+                    // 3 = not available
+  int spare2;       // Spare
 
-  Ais8_200_22(const char *nmea_payload, const size_t pad);
+  Ais8_200_22(const char* nmea_payload, const size_t pad);
 };
 
 // ECE-TRANS-SC3-2006-10e-RIS.pdf - River Information System
@@ -1699,7 +1684,7 @@ class Ais8_200_23 : public Ais8 {
   int wind_dir;  // EMMA CODE
   int spare2;
 
-  Ais8_200_23(const char *nmea_payload, const size_t pad);
+  Ais8_200_23(const char* nmea_payload, const size_t pad);
 };
 
 // ECE-TRANS-SC3-2006-10e-RIS.pdf - River Information System
@@ -1712,7 +1697,7 @@ class Ais8_200_24 : public Ais8 {
   std::array<int, 4> gauge_ids;
   std::array<float, 4> levels;  // m
 
-  Ais8_200_24(const char *nmea_payload, const size_t pad);
+  Ais8_200_24(const char* nmea_payload, const size_t pad);
 };
 
 // ECE-TRANS-SC3-2006-10e-RIS.pdf - River Information System
@@ -1727,7 +1712,7 @@ class Ais8_200_40 : public Ais8 {
   // TODO(schwehr): int status[9];  // WTF is the encoding for this?
   int spare2;
 
-  Ais8_200_40(const char *nmea_payload, const size_t pad);
+  Ais8_200_40(const char* nmea_payload, const size_t pad);
 };
 
 // ECE-TRANS-SC3-2006-10e-RIS.pdf - River Information System
@@ -1739,7 +1724,7 @@ class Ais8_200_55 : public Ais8 {
   int yet_more_personnel;
   std::array<int, 3> spare2;  // 51 spare bits.
 
-  Ais8_200_55(const char *nmea_payload, const size_t pad);
+  Ais8_200_55(const char* nmea_payload, const size_t pad);
 };
 
 enum Ais8_366_22_AreaShapeEnum {
@@ -1754,17 +1739,16 @@ enum Ais8_366_22_AreaShapeEnum {
   AIS8_366_22_SHAPE_RESERVED_7 = 7
 };
 
-extern const char *shape_names[8];
+extern const char* shape_names[8];
 
 class Ais8_366_22_SubArea {
  public:
-    virtual Ais8_366_22_AreaShapeEnum getType() = 0;
-    virtual ~Ais8_366_22_SubArea() { }
+  virtual Ais8_366_22_AreaShapeEnum getType() = 0;
+  virtual ~Ais8_366_22_SubArea() {}
 };
 
-Ais8_366_22_SubArea*
-ais8_366_22_subarea_factory(const AisBitset &bs,
-                            const size_t offset);
+Ais8_366_22_SubArea* ais8_366_22_subarea_factory(const AisBitset& bs,
+                                                 const size_t offset);
 
 // or Point if radius is 0
 class Ais8_366_22_Circle : public Ais8_366_22_SubArea {
@@ -1774,9 +1758,9 @@ class Ais8_366_22_Circle : public Ais8_366_22_SubArea {
   int radius_m;
   unsigned int spare;
 
-  Ais8_366_22_Circle(const AisBitset &bs, const size_t offset);
+  Ais8_366_22_Circle(const AisBitset& bs, const size_t offset);
   ~Ais8_366_22_Circle() {}
-  Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_CIRCLE;}
+  Ais8_366_22_AreaShapeEnum getType() { return AIS8_366_22_SHAPE_CIRCLE; }
 };
 
 class Ais8_366_22_Rect : public Ais8_366_22_SubArea {
@@ -1785,12 +1769,12 @@ class Ais8_366_22_Rect : public Ais8_366_22_SubArea {
   // TODO(schwehr): int precision
   int e_dim_m;  // East dimension in meters
   int n_dim_m;
-  int orient_deg;  // Orientation in degrees from true north
+  int orient_deg;      // Orientation in degrees from true north
   unsigned int spare;  // 5 bits
 
-  Ais8_366_22_Rect(const AisBitset &bs, const size_t offset);
+  Ais8_366_22_Rect(const AisBitset& bs, const size_t offset);
   ~Ais8_366_22_Rect() {}
-  Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_RECT;}
+  Ais8_366_22_AreaShapeEnum getType() { return AIS8_366_22_SHAPE_RECT; }
 };
 
 class Ais8_366_22_Sector : public Ais8_366_22_SubArea {
@@ -1802,9 +1786,9 @@ class Ais8_366_22_Sector : public Ais8_366_22_SubArea {
   int right_bound_deg;
   // TODO(schwehr): spare?
 
-  Ais8_366_22_Sector(const AisBitset &bs, const size_t offset);
+  Ais8_366_22_Sector(const AisBitset& bs, const size_t offset);
   ~Ais8_366_22_Sector() {}
-  Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_SECTOR;}
+  Ais8_366_22_AreaShapeEnum getType() { return AIS8_366_22_SHAPE_SECTOR; }
 };
 
 // Or Waypoint
@@ -1819,9 +1803,9 @@ class Ais8_366_22_Polyline : public Ais8_366_22_SubArea {
   vector<float> dists_m;
   unsigned int spare;
 
-  Ais8_366_22_Polyline(const AisBitset &bs, const size_t offset);
+  Ais8_366_22_Polyline(const AisBitset& bs, const size_t offset);
   ~Ais8_366_22_Polyline() {}
-  Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_POLYLINE;}
+  Ais8_366_22_AreaShapeEnum getType() { return AIS8_366_22_SHAPE_POLYLINE; }
 };
 
 class Ais8_366_22_Polygon : public Ais8_366_22_SubArea {
@@ -1834,9 +1818,9 @@ class Ais8_366_22_Polygon : public Ais8_366_22_SubArea {
   vector<float> dists_m;
   unsigned int spare;
 
-  Ais8_366_22_Polygon(const AisBitset &bs, const size_t offset);
+  Ais8_366_22_Polygon(const AisBitset& bs, const size_t offset);
   ~Ais8_366_22_Polygon() {}
-  Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_POLYGON;}
+  Ais8_366_22_AreaShapeEnum getType() { return AIS8_366_22_SHAPE_POLYGON; }
 };
 
 class Ais8_366_22_Text : public Ais8_366_22_SubArea {
@@ -1844,32 +1828,32 @@ class Ais8_366_22_Text : public Ais8_366_22_SubArea {
   string text;
   unsigned int spare;  // 3 bits
 
-  Ais8_366_22_Text(const AisBitset &bs, const size_t offset);
+  Ais8_366_22_Text(const AisBitset& bs, const size_t offset);
   ~Ais8_366_22_Text() {}
-  Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_TEXT;}
+  Ais8_366_22_AreaShapeEnum getType() { return AIS8_366_22_SHAPE_TEXT; }
 };
 
 class Ais8_366_22 : public Ais8 {
  public:
   // Common block at the front
-  int link_id;  // 10 bit id to match up text blocks
+  int link_id;      // 10 bit id to match up text blocks
   int notice_type;  // area_type / Notice Description
-  int month;  // These really are in utc
+  int month;        // These really are in utc
   int day;
   int utc_hour;
   int utc_minute;
   int duration_minutes;  // Time from the start until the notice expires
   // 1 or more sub messages
 
-  vector<Ais8_366_22_SubArea *> sub_areas;
+  vector<Ais8_366_22_SubArea*> sub_areas;
 
-  Ais8_366_22(const char *nmea_payload, const size_t pad);
+  Ais8_366_22(const char* nmea_payload, const size_t pad);
   ~Ais8_366_22();
 };
-ostream& operator<< (ostream& o, Ais8_366_22 const& msg);
+ostream& operator<<(ostream& o, Ais8_366_22 const& msg);
 
 const size_t AIS8_366_22_NUM_NAMES = 128;
-extern const char *ais8_366_22_notice_names[AIS8_366_22_NUM_NAMES];
+extern const char* ais8_366_22_notice_names[AIS8_366_22_NUM_NAMES];
 
 // 366 34 - Kurt older whale message 2008-2010
 // TODO(schwehr): Ais8_366_34
@@ -1879,18 +1863,17 @@ class Ais8_366_56 : public Ais8 {
  public:
   vector<unsigned char> encrypted;
 
-  Ais8_366_56(const char *nmea_payload, const size_t pad);
+  Ais8_366_56(const char* nmea_payload, const size_t pad);
 };
 
 class Ais8_367_22_SubArea {
  public:
   virtual Ais8_366_22_AreaShapeEnum getType() const = 0;
-  virtual ~Ais8_367_22_SubArea() { }
+  virtual ~Ais8_367_22_SubArea() {}
 };
 
-Ais8_367_22_SubArea*
-ais8_367_22_subarea_factory(const AisBitset &bs,
-                            const size_t offset);
+Ais8_367_22_SubArea* ais8_367_22_subarea_factory(const AisBitset& bs,
+                                                 const size_t offset);
 
 class Ais8_367_22_Circle : public Ais8_367_22_SubArea {
  public:
@@ -1899,9 +1882,9 @@ class Ais8_367_22_Circle : public Ais8_367_22_SubArea {
   int radius_m;
   unsigned int spare;
 
-  Ais8_367_22_Circle(const AisBitset &bs, const size_t offset);
+  Ais8_367_22_Circle(const AisBitset& bs, const size_t offset);
   ~Ais8_367_22_Circle() {}
-  Ais8_366_22_AreaShapeEnum getType() const {return AIS8_366_22_SHAPE_CIRCLE;}
+  Ais8_366_22_AreaShapeEnum getType() const { return AIS8_366_22_SHAPE_CIRCLE; }
 };
 
 class Ais8_367_22_Rect : public Ais8_367_22_SubArea {
@@ -1913,9 +1896,9 @@ class Ais8_367_22_Rect : public Ais8_367_22_SubArea {
   int orient_deg;
   unsigned int spare;
 
-  Ais8_367_22_Rect(const AisBitset &bs, const size_t offset);
+  Ais8_367_22_Rect(const AisBitset& bs, const size_t offset);
   ~Ais8_367_22_Rect() {}
-  Ais8_366_22_AreaShapeEnum getType() const {return AIS8_366_22_SHAPE_RECT;}
+  Ais8_366_22_AreaShapeEnum getType() const { return AIS8_366_22_SHAPE_RECT; }
 };
 
 class Ais8_367_22_Sector : public Ais8_367_22_SubArea {
@@ -1927,9 +1910,9 @@ class Ais8_367_22_Sector : public Ais8_367_22_SubArea {
   int right_bound_deg;
   int spare;
 
-  Ais8_367_22_Sector(const AisBitset &bs, const size_t offset);
+  Ais8_367_22_Sector(const AisBitset& bs, const size_t offset);
   ~Ais8_367_22_Sector() {}
-  Ais8_366_22_AreaShapeEnum getType() const {return AIS8_366_22_SHAPE_SECTOR;}
+  Ais8_366_22_AreaShapeEnum getType() const { return AIS8_366_22_SHAPE_SECTOR; }
 };
 
 // Polyline or Polygon
@@ -1944,10 +1927,11 @@ class Ais8_367_22_Poly : public Ais8_367_22_SubArea {
   vector<float> dists_m;
   unsigned int spare;
 
-  Ais8_367_22_Poly(const AisBitset &bs, const size_t offset,
+  Ais8_367_22_Poly(const AisBitset& bs,
+                   const size_t offset,
                    Ais8_366_22_AreaShapeEnum area_shape);
   ~Ais8_367_22_Poly() {}
-  Ais8_366_22_AreaShapeEnum getType() const {return shape;}
+  Ais8_366_22_AreaShapeEnum getType() const { return shape; }
 };
 
 class Ais8_367_22_Text : public Ais8_367_22_SubArea {
@@ -1955,9 +1939,9 @@ class Ais8_367_22_Text : public Ais8_367_22_SubArea {
   string text;
   unsigned int spare;  // 3 bits
 
-  Ais8_367_22_Text(const AisBitset &bs, const size_t offset);
+  Ais8_367_22_Text(const AisBitset& bs, const size_t offset);
   ~Ais8_367_22_Text() {}
-  Ais8_366_22_AreaShapeEnum getType() const {return AIS8_366_22_SHAPE_TEXT;}
+  Ais8_366_22_AreaShapeEnum getType() const { return AIS8_366_22_SHAPE_TEXT; }
 };
 
 class Ais8_367_22 : public Ais8 {
@@ -1972,12 +1956,12 @@ class Ais8_367_22 : public Ais8 {
   int duration_minutes;
   int spare2;
 
-  vector<Ais8_367_22_SubArea *> sub_areas;
+  vector<Ais8_367_22_SubArea*> sub_areas;
 
-  Ais8_367_22(const char *nmea_payload, const size_t pad);
+  Ais8_367_22(const char* nmea_payload, const size_t pad);
   ~Ais8_367_22();
 };
-ostream& operator<< (ostream& o, Ais8_367_22 const& msg);
+ostream& operator<<(ostream& o, Ais8_367_22 const& msg);
 
 class Ais9 : public AisMsg {
  public:
@@ -2026,9 +2010,9 @@ class Ais9 : public AisMsg {
   bool keep_flag_valid;
   bool keep_flag;
 
-  Ais9(const char *nmea_payload, const size_t pad);
+  Ais9(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais9 &msg);
+ostream& operator<<(ostream& o, const Ais9& msg);
 
 // 10 ":" - UTC and date inquiry
 class Ais10 : public AisMsg {
@@ -2037,9 +2021,9 @@ class Ais10 : public AisMsg {
   int dest_mmsi;
   int spare2;
 
-  Ais10(const char *nmea_payload, const size_t pad);
+  Ais10(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais10 &msg);
+ostream& operator<<(ostream& o, const Ais10& msg);
 
 // 11 ';' - See 4_11
 
@@ -2053,9 +2037,9 @@ class Ais12 : public AisMsg {
   string text;
   int spare2;
 
-  Ais12(const char *nmea_payload, const size_t pad);
+  Ais12(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais12 &msg);
+ostream& operator<<(ostream& o, const Ais12& msg);
 
 // 13 '=' - See 7
 
@@ -2066,9 +2050,9 @@ class Ais14 : public AisMsg {
   string text;
   int spare2;
 
-  Ais14(const char *nmea_payload, const size_t pad);
+  Ais14(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais14 &msg);
+ostream& operator<<(ostream& o, const Ais14& msg);
 
 // 15 - '?' - Interrogation
 class Ais15 : public AisMsg {
@@ -2088,9 +2072,9 @@ class Ais15 : public AisMsg {
   int slot_offset_2;
   int spare4;
 
-  Ais15(const char *nmea_payload, const size_t pad);
+  Ais15(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais15 &msg);
+ostream& operator<<(ostream& o, const Ais15& msg);
 
 // 16 - '@' - Assigned mode command
 class Ais16 : public AisMsg {
@@ -2104,9 +2088,9 @@ class Ais16 : public AisMsg {
   int inc_b;
   int spare2;
 
-  Ais16(const char *nmea_payload, const size_t pad);
+  Ais16(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais16 &msg);
+ostream& operator<<(ostream& o, const Ais16& msg);
 
 // ITU-R M.823  http://www.itu.int/rec/R-REC-M.823/en
 // 17 - 'A' - GNSS broacast - TODO(schwehr): only partially coded
@@ -2123,10 +2107,9 @@ class Ais17 : public AisMsg {
   int health;
   // TODO(schwehr): Handle payload
 
-  Ais17(const char *nmea_payload, const size_t pad);
+  Ais17(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais17 &msg);
-
+ostream& operator<<(ostream& o, const Ais17& msg);
 
 // 18 - 'B' - Class B position report
 class Ais18 : public AisMsg {
@@ -2184,9 +2167,9 @@ class Ais18 : public AisMsg {
   bool commstate_cs_fill_valid;
   int commstate_cs_fill;
 
-  Ais18(const char *nmea_payload, const size_t pad);
+  Ais18(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais18 &msg);
+ostream& operator<<(ostream& o, const Ais18& msg);
 
 // 19 - 'C' - Class B extended ship and position
 class Ais19 : public AisMsg {
@@ -2211,9 +2194,9 @@ class Ais19 : public AisMsg {
   int assigned_mode;
   int spare3;
 
-  Ais19(const char *nmea_payload, const size_t pad);
+  Ais19(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais19 &msg);
+ostream& operator<<(ostream& o, const Ais19& msg);
 
 // 20 - 'D' - Data link management
 // TODO(schwehr): consider a vector
@@ -2245,9 +2228,9 @@ class Ais20 : public AisMsg {
 
   int spare2;
 
-  Ais20(const char *nmea_payload, const size_t pad);
+  Ais20(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais20 &msg);
+ostream& operator<<(ostream& o, const Ais20& msg);
 
 // 21 - 'E' - Aids to navigation report
 class Ais21 : public AisMsg {
@@ -2271,9 +2254,9 @@ class Ais21 : public AisMsg {
   // Extended name goes on the end of name
   int spare2;
 
-  Ais21(const char *nmea_payload, const size_t pad);
+  Ais21(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais21 &msg);
+ostream& operator<<(ostream& o, const Ais21& msg);
 
 // 22 - 'F' - Channel Management
 class Ais22 : public AisMsg {
@@ -2300,9 +2283,9 @@ class Ais22 : public AisMsg {
 
   int spare2;  // Lame that they make a huge spare here.  Bad bad bad
 
-  Ais22(const char *nmea_payload, const size_t pad);
+  Ais22(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais22 &msg);
+ostream& operator<<(ostream& o, const Ais22& msg);
 
 // 23 - 'G' - Group Assignment Command
 class Ais23 : public AisMsg {
@@ -2320,9 +2303,9 @@ class Ais23 : public AisMsg {
   int quiet;
   int spare3;
 
-  Ais23(const char *nmea_payload, const size_t pad);
+  Ais23(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais23 &msg);
+ostream& operator<<(ostream& o, const Ais23& msg);
 
 // 24 - 'H' - Class B Static Data report
 class Ais24 : public AisMsg {
@@ -2345,9 +2328,9 @@ class Ais24 : public AisMsg {
   // Part C - Not defined by ITU 1371-5
   // Part D - Not defined by ITU 1371-5
 
-  Ais24(const char *nmea_payload, const size_t pad);
+  Ais24(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais24 &msg);
+ostream& operator<<(ostream& o, const Ais24& msg);
 
 // 25 - 'I' - Single slot binary message - addressed or broadcast
 // TODO(schwehr): handle payload
@@ -2363,9 +2346,9 @@ class Ais25 : public AisMsg {
   int dac;  // valid if use_app_id is true
   int fi;
 
-  Ais25(const char *nmea_payload, const size_t pad);
+  Ais25(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais25 &msg);
+ostream& operator<<(ostream& o, const Ais25& msg);
 
 // 26 - 'J' - Multi slot binary message with comm state
 // TODO(schwehr): handle payload
@@ -2413,9 +2396,9 @@ class Ais26 : public AisMsg {
   bool keep_flag_valid;
   bool keep_flag;
 
-  Ais26(const char *nmea_payload, const size_t pad);
+  Ais26(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais26 &msg);
+ostream& operator<<(ostream& o, const Ais26& msg);
 
 // 27 - 'K' - Long-range position report - e.g. for satellite receivers
 class Ais27 : public AisMsg {
@@ -2424,14 +2407,14 @@ class Ais27 : public AisMsg {
   bool raim;
   int nav_status;
   AisPoint position;
-  int sog;  // Knots.
-  int cog;  // Degrees.
+  int sog;    // Knots.
+  int cog;    // Degrees.
   bool gnss;  // warning: bits in AIS are flipped sense
   int spare;
 
-  Ais27(const char *nmea_payload, const size_t pad);
+  Ais27(const char* nmea_payload, const size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais27 &msg);
+ostream& operator<<(ostream& o, const Ais27& msg);
 
 }  // namespace libais
 

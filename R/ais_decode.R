@@ -28,7 +28,7 @@
 #' nmea_lines[1:10]
 #' 
 #' # decoding a file =====================================================================
-#' ais_decode_nmea(nmea_file)
+#' ais_decode_filter(nmea_file, msg_type = ais_msgs$msg_1_2_3)
 #' 
 #' @export
 ais_decode_filter <- function(msgs,
@@ -48,9 +48,9 @@ ais_decode_filter <- function(msgs,
     
     if (data_type == "auto") {
         if (all(file.exists(msgs))) {
-            if (length(msgs) != 1L) {
-                stop("Multiple files are not yet supported.")
-            }
+            # if (length(msgs) != 1L) {
+            #     stop("Multiple files are not yet supported.")
+            # }
             data_type <- "file"
             msgs <- path.expand(msgs)
         } else if (length(msgs) > 2L) {

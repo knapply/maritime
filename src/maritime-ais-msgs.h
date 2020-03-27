@@ -25,7 +25,7 @@ class AIS_Msgs {
  public:
   // AIS_Msgs(){};
 
-  AIS_Msgs(const int n)
+  explicit AIS_Msgs(const int n)
       : message_id(n, NA_INTEGER),
         repeat_indicator(n, NA_INTEGER),
         mmsi(n, NA_INTEGER){};
@@ -92,7 +92,7 @@ class Msgs_1_2_3 : public AIS_Msgs<libais::Ais1_2_3> {
   vec_lgl keep_flag;
 
  public:
-  Msgs_1_2_3(const int n)
+  explicit Msgs_1_2_3(const int n)
       : AIS_Msgs::AIS_Msgs(n),
         rot_over_range(n, NA_INTEGER),
         rot(n, NA_REAL),
@@ -219,7 +219,7 @@ class Msgs_4_11 : public AIS_Msgs<libais::Ais4_11> {
   vec_int slot_offset;
 
  public:
-  Msgs_4_11(const int n)
+  explicit Msgs_4_11(const int n)
       : AIS_Msgs::AIS_Msgs(n),
         year(n, NA_INTEGER),
         month(n, NA_INTEGER),

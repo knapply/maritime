@@ -29,6 +29,7 @@ VignetteBuilder: knitr
 Depends: R (>= 3.6)
 SystemRequirements: C++11
 LinkingTo:
+    BH,
     Rcpp,
     RcppProgress,
     rmio

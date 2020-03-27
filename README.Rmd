@@ -106,15 +106,29 @@ ais_sf_tbl
 
 
 ```{r, eval=FALSE, echo=FALSE}
-library(maritime)
-nmea_file <- "inst/example-data/big-files/20181210.log"
-paste(round(file.size(nmea_file) / 1e9, 2L), "GB")
+# library(maritime)
+files <- dir("inst/example-data/big-files/", full.names = TRUE)
+# lines1 <- readr::read_lines(files[[1]])
+all_lines <- c(readr::read_lines(files[[1]]), readr::read_lines(files[[2]]))
+# cumsum(nchar(lines1))
+# lines2 <- readr::read_lines(files[[2]])
+# all_lines <- c(lines1, lines2)
+# max(nchar(all_lines))
+# range(nchar(all_lines))
+# hist(nchar(all_lines))
+# 
+# 
+# files <- rep(files, 3)
+# length(files)
+# paste(round(sum(file.size(files)) / 1e9, 2L), "GB")
 
-test <- ais_decode_filter(nmea_file, msg_type = ais_msgs$msg_4_11)
-
+test <- .ais_stream_test(files)
+scales::comma(length(test))
 bench_mark <- bench::mark(
-  file = decoded <- ais_decode_filter(nmea_file, as_tibble = FALSE, 
-                                    as_sf = FALSE, verbose = FALSE),
+  file = decoded <- ais_decode_filter(
+    files, 
+    as_tibble = FALSE, as_sf = FALSE, verbose = FALSE
+  ),
   iterations = 1,
   check = FALSE
 )
@@ -138,3 +152,23 @@ Message 5, single line
 !BSVDM,2,1,9,A,53KPtl01pv8`tTtR22050thhtr2222222222220l1`A916Vh0;20DPSmD`0D,0*21
 ```
 
+more message 5s
+
+```
+!AIVDM,2,1,0,A,58wt8Ui`g??r21`7S=:22058<v05Htp000000015>8OA;0sk,0*7B 
+!AIVDM,2,2,0,A,eQ8823mDm3kP00000000000,2*5D
+
+# nchar("58wt8Ui`g??r21`7S=:22058<v05Htp000000015>8OA;0skeQ8823mDm3kP00000000000")
+# 71
+```
+
+$$C_c(i,G)=\frac{1}{n}\sum_{j \neq i} \frac{1}{d(i, j)}$$
+CC(i, G) =
+1
+N
+Õ
+j,i
+1
+d(i, j)
+,
+$$

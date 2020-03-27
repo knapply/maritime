@@ -17,3 +17,7 @@ ais_version <- function() {
     .Call(`_maritime_ais_decode_filter_file_impl`, file_path, msg_type, as_tibble, as_sf, verbose)
 }
 
+.ais_stream_test <- function(file_path) {
+    .Call(`_maritime_ais_stream_test`, file_path)
+}
+

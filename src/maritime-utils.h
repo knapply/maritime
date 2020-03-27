@@ -1,11 +1,14 @@
 #ifndef MARITIME_UTILS_HPP
 #define MARITIME_UTILS_HPP
 
+#include "maritime.h"
+
 namespace maritime {
 
-inline void handle_mmap_error(const std::error_code& error) {
+inline void handle_error(const std::string& message,
+                         const std::error_code& error) {
   const auto& errmsg = error.message();
-  Rcpp::stop("error mapping file: %s, exiting...\n", errmsg.c_str());
+  Rcpp::stop(message.c_str(), errmsg.c_str());
 }
 
 inline void rstrip(std::string& s) {
@@ -125,14 +128,13 @@ inline void _as_sf(Rcpp::List& x) {
   // col_names.push_back("geometry");
   // x.attr("names") = col_names;
   // x.push_back(geometry);
-  auto agr_attr= vec_int(x.size(), NA_INTEGER);
+  auto agr_attr = vec_int(x.size(), NA_INTEGER);
   agr_attr.attr(".Label") = vec_chr{"constant", "aggregate", "identity"};
   agr_attr.attr("class") = "factor";
   x.attr("agr") = agr_attr;
 
   x["geometry"] = sfc;
   x.attr("sf_column") = "geometry";
-
 
   // const vec_chr old_class = x.attr("class");
   // vec_chr new_class(old_class.size() + 1);

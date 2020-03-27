@@ -67,7 +67,7 @@ nmea_lines <- readLines(nmea_file, warn = FALSE)
 nmea_lines[1:10]
 
 # decoding a file =====================================================================
-ais_decode_nmea(nmea_file)
+ais_decode_filter(nmea_file, msg_type = ais_msgs$msg_1_2_3)
 
 }
 \author{
