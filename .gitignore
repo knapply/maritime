@@ -6,3 +6,6 @@
 *.so
 *.dll
 inst/example-data/big-files
+.idea
+CMakeLists.txt
+cmake-build-debug

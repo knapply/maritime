@@ -1,7 +1,11 @@
-#ifndef MARITIME_AIS_MSGS_HPP
-#define MARITIME_AIS_MSGS_HPP
+#ifndef MARITIME_AIS_MSGS_H
+#define MARITIME_AIS_MSGS_H
 
-#include "maritime.h"
+// #include "maritime.h"
+
+// #include "ais.h"
+#include "maritime-ais.h"
+#include "maritime-utils.h"
 
 namespace maritime {
 namespace ais {
@@ -10,13 +14,12 @@ template <class msg_T>
 class AIS_Msgs {
  public:
   int common_row_index = 0;
-  vec_int seq_out;
 
-  const vec_chr common_field_names{
-      "message_id",
-      "repeat_indicator",
-      "mmsi",
-  };
+  // const vec_chr common_field_names{
+  //     "message_id",
+  //     "repeat_indicator",
+  //     "mmsi",
+  // };
 
   vec_int message_id;
   vec_int repeat_indicator;
@@ -30,7 +33,7 @@ class AIS_Msgs {
         repeat_indicator(n, NA_INTEGER),
         mmsi(n, NA_INTEGER){};
 
-  bool push(const msg_T& msg) {
+  bool init_push(const msg_T& msg) {
     const auto success = !msg.had_error();
 
     if (success) {
@@ -44,23 +47,13 @@ class AIS_Msgs {
     return success;
   };
 
-  void set_seq_out() {
-    std::vector<int> seq_out(this->common_row_index);
-    for (int i = 0; i < this->common_row_index; ++i) {
-      seq_out[i] = i;
-    }
-    this->seq_out = seq_out;
-  }
+  Rcpp::List init_as_list() const {
+    const auto seq_out = Rcpp::seq_len(this->common_row_index);
 
-  Rcpp::List as_list() {
-    this->set_seq_out();
-
-    Rcpp::List out(common_field_names.size());
-    out.attr("names") = common_field_names;
-
-    out["message_id"] = this->message_id[this->seq_out];
-    out["repeat_indicator"] = this->repeat_indicator[this->seq_out];
-    out["mmsi"] = this->mmsi[this->seq_out];
+    Rcpp::List out;
+    out["message_id"] = this->message_id[seq_out];
+    out["repeat_indicator"] = this->repeat_indicator[seq_out];
+    out["mmsi"] = this->mmsi[seq_out];
 
     return out;
   };
@@ -118,16 +111,9 @@ class Msgs_1_2_3 : public AIS_Msgs<libais::Ais1_2_3> {
         slots_to_allocate(n, NA_INTEGER),
         keep_flag(n, NA_LOGICAL){};
 
-  static Msgs_1_2_3 from_nmea(const std::string& nmea) {
-    auto out = Msgs_1_2_3(1);
-    const libais::Ais1_2_3 msg(nmea.c_str(), 0);
-    out.push(msg);
-    return out;
-  };
-
   void push(const libais::Ais1_2_3& msg) {
     const auto row_index = AIS_Msgs::common_row_index;
-    const auto push_success = AIS_Msgs::push(msg);
+    const auto push_success = AIS_Msgs::init_push(msg);
 
     if (!push_success) {
       return;
@@ -158,39 +144,40 @@ class Msgs_1_2_3 : public AIS_Msgs<libais::Ais1_2_3> {
     this->keep_flag[row_index] = msg.keep_flag;
   };
 
-  Rcpp::List as_list() {
-    auto out = AIS_Msgs::as_list();
+  Rcpp::List as_list() const {
+    auto out = AIS_Msgs::init_as_list();
+    const auto seq_out = Rcpp::seq_len(this->common_row_index);
 
-    out["rot_over_range"] = this->rot_over_range[this->seq_out];
-    out["rot"] = this->rot[this->seq_out];
-    out["sog"] = this->sog[this->seq_out];
-    out["position_accuracy"] = this->position_accuracy[this->seq_out];
-    out["lng_deg"] = this->lng_deg[this->seq_out];
-    out["lat_deg"] = this->lat_deg[this->seq_out];
-    out["cog"] = this->cog[this->seq_out];
-    out["true_heading"] = this->true_heading[this->seq_out];
-    out["timestamp"] = this->timestamp[this->seq_out];
-    out["special_manoeuvre"] = this->special_manoeuvre[this->seq_out];
-    out["spare"] = this->spare[this->seq_out];
-    out["raim"] = this->raim[this->seq_out];
-    out["sync_state"] = this->sync_state[this->seq_out];
-    out["slot_timeout"] = this->slot_timeout[this->seq_out];
-    out["received_stations"] = this->received_stations[this->seq_out];
-    out["slot_number"] = this->slot_number[this->seq_out];
-    out["utc_hour"] = this->utc_hour[this->seq_out];
-    out["utc_min"] = this->utc_min[this->seq_out];
-    out["utc_spare"] = this->utc_spare[this->seq_out];
-    out["slot_offset"] = this->slot_offset[this->seq_out];
-    out["slot_increment"] = this->slot_increment[this->seq_out];
-    out["slots_to_allocate"] = this->slots_to_allocate[this->seq_out];
-    out["keep_flag"] = this->keep_flag[this->seq_out];
+    out["rot_over_range"] = this->rot_over_range[seq_out];
+    out["rot"] = this->rot[seq_out];
+    out["sog"] = this->sog[seq_out];
+    out["position_accuracy"] = this->position_accuracy[seq_out];
+    out["lng_deg"] = this->lng_deg[seq_out];
+    out["lat_deg"] = this->lat_deg[seq_out];
+    out["cog"] = this->cog[seq_out];
+    out["true_heading"] = this->true_heading[seq_out];
+    out["timestamp"] = this->timestamp[seq_out];
+    out["special_manoeuvre"] = this->special_manoeuvre[seq_out];
+    out["spare"] = this->spare[seq_out];
+    out["raim"] = this->raim[seq_out];
+    out["sync_state"] = this->sync_state[seq_out];
+    out["slot_timeout"] = this->slot_timeout[seq_out];
+    out["received_stations"] = this->received_stations[seq_out];
+    out["slot_number"] = this->slot_number[seq_out];
+    out["utc_hour"] = this->utc_hour[seq_out];
+    out["utc_min"] = this->utc_min[seq_out];
+    out["utc_spare"] = this->utc_spare[seq_out];
+    out["slot_offset"] = this->slot_offset[seq_out];
+    out["slot_increment"] = this->slot_increment[seq_out];
+    out["slots_to_allocate"] = this->slots_to_allocate[seq_out];
+    out["keep_flag"] = this->keep_flag[seq_out];
 
     return out;
   };
 
-  Rcpp::List as_df(const bool as_tibble, const bool as_sf) {
+  Rcpp::List as_df() const {
     auto out = this->as_list();
-    finalize_df(out, this->seq_out, as_tibble, as_sf);
+    finalize_df(out, this->common_row_index);
     return out;
   };
 };
@@ -245,7 +232,7 @@ class Msgs_4_11 : public AIS_Msgs<libais::Ais4_11> {
 
   void push(const libais::Ais4_11& msg) {
     const auto row_index = AIS_Msgs::common_row_index;
-    const auto push_success = AIS_Msgs::push(msg);
+    const auto push_success = AIS_Msgs::init_push(msg);
 
     if (!push_success) {
       return;
@@ -282,37 +269,38 @@ class Msgs_4_11 : public AIS_Msgs<libais::Ais4_11> {
     }
   };
 
-  Rcpp::List as_list() {
-    auto out = AIS_Msgs::as_list();
+  Rcpp::List as_list() const {
+    auto out = AIS_Msgs::init_as_list();
+    const auto seq_out = Rcpp::seq_len(this->common_row_index);
 
-    out["year"] = this->year[this->seq_out];
-    out["month"] = this->month[this->seq_out];
-    out["day"] = this->day[this->seq_out];
-    out["hour"] = this->hour[this->seq_out];
-    out["minute"] = this->minute[this->seq_out];
-    out["second"] = this->second[this->seq_out];
-    out["position_accuracy"] = this->position_accuracy[this->seq_out];
-    out["lng_deg"] = this->lng_deg[this->seq_out];
-    out["lat_deg"] = this->lat_deg[this->seq_out];
-    out["fix_type"] = this->fix_type[this->seq_out];
-    out["transmission_ctl"] = this->transmission_ctl[this->seq_out];
-    out["spare"] = this->spare[this->seq_out];
-    out["raim"] = this->raim[this->seq_out];
-    out["sync_state"] = this->sync_state[this->seq_out];
-    out["slot_timeout"] = this->slot_timeout[this->seq_out];
-    out["received_stations"] = this->received_stations[this->seq_out];
-    out["slot_number"] = this->slot_number[this->seq_out];
-    out["utc_hour"] = this->utc_hour[this->seq_out];
-    out["utc_min"] = this->utc_min[this->seq_out];
-    out["utc_spare"] = this->utc_spare[this->seq_out];
-    out["slot_offset"] = this->slot_offset[this->seq_out];
+    out["year"] = this->year[seq_out];
+    out["month"] = this->month[seq_out];
+    out["day"] = this->day[seq_out];
+    out["hour"] = this->hour[seq_out];
+    out["minute"] = this->minute[seq_out];
+    out["second"] = this->second[seq_out];
+    out["position_accuracy"] = this->position_accuracy[seq_out];
+    out["lng_deg"] = this->lng_deg[seq_out];
+    out["lat_deg"] = this->lat_deg[seq_out];
+    out["fix_type"] = this->fix_type[seq_out];
+    out["transmission_ctl"] = this->transmission_ctl[seq_out];
+    out["spare"] = this->spare[seq_out];
+    out["raim"] = this->raim[seq_out];
+    out["sync_state"] = this->sync_state[seq_out];
+    out["slot_timeout"] = this->slot_timeout[seq_out];
+    out["received_stations"] = this->received_stations[seq_out];
+    out["slot_number"] = this->slot_number[seq_out];
+    out["utc_hour"] = this->utc_hour[seq_out];
+    out["utc_min"] = this->utc_min[seq_out];
+    out["utc_spare"] = this->utc_spare[seq_out];
+    out["slot_offset"] = this->slot_offset[seq_out];
 
     return out;
   };
 
-  Rcpp::List as_df(const bool as_tibble, const bool as_sf) {
+  Rcpp::List as_df() const {
     auto out = this->as_list();
-    finalize_df(out, this->seq_out, as_tibble, as_sf);
+    finalize_df(out, this->common_row_index);
     return out;
   };
 };

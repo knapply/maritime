@@ -1,6 +1,7 @@
+#include <fstream>
+#include <mio/mmap.hpp>
+#include "vdm.h"
 #include "maritime.h"
-
-
 //' `libais` Version Information
 //'
 //' Version info for [libais](https://github.com/schwehr/libais).
@@ -17,8 +18,25 @@ Rcpp::List ais_version() {
   return out;
 }
 
+// [[Rcpp::export(.bullshit)]]
+std::vector<int> bullshit(std::vector<std::string> x) {
+  libais::VdmStream stream;
 
+  for (auto& l : x) {
+    if (stream.AddLine(l)) {
+      Rcpp::Rcout << "yaas ";
+    }
+  }
 
+  std::vector<int> out;
+  while (stream.size()) {
+    const auto dirt = stream.PopOldestMessage().get();
+    out.push_back(dirt->mmsi);
+    // out.push_back(dirt.)
+  }
+
+  return out;
+}
 
 // // void handle_error(const std::error_code& error) {
 // //   const auto& errmsg = error.message();
@@ -47,7 +65,8 @@ Rcpp::List ais_version() {
 //       case maritime::ais::MSG_TYPE::msg_1_2_3:
 //         out[i] =
 //             as_df ? maritime::ais::Msgs_1_2_3::from_nmea(bodies[i]).as_df()
-//                   : maritime::ais::Msgs_1_2_3::from_nmea(bodies[i]).as_list();
+//                   :
+//                   maritime::ais::Msgs_1_2_3::from_nmea(bodies[i]).as_list();
 //         break;
 
 //       default:
@@ -58,7 +77,7 @@ Rcpp::List ais_version() {
 //   return out;
 // }
 
-// fff// [[Rcpp::export(.ais_decode_file)]]
+// ff[[Rcpp::export(.ais_decode_file1)]]
 // SEXP ais_decode_file(const std::string& file_path,
 //                      const bool as_df,
 //                      const bool verbose) {
@@ -70,7 +89,7 @@ Rcpp::List ais_version() {
 //   mio::mmap_source mmap;
 //   mmap.map(file_path, error);
 //   if (error) {
-//     handle_error(error);
+//     Rcpp::stop("mmap error");
 //   }
 
 //   const auto file_size = mmap.size();
@@ -128,5 +147,67 @@ Rcpp::List ais_version() {
 //     }
 //   }
 
-//   return as_df ? maritime::as_df(out_1_2_3) : out_1_2_3.as_list();
+//   return maritime::as_df(out_1_2_3);
+// }
+
+// // ff[[Rcpp::export(.read_lines)]]
+// void read_lines(const std::string& file_path) {
+//   std::ifstream in_file;
+//   in_file.open(file_path);
+
+//   std::string line;
+//   std::vector<std::string> out;
+//   while (std::getline(in_file, line)) {
+//     out.push_back(line);
+//   }
+// }
+
+// // ff[[Rcpp::export(.read_mmap)]]
+// void read_mmap(const std::string& file_path) {
+//   constexpr int max_line_length = 100;
+
+//   std::error_code error;
+//   mio::mmap_source mmap;
+//   mmap.map(file_path, error);
+//   if (error) {
+//     Rcpp::stop("mmap error");
+//   }
+//   std::vector<std::string> out(mmap.length() / max_line_length);
+//   auto i = mmap.begin();
+//   for (std::size_t l_start = 0, l_end = 1; l_end < mmap.size(); ++l_end) {
+//     if (mmap[l_end] == '\n') {
+//       const std::string line(mmap.begin() + l_start, mmap.begin() + l_end);
+//       out.push_back(line);
+//       l_start = l_end + 1;
+//     }
+//   }
+// }
+
+// #include "vdm.h"
+
+// //fff[[Rcpp::export(.vdm)]]
+// int vdm(std::vector<std::string>& x) {
+//   libais::VdmStream stream;
+//   for (auto& l : x) {
+//     if (stream.AddLine(l)) {
+//       Rcpp::Rcout << "yas" << std::endl;
+//     }
+//   }
+
+//   // auto msg = reinterpret_cast<libais::Ais1_2_3*>(ais_msg.get());
+
+//   // std::vector<libais::AisMsg*> out(stream.size());
+//   // const std::unique_ptr<libais::AisMsg> msg
+
+//   // std::vector<int> out(stream.size());
+//   int out = 0;
+//   while (stream.PopOldestMessage()) {
+//     out++;
+//   }
+//   // auto out = stream.size();
+//   // return stream.size();
+//   // stream.
+//   return out;
+
+//   // return out[0]->mmsi();
 // }

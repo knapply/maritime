@@ -15,37 +15,38 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// bullshit
+std::vector<int> bullshit(std::vector<std::string> x);
+RcppExport SEXP _maritime_bullshit(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::vector<std::string> >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(bullshit(x));
+    return rcpp_result_gen;
+END_RCPP
+}
 // ais_decode_filter_file_impl
-SEXP ais_decode_filter_file_impl(const std::vector<std::string>& file_path, const int msg_type, const bool as_tibble, const bool as_sf, const bool verbose);
-RcppExport SEXP _maritime_ais_decode_filter_file_impl(SEXP file_pathSEXP, SEXP msg_typeSEXP, SEXP as_tibbleSEXP, SEXP as_sfSEXP, SEXP verboseSEXP) {
+SEXP ais_decode_filter_file_impl(const std::vector<std::string>& file_path, const int msg_type, const bool verbose);
+RcppExport SEXP _maritime_ais_decode_filter_file_impl(SEXP file_pathSEXP, SEXP msg_typeSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const std::vector<std::string>& >::type file_path(file_pathSEXP);
     Rcpp::traits::input_parameter< const int >::type msg_type(msg_typeSEXP);
-    Rcpp::traits::input_parameter< const bool >::type as_tibble(as_tibbleSEXP);
-    Rcpp::traits::input_parameter< const bool >::type as_sf(as_sfSEXP);
     Rcpp::traits::input_parameter< const bool >::type verbose(verboseSEXP);
-    rcpp_result_gen = Rcpp::wrap(ais_decode_filter_file_impl(file_path, msg_type, as_tibble, as_sf, verbose));
-    return rcpp_result_gen;
-END_RCPP
-}
-// ais_stream_test
-std::vector<std::string> ais_stream_test(const std::vector<std::string>& file_path);
-RcppExport SEXP _maritime_ais_stream_test(SEXP file_pathSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const std::vector<std::string>& >::type file_path(file_pathSEXP);
-    rcpp_result_gen = Rcpp::wrap(ais_stream_test(file_path));
+    rcpp_result_gen = Rcpp::wrap(ais_decode_filter_file_impl(file_path, msg_type, verbose));
     return rcpp_result_gen;
 END_RCPP
 }
 
+RcppExport SEXP _rcpp_module_boot_regex_module();
+
 static const R_CallMethodDef CallEntries[] = {
     {"_maritime_ais_version", (DL_FUNC) &_maritime_ais_version, 0},
-    {"_maritime_ais_decode_filter_file_impl", (DL_FUNC) &_maritime_ais_decode_filter_file_impl, 5},
-    {"_maritime_ais_stream_test", (DL_FUNC) &_maritime_ais_stream_test, 1},
+    {"_maritime_bullshit", (DL_FUNC) &_maritime_bullshit, 1},
+    {"_maritime_ais_decode_filter_file_impl", (DL_FUNC) &_maritime_ais_decode_filter_file_impl, 3},
+    {"_rcpp_module_boot_regex_module", (DL_FUNC) &_rcpp_module_boot_regex_module, 0},
     {NULL, NULL, 0}
 };
 
