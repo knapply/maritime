@@ -67,6 +67,7 @@ class AIS_Msgs {
 };
 
 class Msgs_1_2_3 : public AIS_Msgs<libais::Ais1_2_3> {
+  vec_int nav_status;
   vec_lgl rot_over_range;
   vec_dbl rot;
   vec_dbl sog;
@@ -94,6 +95,7 @@ class Msgs_1_2_3 : public AIS_Msgs<libais::Ais1_2_3> {
  public:
   Msgs_1_2_3(const int n)
       : AIS_Msgs::AIS_Msgs(n),
+        nav_status(n, NA_INTEGER),
         rot_over_range(n, NA_INTEGER),
         rot(n, NA_REAL),
         sog(n, NA_REAL),
@@ -133,6 +135,7 @@ class Msgs_1_2_3 : public AIS_Msgs<libais::Ais1_2_3> {
       return;
     }
 
+    this->nav_status[row_index] = msg.nav_status;
     this->rot_over_range[row_index] = msg.rot_over_range;
     this->rot[row_index] = msg.rot;
     this->sog[row_index] = msg.sog;
@@ -145,22 +148,37 @@ class Msgs_1_2_3 : public AIS_Msgs<libais::Ais1_2_3> {
     this->special_manoeuvre[row_index] = msg.special_manoeuvre;
     this->spare[row_index] = msg.spare;
     this->raim[row_index] = msg.raim;
+
     this->sync_state[row_index] = msg.sync_state;
-    this->slot_timeout[row_index] = msg.slot_timeout;
-    this->received_stations[row_index] = msg.received_stations;
-    this->slot_number[row_index] = msg.slot_number;
-    this->utc_hour[row_index] = msg.utc_hour;
-    this->utc_min[row_index] = msg.utc_min;
-    this->utc_spare[row_index] = msg.utc_spare;
-    this->slot_offset[row_index] = msg.slot_offset;
-    this->slot_increment[row_index] = msg.slot_increment;
-    this->slots_to_allocate[row_index] = msg.slots_to_allocate;
-    this->keep_flag[row_index] = msg.keep_flag;
+
+    if (msg.message_id == 1 || msg.message_id == 2) {
+      this->slot_timeout[row_index] = msg.slot_timeout;
+    }
+    if (msg.received_stations_valid) {
+      this->received_stations[row_index] = msg.received_stations;
+    }
+    if (msg.slot_number_valid) {
+      this->slot_number[row_index] = msg.slot_number;
+    }
+    if (msg.utc_valid) {
+      this->utc_hour[row_index] = msg.utc_hour;
+      this->utc_min[row_index] = msg.utc_min;
+      this->utc_spare[row_index] = msg.utc_spare;
+    }
+    if (msg.slot_offset_valid) {
+      this->slot_offset[row_index] = msg.slot_offset;
+    }
+    if (msg.slot_increment_valid) {
+      this->slot_increment[row_index] = msg.slot_increment;
+      this->slots_to_allocate[row_index] = msg.slots_to_allocate;
+      this->keep_flag[row_index] = msg.keep_flag;
+    }
   };
 
   Rcpp::List as_list() {
     auto out = AIS_Msgs::as_list();
 
+    out["nav_status"] = this->nav_status[this->seq_out];
     out["rot_over_range"] = this->rot_over_range[this->seq_out];
     out["rot"] = this->rot[this->seq_out];
     out["sog"] = this->sog[this->seq_out];

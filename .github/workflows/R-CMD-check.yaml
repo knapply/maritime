@@ -3,6 +3,7 @@ on:
     branches:
       - master
       - dev
+      - working-version
   pull_request:
     branches:
       - master
