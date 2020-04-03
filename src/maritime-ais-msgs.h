@@ -14,20 +14,11 @@ template <class msg_T>
 class AIS_Msgs {
  public:
   int common_row_index = 0;
-
-  // const vec_chr common_field_names{
-  //     "message_id",
-  //     "repeat_indicator",
-  //     "mmsi",
-  // };
-
   vec_int message_id;
   vec_int repeat_indicator;
   vec_int mmsi;
 
  public:
-  // AIS_Msgs(){};
-
   explicit AIS_Msgs(const int n)
       : message_id(n, NA_INTEGER),
         repeat_indicator(n, NA_INTEGER),
