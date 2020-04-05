@@ -38,7 +38,7 @@ bytes](https://img.shields.io/github/languages/code-size/knapply/maritime.svg)](
 `{maritime}` is a toolkit for maritime data.
 
 Initial focus is building *performant* and correct AIS decoding routines
-for R by building on[Kurt Schwehr](https://twitter.com/kurtschwehr)’s
+for R by building on [Kurt Schwehr](https://twitter.com/kurtschwehr)’s
 [**libais**](https://github.com/schwehr/libais).
 
 # Installation
@@ -71,10 +71,6 @@ What’s implemented so far?
 library(maritime)
 ```
 
-# Performance
-
-Here’s a quick demo of what’ implemented so far:
-
 ``` r
 nmea_file <- "inst/example-data/big-files/20181210.log"
 paste(round(file.size(nmea_file) / 1e9, 2L), "GB")
@@ -98,6 +94,49 @@ readLines(nmea_file, n = 10) # quick peak at the data
     #> [10] "!AIVDM,1,1,,B,H3gi=84N0000000B5elii00P7110,0*36,1544400000,1544400000"
 
 ``` r
+ais_decode_filter(msgs = nmea_file, msg_type = ais_msgs$msg_1_2_3)
+```
+
+    #> # A tibble: 5,117,490 x 29
+    #>    time_start          time_end            message_id repeat_indicator   mmsi nav_status rot_over_range   rot    sog position_accura… lng_deg lat_deg
+    #>    <dttm>              <dttm>                   <int>            <int>  <int>      <int> <lgl>          <dbl>  <dbl>            <int>   <dbl>   <dbl>
+    #>  1 2018-12-10 00:00:00 2018-12-10 00:00:00          1                0 3.10e8          0 FALSE             0  11.2                  1  -82.9     27.6
+    #>  2 2018-12-10 00:00:00 2018-12-10 00:00:00          1                0 2.58e8          0 FALSE             0   0.100                0   30.0     69.7
+    #>  3 2018-12-10 00:00:00 2018-12-10 00:00:00          3                0 2.66e8          5 FALSE             0   0                    1   17.9     59.3
+    #>  4 2018-12-10 00:00:00 2018-12-10 00:00:00          3                0 2.66e8          5 FALSE             0   0                    1   15.6     56.2
+    #>  5 2018-12-10 00:00:00 2018-12-10 00:00:00          1                0 3.67e8          3 FALSE             0   2.90                 1  -88.9     30.2
+    #>  6 2018-12-10 00:00:00 2018-12-10 00:00:00          1                0 3.05e8          0 FALSE             0  13.7                  1  -79.4     26.6
+    #>  7 2018-12-10 00:00:00 2018-12-10 00:00:00          1                0 2.65e8          0 FALSE             0   0                    0   11.0     58.9
+    #>  8 2018-12-10 00:00:00 2018-12-10 00:00:00          1                0 2.57e8          0 TRUE           -731.  0                    1    7.60    63.1
+    #>  9 2018-12-10 00:00:00 2018-12-10 00:00:00          3                0 2.73e8          5 FALSE             0   0                    0   19.0     69.7
+    #> 10 2018-12-10 00:00:00 2018-12-10 00:00:00          1                0 3.67e8         15 TRUE           -731.  0                    0  -89.6     40.7
+    #> # … with 5,117,480 more rows, and 17 more variables: cog <dbl>, true_heading <int>, timestamp <int>, special_manoeuvre <int>, spare <int>,
+    #> #   raim <lgl>, sync_state <int>, slot_timeout <int>, received_stations <int>, slot_number <int>, utc_hour <int>, utc_min <int>, utc_spare <int>,
+    #> #   slot_offset <int>, slot_increment <int>, slots_to_allocate <int>, keep_flag <lgl>
+
+``` r
+ais_decode_filter(msgs = nmea_file, msg_type = ais_msgs$msg_5)
+```
+
+    #> # A tibble: 3,723,201 x 23
+    #>    time_start          time_end            message_id repeat_indicator   mmsi ais_version imo_num callsign name  type_and_cargo dim_a dim_b dim_c
+    #>    <dttm>              <dttm>                   <int>            <int>  <int>       <int>   <int> <chr>    <chr>          <int> <int> <int> <int>
+    #>  1 2018-12-10 00:00:00 2018-12-10 00:00:00          5                0 3.70e8           0 9550436 "3FEA2 … "GLO…             70   144    26    19
+    #>  2 2018-12-10 00:00:00 2018-12-10 00:00:00          5                0 2.66e8           1 8010673 "SJOY  … "BAL…             90    38    19     6
+    #>  3 2018-12-10 00:00:00 2018-12-10 00:00:00          5                0 2.45e8           2 7711074 "PBCZ@@… "DEO…             33    57    15     7
+    #>  4 2018-12-10 00:00:00 2018-12-10 00:00:00          5                0 2.57e8           0 5255777 "LATU3@… "NOR…             69    19    61    12
+    #>  5 2018-12-10 00:00:00 2018-12-10 00:00:00          5                0 2.66e8           1       0 "SCFR@@… "VAD…             60     8    29     4
+    #>  6 2018-12-10 00:00:00 2018-12-10 00:00:00          5                0 3.67e8           0     220 "WDF650… "COU…             52     7     9     4
+    #>  7 2018-12-10 00:00:00 2018-12-10 00:00:00          5                0 2.58e8           0 9417830 "LFFE  … "SKA…             52    20    67    10
+    #>  8 2018-12-10 00:00:00 2018-12-10 00:00:00          5                0 3.67e8           0 8635863 "WDC280… "RAY…             31     8    12     2
+    #>  9 2018-12-10 00:00:00 2018-12-10 00:00:00          5                0 3.67e8           0       0 "WCZ456… "DOU…              0     5    20     5
+    #> 10 2018-12-10 00:00:00 2018-12-10 00:00:00          5                0 2.15e8           0 9431006 "9HA262… "WIL…             70   105    18     3
+    #> # … with 3,723,191 more rows, and 10 more variables: dim_d <int>, fix_type <int>, eta_month <int>, eta_day <int>, eta_hour <int>, eta_minute <int>,
+    #> #   draught <dbl>, destination <chr>, dte <int>, spare <int>
+
+# Performance
+
+``` r
 bench_mark <- bench::mark(
   file = decoded <- ais_decode_list(nmea_file, as_tibble = FALSE, verbose = FALSE),
   iterations = 1,
@@ -110,7 +149,7 @@ bench_mark
     #> # A tibble: 1 x 6
     #>   expression      min   median `itr/sec` mem_alloc `gc/sec`
     #>   <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-    #> 1 file          23.6s    23.6s    0.0424    3.06GB    0.255
+    #> 1 file          25.2s    25.2s    0.0396    3.03GB    0.278
 
 ``` r
 lapply(decoded, tibble::as_tibble)

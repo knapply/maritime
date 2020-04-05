@@ -81,9 +81,6 @@ What's implemented so far?
 library(maritime)
 ```
 
-# Performance
-
-Here's a quick demo of what' implemented so far:
 
 
 ```{r}
@@ -92,6 +89,18 @@ paste(round(file.size(nmea_file) / 1e9, 2L), "GB")
 
 readLines(nmea_file, n = 10) # quick peak at the data
 ```
+
+
+```{r}
+ais_decode_filter(msgs = nmea_file, msg_type = ais_msgs$msg_1_2_3)
+```
+
+
+```{r}
+ais_decode_filter(msgs = nmea_file, msg_type = ais_msgs$msg_5)
+```
+
+# Performance
 
 
 ```{r}
