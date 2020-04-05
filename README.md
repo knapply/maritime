@@ -3,9 +3,11 @@
 
   - [Introduction](#introduction)
   - [Installation](#installation)
-  - [Status](#status)
   - [Usage](#usage)
-  - [Performance](#performance)
+  - [AIS](#ais)
+      - [Status](#status)
+      - [Performance](#performance)
+      - [Future](#future)
   - [Credits](#credits)
 
 <!-- README.Rmd generates README.md. -->
@@ -37,8 +39,8 @@ bytes](https://img.shields.io/github/languages/code-size/knapply/maritime.svg)](
 
 `{maritime}` is a toolkit for maritime data.
 
-Initial focus is building *performant* and correct AIS decoding routines
-for R by building on [Kurt Schwehr](https://twitter.com/kurtschwehr)’s
+Initial focus is *performant* and correct AIS decoding routines for R by
+building on [Kurt Schwehr](https://twitter.com/kurtschwehr)’s
 [**libais**](https://github.com/schwehr/libais).
 
 # Installation
@@ -51,7 +53,15 @@ if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
 remotes::install_github("knapply/maritime")
 ```
 
-# Status
+# Usage
+
+``` r
+library(maritime)
+```
+
+# AIS
+
+## Status
 
 What’s implemented so far?
 
@@ -65,11 +75,7 @@ What’s implemented so far?
       - `ais_msgs$msg_9`
       - `ais_msgs$msg_10`
 
-# Usage
-
-``` r
-library(maritime)
-```
+<!-- end list -->
 
 ``` r
 nmea_file <- "inst/example-data/big-files/20181210.log"
@@ -134,7 +140,7 @@ ais_decode_filter(msgs = nmea_file, msg_type = ais_msgs$msg_5)
     #> # … with 3,723,191 more rows, and 10 more variables: dim_d <int>, fix_type <int>, eta_month <int>, eta_day <int>, eta_hour <int>, eta_minute <int>,
     #> #   draught <dbl>, destination <chr>, dte <int>, spare <int>
 
-# Performance
+## Performance
 
 ``` r
 bench_mark <- bench::mark(
@@ -149,7 +155,7 @@ bench_mark
     #> # A tibble: 1 x 6
     #>   expression      min   median `itr/sec` mem_alloc `gc/sec`
     #>   <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-    #> 1 file          25.2s    25.2s    0.0396    3.03GB    0.278
+    #> 1 file          27.1s    27.1s    0.0368    3.03GB    0.258
 
 ``` r
 lapply(decoded, tibble::as_tibble)
@@ -230,6 +236,83 @@ lapply(decoded, tibble::as_tibble)
     #> 
     #> $msgs_10
     #> # A tibble: 0 x 0
+
+## Future
+
+``` r
+ptr_df <- tibble::as_tibble(
+  maritime:::.nest_test(nmea_file)
+)
+ptr_df
+```
+
+    #> # A tibble: 9,002,269 x 6
+    #>    time_start          time_end            message_id      mmsi msg           geometry  
+    #>    <dttm>              <dttm>                   <int>     <int> <list>        <list>    
+    #>  1 2018-12-10 00:00:00 2018-12-10 00:00:00          1 309653000 <externalptr> <list [2]>
+    #>  2 2018-12-10 00:00:00 2018-12-10 00:00:00          5 370386000 <externalptr> <list [2]>
+    #>  3 2018-12-10 00:00:00 2018-12-10 00:00:00          1 258145500 <externalptr> <list [2]>
+    #>  4 2018-12-10 00:00:00 2018-12-10 00:00:00          3 265510630 <externalptr> <list [2]>
+    #>  5 2018-12-10 00:00:00 2018-12-10 00:00:00          3 265586870 <externalptr> <list [2]>
+    #>  6 2018-12-10 00:00:00 2018-12-10 00:00:00          5 265509180 <externalptr> <list [2]>
+    #>  7 2018-12-10 00:00:00 2018-12-10 00:00:00          5 245488000 <externalptr> <list [2]>
+    #>  8 2018-12-10 00:00:00 2018-12-10 00:00:00          5 257276000 <externalptr> <list [2]>
+    #>  9 2018-12-10 00:00:00 2018-12-10 00:00:00          1 367493000 <externalptr> <list [2]>
+    #> 10 2018-12-10 00:00:00 2018-12-10 00:00:00          5 265520420 <externalptr> <list [2]>
+    #> # … with 9,002,259 more rows
+
+The `msg` column contains external pointers to decoded **libais**
+objects.
+
+``` r
+tibble::as_tibble(
+  do.call(
+    rbind,
+    lapply(ptr_df[ptr_df$message_id == 1, ]$msg[1:10], 
+           maritime:::.ais_unwrap_msg)
+    )
+)
+```
+
+    #> # A tibble: 10 x 27
+    #>    message_id repeat_indicator   mmsi nav_status rot_over_range     rot    sog position_accura… lng_deg lat_deg   cog true_heading timestamp
+    #>         <int>            <int>  <int>      <int> <lgl>            <dbl>  <dbl>            <int>   <dbl>   <dbl> <dbl>        <int>     <int>
+    #>  1          1                0 3.10e8          0 FALSE             0    11.2                  1  -82.9     27.6 266.           267        56
+    #>  2          1                0 2.58e8          0 FALSE             0     0.100                0   30.0     69.7 134            333        58
+    #>  3          1                0 3.67e8          3 FALSE             0     2.90                 1  -88.9     30.2 307.           317        59
+    #>  4          1                0 3.05e8          0 FALSE             0    13.7                  1  -79.4     26.6  95.2          104        59
+    #>  5          1                0 2.65e8          0 FALSE             0     0                    0   11.0     58.9  37.9           35        59
+    #>  6          1                0 2.57e8          0 TRUE           -731.    0                    1    7.60    63.1 360            511        58
+    #>  7          1                0 3.67e8         15 TRUE           -731.    0                    0  -89.6     40.7 222.           511        58
+    #>  8          1                0 5.38e8          0 FALSE             2.19  0.200                1  -89.5     28.5  57            290        56
+    #>  9          1                0 3.68e8          0 FALSE             0     3                    1  -91.6     31.2  44.9           27        59
+    #> 10          1                0 2.59e8          0 FALSE             0     0                    0    5.50    59.8 264.            26        56
+    #> # … with 14 more variables: special_manoeuvre <int>, spare <int>, raim <lgl>, sync_state <int>, slot_timeout <int>, received_stations <int>,
+    #> #   slot_number <int>, utc_hour <int>, utc_min <int>, utc_spare <int>, slot_offset <int>, slot_increment <int>, slots_to_allocate <int>,
+    #> #   keep_flag <int>
+
+### Inspection Tools
+
+``` r
+tibble::as_tibble(
+  maritime:::.nmea_df(nmea_file, n_max = -1)
+)
+```
+
+    #> # A tibble: 13,355,207 x 10
+    #>    line_number talker fragment_count fragment_number message_id channel payload                      fill_bits time_start          time_end           
+    #>          <int> <chr>           <int>           <int>      <int> <chr>   <chr>                            <int> <dttm>              <dttm>             
+    #>  1           0 SAVDM               1               1          7 A       14WCf2001hr4dE<?joPbHpGh88RM         0 2018-12-10 00:00:00 2018-12-10 00:00:00
+    #>  2          -1 AIVDM               2              -1          6 B       55Q>TD02AfVC<HD7:20Lht84j05…         2 2018-12-10 00:00:00 2018-12-10 00:00:00
+    #>  3           3 AIVDM               1               1          6 A       B3gsP70007Topd9B8lmVKwu5kP06         0 2018-12-10 00:00:00 2018-12-10 00:00:00
+    #>  4           4 SAVDM               1               1          3 A       H52ONqlUCBD6llD00000000h6220         0 2018-12-10 00:00:00 2018-12-10 00:00:00
+    #>  5           5 BSVDM               1               1          3 A       13n;to000129MwVWqNmm?:Kl0@RJ         0 2018-12-10 00:00:00 2018-12-10 00:00:00
+    #>  6           6 ABVDM               1               1          1 B       33u=NqU000QAtkdQsKdN42;n0De:         0 2018-12-10 00:00:00 2018-12-10 00:00:00
+    #>  7           7 AIVDM               1               1          1 B       H3gi=84N0000000B5elii00P7110         0 2018-12-10 00:00:00 2018-12-10 00:00:00
+    #>  8           8 SAVDM               1               1          3 A       H5NWU?TU653hhhi00000001H;330         0 2018-12-10 00:00:00 2018-12-10 00:00:00
+    #>  9           9 ABVDM               1               1          0 B       33uB8eU000Q7F2NP8NcBch1n0DbJ         0 2018-12-10 00:00:00 2018-12-10 00:00:00
+    #> 10          10 SAVDM               1               1          9 B       B52`F8000=qpmg4cW8PWOwu5oP06         0 2018-12-10 00:00:00 2018-12-10 00:00:00
+    #> # … with 13,355,197 more rows
 
 # Credits
 
