@@ -4,7 +4,7 @@ Version: 0.0.9
 Authors@R: 
     c(
         person("Brendan", "Knapp", 
-               email = "brendan.g.knapp@nps.edu", 
+               email = "brendan.knapp@nps.edu", 
                role = c("aut", "cre"),
                comment = c(ORCID = "0000-0003-3284-4972"))
         ,
