@@ -4,7 +4,10 @@
     <loc>https://knapply.github.io/maritime/index.html</loc>
   </url>
   <url>
-    <loc>https://knapply.github.io/maritime/reference/ais_decode_nmea.html</loc>
+    <loc>https://knapply.github.io/maritime/reference/ais_decode_filter.html</loc>
+  </url>
+  <url>
+    <loc>https://knapply.github.io/maritime/reference/ais_msgs.html</loc>
   </url>
   <url>
     <loc>https://knapply.github.io/maritime/reference/ais_version.html</loc>

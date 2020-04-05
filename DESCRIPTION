@@ -5,7 +5,7 @@ Authors@R:
     c(
         person("Brendan", "Knapp", 
                email = "brendan.g.knapp@nps.edu", 
-               role = c("aut", "cre", "cph"),
+               role = c("aut", "cre"),
                comment = c(ORCID = "0000-0003-3284-4972"))
         ,
         person(given = "Christopher", family = "Callaghan",

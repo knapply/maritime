@@ -44,6 +44,11 @@ options(width = 150)
 
 # Introduction
 
+`{maritime}` is a toolkit for maritime data.
+
+Initial focus is building _performant_ and correct AIS decoding routines for R by building on [Kurt Schwehr](https://twitter.com/kurtschwehr)'s [__libais__](https://github.com/schwehr/libais).
+
+
 # Installation
 
 You'll need a C++ compiler. If you're using Windows, that means [Rtools](https://cran.r-project.org/bin/windows/Rtools/).
@@ -54,27 +59,50 @@ remotes::install_github("knapply/maritime")
 ```
 
 
+
+# Status
+
+What's implemented so far?
+
+* _Fast_ preprocessing and line normalization.
+  + Multi-line messages are reconciled and merged _automatically_.
+* Message Types:
+  + `ais_msgs$msg_1_2_3`
+  + `ais_msgs$msg_4_11`
+  + `ais_msgs$msg_5`
+  + `ais_msgs$msg_7_13`
+  + `ais_msgs$msg_9`
+  + `ais_msgs$msg_10`
+  
+  
 # Usage
 
 ```{r}
 library(maritime)
 ```
 
-
 # Performance
+
+Here's a quick demo of what' implemented so far:
+
 
 ```{r}
 nmea_file <- "inst/example-data/big-files/20181210.log"
 paste(round(file.size(nmea_file) / 1e9, 2L), "GB")
 
+readLines(nmea_file, n = 10) # quick peak at the data
+```
+
+
+```{r}
 bench_mark <- bench::mark(
-  file = decoded <- ais_decode_nmea(nmea_file, as_tibble = FALSE, as_sf = FALSE),
+  file = decoded <- ais_decode_list(nmea_file, as_tibble = FALSE, verbose = FALSE),
   iterations = 1,
   check = FALSE
 )
 
 bench_mark
-tibble::as_tibble(decoded)
+lapply(decoded, tibble::as_tibble)
 ```
 
 
