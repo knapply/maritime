@@ -61,39 +61,5 @@ class AIS_Msgs {
   };
 };
 
-template <typename T, typename... Args>
-std::unique_ptr<T> MakeUnique(Args &&... args) {
-  return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-}
-
-// template<>
-inline Rcpp::XPtr<libais::AisMsg> as_ais_ptr(libais::AisMsg x) {
-    // auto cloned = Rcpp::clone(x);
-  //   static funcPtr timesTwo{ [](NumericVector x) -> NumericVector { return x
-  //   * 2; }
-//   Rcpp::XPtr<libais::AisMsg> ptr(&x, true);
-//   ptr = x;
-  //   ptr = *x;
-//   Rcpp::as<Rcpp::XPtr<libais::AisMsg>>(x);
-
-  return Rcpp::XPtr<libais::AisMsg>(&x, true);
-}
-
-// // template<MSG_TYPE msg_T>
-// SEXP deref_ais_ptr(Rcpp::XPtr<libais::AisMsg> ais_ptr) {
-//   if (ais_ptr.isNULL()) {
-//     return R_NilValue;
-//   }
-
-//   switch ((*ais_ptr).message_id) {
-//     case 1:
-//     case 2:
-//     case 3:
-//       return Rcpp::wrap(reinterpret_cast<libais::Ais1_2_3*>(ais_ptr.get()));
-
-//     default:
-//       return R_NilValue;
-//   }
-// }
 
 #endif
