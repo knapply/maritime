@@ -42,7 +42,7 @@ maritime_as_df <- function() {
 #' @rdname maritime_options
 #' @export
 maritime_as_sf <- function() {
-    getOption("maritime_as_sf", TRUE)
+    getOption("maritime_as_sf", FALSE)
 }
 
 
