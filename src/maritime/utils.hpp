@@ -70,15 +70,15 @@ SEXP as_df(const Msg_Proto_DF& msg_proto_df) {
   return out;
 }
 
-template <class Msg_Proto_DF>
-SEXP as_nested_df(const Msg_Proto_DF& msg_proto_df) {
-  if (msg_proto_df.common_row_index == 0) {
-    return R_NilValue;
-  }
-  auto out = msg_proto_df.as_nest();
-  finalize_df(out, msg_proto_df.common_row_index);
-  return out;
-}
+// template <class Msg_Proto_DF>
+// SEXP as_nested_df(const Msg_Proto_DF& msg_proto_df) {
+//   if (msg_proto_df.common_row_index == 0) {
+//     return R_NilValue;
+//   }
+//   auto out = msg_proto_df.as_nest();
+//   finalize_df(out, msg_proto_df.common_row_index);
+//   return out;
+// }
 
 //
 //

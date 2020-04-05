@@ -1,5 +1,6 @@
 #include "ais.h"
 #include "maritime/decoder.hpp"
+#include "maritime/proto_msg_dfs.hpp"
 
 // [[Rcpp::export(.nmea_df)]]
 SEXP nmea_df(const std::string& file_path, const int n_max) {
@@ -7,30 +8,95 @@ SEXP nmea_df(const std::string& file_path, const int n_max) {
   return nmea_stream.as_df(n_max);
 }
 
-// //ff [[Rcpp::export(.nest_test)]]
-// SEXP nest_test(const std::string& file_path) {
-//   const auto nmea_stream = NMEA_Stream::from_file(file_path);
-//   const Decoder decoder(nmea_stream);
+// [[Rcpp::export(.nest_test)]]
+SEXP nest_test(const std::string& file_path) {
+  const auto nmea_stream = NMEA_Stream::from_file(file_path);
+  const Decoder decoder(nmea_stream);
 
-//   const auto n_msgs = decoder.msg_counts.at(MSG_TYPE::msg_1_2_3);
-//   const auto total_msgs = decoder.nmea_stream.complete.size();
+  const auto n_msgs = decoder.nmea_stream.complete.size();
+  const auto total_msgs = decoder.nmea_stream.complete.size();
 
-//   Progress progress(total_msgs, true);
+  Progress progress(total_msgs, true);
 
-//   Nest_1_2_3 res(n_msgs);
-//   for (std::size_t i = 0; i < total_msgs; ++i) {
-//     progress.increment();
-//     const auto nmea = decoder.nmea_stream.complete[i];
+  Nest res(n_msgs);
+  for (std::size_t i = 0; i < total_msgs; ++i) {
+    progress.increment();
+    auto nmea = decoder.nmea_stream.complete[i];
 
-//     if (get_msg_type(nmea.payload) == MSG_TYPE::msg_1_2_3) {
-//       res.push(libais::Ais1_2_3(nmea.payload.data.c_str(), nmea.fill_bits),
-//       //
-//                nmea.time_start, nmea.time_end);
-//     }
-//   }
-//   const auto out = res.as_list();
-//   return as_df(res);
-// }
+    switch (get_msg_type(nmea.payload)) {
+      case MSG_TYPE::msg_1_2_3:
+        res.push(                                                //
+            Rcpp::XPtr<libais::AisMsg>(                          //
+                new libais::Ais1_2_3(nmea.payload.data.c_str(),  //
+                                     nmea.fill_bits),            //
+                true),                                           //
+            nmea.time_start,                                     //
+            nmea.time_end                                        //
+        );                                                       //
+        break;
+
+      case MSG_TYPE::msg_4_11:
+        res.push(                                               //
+            Rcpp::XPtr<libais::AisMsg>(                         //
+                new libais::Ais4_11(nmea.payload.data.c_str(),  //
+                                    nmea.fill_bits),            //
+                true),                                          //
+            nmea.time_start,                                    //
+            nmea.time_end                                       //
+        );                                                      //
+        break;
+
+      case MSG_TYPE::msg_5:
+        res.push(                                            //
+            Rcpp::XPtr<libais::AisMsg>(                      //
+                new libais::Ais5(nmea.payload.data.c_str(),  //
+                                 nmea.fill_bits),            //
+                true),                                       //
+            nmea.time_start,                                 //
+            nmea.time_end                                    //
+        );                                                   //
+        break;
+
+      case MSG_TYPE::msg_7_13:
+        res.push(                                               //
+            Rcpp::XPtr<libais::AisMsg>(                         //
+                new libais::Ais7_13(nmea.payload.data.c_str(),  //
+                                    nmea.fill_bits),            //
+                true),                                          //
+            nmea.time_start,                                    //
+            nmea.time_end                                       //
+        );                                                      //
+        break;
+
+      case MSG_TYPE::msg_9:
+        res.push(                                            //
+            Rcpp::XPtr<libais::AisMsg>(                      //
+                new libais::Ais9(nmea.payload.data.c_str(),  //
+                                 nmea.fill_bits),            //
+                true),                                       //
+            nmea.time_start,                                 //
+            nmea.time_end                                    //
+        );                                                   //
+        break;
+
+      case MSG_TYPE::msg_10:
+        res.push(                                             //
+            Rcpp::XPtr<libais::AisMsg>(                       //
+                new libais::Ais10(nmea.payload.data.c_str(),  //
+                                  nmea.fill_bits),            //
+                true),                                        //
+            nmea.time_start,                                  //
+            nmea.time_end                                     //
+        );                                                    //
+        break;
+
+      default:
+        break;
+    }
+  }
+  const auto out = res.as_list();
+  return as_df(res);
+}
 
 SEXP decode_filter_file_switch(const std::string& file_path,
                                const int msg_type,
@@ -88,19 +154,53 @@ SEXP decode_list_file_impl(const std::string& file_path, const bool verbose) {
   return decode_list_file(file_path, verbose);
 }
 
-//
-//
-//
+// [[Rcpp::export(.ais_unwrap_msg)]]
+SEXP unwrap_ais_ptr(const SEXP ais_ptr) {
+  // const auto enum_msg_type = static_cast<MSG_TYPE>(msg_type);
+
+  auto ptr = Rcpp::XPtr<libais::AisMsg>(ais_ptr);
+
+  if (ptr.isNULL()) {
+    return R_NilValue;
+  }
+
+  switch (ptr->message_id) {
+    case 1:
+    case 2:
+    case 3:
+      return ais_wrap(                                           //
+          *reinterpret_cast<const libais::Ais1_2_3*>(ptr.get())  //
+      );
+
+    default:
+      return R_NilValue;
+  }
+  return R_NilValue;
+}
 
 /*** R
-file_path <- "inst/example-data/big-files/20181210.log"
-# file_path <- "inst/example-data/20181101.log"
-test_lines <- readr::read_lines(file_path, n_max = 10)
+# file_path <- "inst/example-data/big-files/20181210.log"
+file_path <- "inst/example-data/20181101.log"
+# test_lines <- readr::read_lines(file_path, n_max = 10)
 # test_text <- readr::read_file(file_path)
 # test_lines[1:10]
-mat <- stringr::str_split(test_lines[1:20], ",",simplify = TRUE)
+# mat <- stringr::str_split(test_lines[1:20], ",",simplify = TRUE)
 
 test <- tibble::as_tibble(.nest_test(file_path))
+
+test
+
+
+bench::mark(
+  .nest_test(file_path)
+)
+
+
+.ais_unwrap_msg(test$msg[[1]])
+dplyr::bind_rows(lapply(lapply(test$msg, .ais_unwrap_msg),tibble::as_tibble))
+
+dt <- data.table::setDT(data.table::copy(test))
+# test[, "msg_specific_values"]
 # lapply(test$msg_specific_values, tibble::as_tibble)
 # nchar(mat[,8])
 # nchar(mat[,9])
@@ -110,7 +210,7 @@ tibble::as_tibble(test1[test1$message_id == 7, ])
 tibble::as_tibble(test1[test1$message_id == 10, ])
 # test2 <-
 # bench::mark(
-  test2 <- .ais_decode_file_filter(file_path = file_path, 8)
+  test2 <- .ais_decode_file_filter(file_path = file_path, 1, verbose = T)
 # )
 tibble::as_tibble(test2)
 

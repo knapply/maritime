@@ -87,5 +87,5 @@ ais_decode_list(nmea_file)
 
 }
 \author{
-Brendan Knapp \email{brendan.g.knapp@nps.edu}
+Brendan Knapp \email{brendan.knapp@nps.edu}
 }

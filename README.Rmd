@@ -46,7 +46,7 @@ options(width = 150)
 
 `{maritime}` is a toolkit for maritime data.
 
-Initial focus is building _performant_ and correct AIS decoding routines for R by building on [Kurt Schwehr](https://twitter.com/kurtschwehr)'s [__libais__](https://github.com/schwehr/libais).
+Initial focus is _performant_ and correct AIS decoding routines for R by building on [Kurt Schwehr](https://twitter.com/kurtschwehr)'s [__libais__](https://github.com/schwehr/libais).
 
 
 # Installation
@@ -58,9 +58,17 @@ if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
 remotes::install_github("knapply/maritime")
 ```
 
+# Usage
 
 
-# Status
+```{r}
+library(maritime)
+```
+
+
+# AIS
+
+## Status
 
 What's implemented so far?
 
@@ -75,18 +83,10 @@ What's implemented so far?
   + `ais_msgs$msg_10`
   
   
-# Usage
-
-```{r}
-library(maritime)
-```
-
-
 
 ```{r}
 nmea_file <- "inst/example-data/big-files/20181210.log"
 paste(round(file.size(nmea_file) / 1e9, 2L), "GB")
-
 readLines(nmea_file, n = 10) # quick peak at the data
 ```
 
@@ -100,7 +100,7 @@ ais_decode_filter(msgs = nmea_file, msg_type = ais_msgs$msg_1_2_3)
 ais_decode_filter(msgs = nmea_file, msg_type = ais_msgs$msg_5)
 ```
 
-# Performance
+## Performance
 
 
 ```{r}
@@ -113,6 +113,39 @@ bench_mark <- bench::mark(
 bench_mark
 lapply(decoded, tibble::as_tibble)
 ```
+
+
+## Future
+
+
+```{r}
+ptr_df <- tibble::as_tibble(
+  maritime:::.nest_test(nmea_file)
+)
+ptr_df
+```
+
+The `msg` column contains external pointers to decoded __libais__ objects.
+
+```{r}
+tibble::as_tibble(
+  do.call(
+    rbind,
+    lapply(ptr_df[ptr_df$message_id == 1, ]$msg[1:10], 
+           maritime:::.ais_unwrap_msg)
+    )
+)
+```
+
+
+### Inspection Tools
+
+```{r}
+tibble::as_tibble(
+  maritime:::.nmea_df(nmea_file, n_max = -1)
+)
+```
+
 
 
 # Credits
