@@ -38,8 +38,10 @@ ais_decode_list(
 \itemize{
 \item \code{"auto"}: let \code{ais_decode()} decide
 \item \code{"file"}: treat \code{x} as a file path
-\item \code{"strings"}: treat \code{x} as a vector with each element containing a single AIS message
-\item \code{"text"}: treat \code{x} as a single \code{character} containing multiple AIS messages
+\item \code{"strings"}: treat \code{x} as a vector with each element containing a
+single AIS message
+\item \code{"text"}: treat \code{x} as a single \code{character} containing multiple AIS
+messages
 }
 }
 }}
@@ -65,11 +67,13 @@ ais_decode_list(
 }}
 }
 \description{
-National Marine Electronics Association (NMEA) messages are comma separated value
-lines of text that start with sender or "talker" code and the sentence type.
+National Marine Electronics Association (NMEA) messages are comma separated
+value lines of text that start with sender or "talker" code and the sentence
+type.
 }
 \details{
-\code{ais_decode_filter} decodes NMEA messages (currently 1, 2, and 3) contained in files or \code{character} vectors.
+\code{ais_decode_filter} decodes NMEA messages (currently 1, 2, and 3) contained
+in files or \code{character} vectors.
 }
 \examples{
 nmea_file <- example_nmea_file()
@@ -77,14 +81,13 @@ nmea_lines <- readLines(nmea_file, warn = FALSE)
 
 nmea_lines[1:10]
 
-# decoding a file, filter by messgage type ============================================
+# decoding a file, filter by messgage type ==================================
 ais_decode_filter(nmea_file, msg_type = ais_msgs$msg_1_2_3)
 ais_decode_filter(nmea_file, msg_type = ais_msgs$msg_4_11)
 ais_decode_filter(nmea_file, msg_type = ais_msgs$msg_5)
 
-# decoding a file, keeping everything (WIP) ===========================================
+# decoding a file, keeping everything (WIP) =================================
 ais_decode_list(nmea_file)
-
 }
 \author{
 Brendan Knapp \email{brendan.knapp@nps.edu}

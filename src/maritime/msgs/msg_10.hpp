@@ -11,19 +11,19 @@ class Msgs_10 : public AIS_Msgs<libais::Ais10> {
  public:
   Msgs_10(const int n)
       : AIS_Msgs::AIS_Msgs(n),  //
-        spare(n),
-        dest_mmsi(n),
-        spare2(n){};
+        spare(n, NA_INTEGER),
+        dest_mmsi(n, NA_INTEGER),
+        spare2(n, NA_INTEGER){};
 
-  void push(const libais::Ais10& msg,
-            const double _time_start,
-            const double _time_end) {
-    const auto row_index = AIS_Msgs::common_row_index;
-    const auto push_success = AIS_Msgs::init_push(msg, _time_start, _time_end);
-
-    if (!push_success) {
+  void push(libais::Ais10&& msg,
+            const std::size_t _line_number,
+            const double _time) {
+    if (msg.had_error()) {
       return;
     }
+    const auto row_index = AIS_Msgs::common_row_index;
+    AIS_Msgs::init_push(msg.message_id, msg.repeat_indicator, msg.mmsi,
+                        _line_number, _time);
 
     this->spare[row_index] = msg.spare;
     this->dest_mmsi[row_index] = msg.dest_mmsi;

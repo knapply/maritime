@@ -1,49 +1,44 @@
 #ifndef MARITIME_UTILS_HPP
 #define MARITIME_UTILS_HPP
 
-#include <Rcpp.h>
+#include "Rcpp_compat.hpp"
 
 typedef Rcpp::CharacterVector vec_chr;
 typedef Rcpp::IntegerVector vec_int;
 typedef Rcpp::LogicalVector vec_lgl;
 typedef Rcpp::DoubleVector vec_dbl;
 
-int count_digits(const int x) {
+template <typename T>
+inline int count_digits(const T x) {
   if (x < 0) {
     return count_digits(-x);
   }
 
-  constexpr int x1 = 1e1;
-  constexpr int x2 = 1e2;
-  constexpr int x3 = 1e3;
-  constexpr int x4 = 1e4;
-  constexpr int x5 = 1e5;
-  constexpr int x6 = 1e6;
-  constexpr int x7 = 1e7;
-  constexpr int x8 = 1e8;
-  constexpr int x9 = 1e9;
+  constexpr T x1 = 1e1;
+  constexpr T x2 = 1e2;
+  constexpr T x3 = 1e3;
+  constexpr T x4 = 1e4;
+  constexpr T x5 = 1e5;
+  constexpr T x6 = 1e6;
+  constexpr T x7 = 1e7;
+  constexpr T x8 = 1e8;
+  constexpr T x9 = 1e9;
 
-  if (x < x1) {
-    return 1;
-  } else if (x < x2) {
-    return 2;
-  } else if (x < x3) {
-    return 3;
-  } else if (x < x4) {
-    return 4;
-  } else if (x < x5) {
-    return 5;
-  } else if (x < x6) {
-    return 6;
-  } else if (x < x7) {
-    return 7;
-  } else if (x < x8) {
-    return 8;
-  } else if (x < x9) {
-    return 9;
-  } else {
-    return 10;
-  }
+  return x < x1
+             ? 1
+             : x < x2
+                   ? 2
+                   : x < x3
+                         ? 3
+                         : x < x4
+                               ? 4
+                               : x < x5
+                                     ? 5
+                                     : x < x6
+                                           ? 6
+                                           : x < x7
+                                                 ? 7
+                                                 : x < x8 ? 8 : x < x9 ? 9 : 10;
 }
 
 inline void finalize_df(Rcpp::List& x, const int& n_rows) {
@@ -61,7 +56,7 @@ inline void finalize_df(Rcpp::List& x, const int& n_rows) {
 }
 
 template <class Msg_Proto_DF>
-SEXP as_df(const Msg_Proto_DF& msg_proto_df) {
+inline SEXP as_df(Msg_Proto_DF&& msg_proto_df) {
   if (msg_proto_df.common_row_index == 0) {
     return R_NilValue;
   }
