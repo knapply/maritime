@@ -1,0 +1,235 @@
+---
+title: "{maritime} Benchmarking"
+author: "Brendan Knapp"
+date: "4/10/2020"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+assignInNamespace(
+  "print.data.table",
+  function(x, ...) print(tibble::as_tibble(x), ...),
+  ns = "data.table"
+)
+options(width = 100)
+```
+
+# All in R
+
+```{r paged.print=FALSE}
+library(maritime)
+library(data.table)
+
+file_path <- "inst/example-data/big-files/20181210.log"
+# file_path <- "inst/example-data/20181101.log"
+
+
+ais_decode_bind <- function(file_path) {
+  # dttm_cols <- c("time_start", "time_end")
+
+  out <- rbindlist(
+    ais_decode_list(file_path),
+    use.names = TRUE, fill = TRUE, idcol = "msg_type"
+  )
+  # list_cols <- names(out)[vapply(out, is.recursive, logical(1L))]
+  # if (length(list_cols)) {
+  #   out[, (list_cols) := NULL]
+  # }
+
+  out
+}
+
+all_r_bench_mark <- bench::mark(
+  ais_decode_bind = res <- ais_decode_bind(file_path),
+  iterations = 1,
+  filter_gc = FALSE
+)
+
+all_r_bench_mark
+
+res
+```
+
+# R to SQLite
+
+```{r}
+ais_table_template <- function() {
+  structure(list(
+    msg_type = character(0), time_start = structure(integer(0), class = c(
+      "POSIXct",
+      "POSIXt"
+    ), tzone = "UTC"), time_end = structure(integer(0), class = c(
+      "POSIXct",
+      "POSIXt"
+    ), tzone = "UTC"), message_id = integer(0), repeat_indicator = integer(0),
+    mmsi = integer(0), nav_status = integer(0), rot_over_range = logical(0),
+    rot = numeric(0), sog = numeric(0), position_accuracy = integer(0),
+    lng_deg = numeric(0), lat_deg = numeric(0), cog = numeric(0),
+    true_heading = integer(0), timestamp = integer(0), special_manoeuvre = integer(0),
+    spare = integer(0), raim = logical(0), sync_state = integer(0),
+    slot_timeout = integer(0), received_stations = integer(0),
+    slot_number = integer(0), utc_hour = integer(0), utc_min = integer(0),
+    utc_spare = integer(0), slot_offset = integer(0), slot_increment = integer(0),
+    slots_to_allocate = integer(0), keep_flag = logical(0), year = integer(0),
+    month = integer(0), day = integer(0), hour = integer(0),
+    minute = integer(0), second = integer(0), fix_type = integer(0),
+    transmission_ctl = integer(0), ais_version = integer(0),
+    imo_num = integer(0), callsign = character(0), name = character(0),
+    type_and_cargo = integer(0), dim_a = integer(0), dim_b = integer(0),
+    dim_c = integer(0), dim_d = integer(0), eta_month = integer(0),
+    eta_day = integer(0), eta_hour = integer(0), eta_minute = integer(0),
+    draught = numeric(0), destination = character(0), dte = integer(0),
+    spare2 = integer(0)
+  ), row.names = integer(0), class = "data.frame")
+}
+```
+
+```{r}
+ais_init_db <- function(conn, name) {
+  DBI::dbWriteTable(
+    conn = conn,
+    name = name,
+    value = ais_table_template()
+  )
+}
+
+ais_append_db <- function(conn, name, file_path) {
+  # TODO use explicit NAs in empty list cols at cpp level
+  init <- lapply(ais_decode_list(file_path), function(.x) {
+    setDT(.x)
+
+    list_cols <- names(.x)[vapply(.x, is.recursive, logical(1L))]
+    if (length(list_cols)) .x[, (list_cols) := NULL]
+
+    .x
+  })
+
+
+  for (i in seq_along(init)) {
+    this_df <- init[[i]]
+    if (is.null(this_df) || nrow(this_df) == 0L) {
+      next
+    }
+
+    this_df[, msg_type := names(init)[[i]]]
+    col_names <- intersect(names(this_df), DBI::dbListFields(conn, name))
+
+    DBI::dbAppendTable(
+      conn = conn,
+      name = name,
+      value = this_df[, ..col_names]
+    )
+  }
+
+  invisible(conn)
+}
+```
+
+
+
+```{r}
+con <- DBI::dbConnect(RSQLite::SQLite(), "temp.sqlite")
+
+# ais_init_db(con, "ais_db")
+
+list_cols <- names(res)[vapply(res, is.recursive, logical(1L))]
+res2 <- copy(res)[, (list_cols) := NULL]
+
+DBI::dbWriteTable(con, "ais_db", res)
+
+con %>% 
+  tbl("ais_db") %>% 
+  select(name) %>% 
+  filter(!is.na(name))
+  group_by(message_id) %>% 
+  summarise(n = n())
+
+
+
+db_bench_mark <- bench::mark(
+  `ais_append_db()` = ais_append_db(
+    conn = con, name = "ais_db",
+    file_path = file_path
+  )
+  ,
+  iterations = 1,
+  filter_gc = FALSE
+)
+```
+
+```{r}
+db_bench_mark
+```
+
+
+```{r}
+library(dplyr)
+library(dbplyr)
+
+tbl(con, "ais_db")
+
+tbl(con, "ais_db") %>%
+  filter(message_id == 3L)
+```
+
+
+## Loading Multiple Files
+
+```{r}
+file_paths <- dir("inst/example-data", pattern = "\\.log$", 
+                  full.names = TRUE, recursive = TRUE)
+paste(round(sum(file.size(file_paths)) / 1e9, digits = 2), "GB")
+file_paths
+```
+
+
+
+```{r}
+ais_build_db <- function(file_paths, name = "ais_db",
+                         conn = DBI::dbConnect(RSQLite::SQLite(), ":memory:")) {
+  stopifnot(all(file.exists(file_paths)))
+  
+  ais_init_db(conn = conn, name = name)
+  for (i in seq_along(file_paths)) {
+    ais_append_db(conn = conn, name = name, file_path = file_paths[[i]])
+  }
+
+  conn
+}
+
+
+disk_con <- DBI::dbConnect(RSQLite::SQLite(), "temp.sqlite")
+
+batch_db_con <- ais_build_db(file_paths, conn = disk_con)
+
+batch_db_bench_mark <- bench::mark(
+  `in-memory ais_build_db()` = 
+    batch_db_con <- ais_build_db(file_paths)
+  ,
+  iterations = 1,
+  filter_gc = FALSE
+)
+
+batch_db_con %>% 
+  tbl("ais_db") %>%
+  group_by(message_id) %>%
+  summarise(n = n()) %>% 
+  arrange(message_id)
+
+DBI::dbDisconnect(disk_con)
+unlink("temp.sqlite")
+```
+
+
+# All Benchmarks
+
+
+```{r}
+do.call(rbind, list(all_r_bench_mark, db_bench_mark, batch_db_bench_mark))
+```
+
+
+<br><br><br><br>

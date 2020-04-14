@@ -1,10 +1,31 @@
+// Modified(knapply)
+// 1) `strip()` added to trim whitespace before `.toString()` returns
+
+#include <algorithm>
+
 #include "ais.h"
 
 namespace libais {
 
+static inline void lstrip(std::string &s) {
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
+        return !std::isspace(ch);
+    }));
+}
+
+static inline void rstrip(std::string &s) {
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
+        return !std::isspace(ch);
+    }).base(), s.end());
+}
+
+static inline void strip(std::string &s) {
+    lstrip(s);
+    rstrip(s);
+}
 AisBitset::AisBitset() : num_bits(0), num_chars(0), current_position(0) {}
 
-AIS_STATUS AisBitset::ParseNmeaPayload(const char *nmea_payload, int pad) {
+AIS_STATUS AisBitset::ParseNmeaPayload(const char* nmea_payload, int pad) {
   assert(nmea_payload);
   assert(pad >= 0 && pad < 6);
 
@@ -16,12 +37,12 @@ AIS_STATUS AisBitset::ParseNmeaPayload(const char *nmea_payload, int pad) {
 
   num_chars = strlen(nmea_payload);
 
-  const size_t max_chars = size()/6;
+  const size_t max_chars = size() / 6;
   if (static_cast<size_t>(num_chars) > max_chars) {
 #ifdef LIBAIS_DEBUG
     std::cerr << "ERROR: message longer than max allowed size (" << max_chars
-              << "): found " << num_chars << " characters in "
-              << nmea_payload << std::endl;
+              << "): found " << num_chars << " characters in " << nmea_payload
+              << std::endl;
 #endif
     num_chars = 0;  // Don't leave an impression that there are any valid chars.
     return AIS_ERR_MSG_TOO_LONG;
@@ -88,7 +109,7 @@ unsigned int AisBitset::ToUnsignedInt(const size_t start,
   return result;
 }
 
-int AisBitset::ToInt(const size_t start, const size_t len)  const {
+int AisBitset::ToInt(const size_t start, const size_t len) const {
   assert(len <= 32);
   // TODO(schwehr): Prefer to use num_bits (includes pad) for checking bounds.
   assert(start + len <= num_chars * 6);
@@ -119,9 +140,10 @@ string AisBitset::ToString(const size_t start, const size_t len) const {
   const size_t num_char = len / 6;
   string result(num_char, '@');
   for (size_t char_idx = 0; char_idx < num_char; char_idx++) {
-    const int char_num = ToUnsignedInt(start + char_idx*6, 6);
+    const int char_num = ToUnsignedInt(start + char_idx * 6, 6);
     result[char_idx] = bits_to_char_tbl_[char_num];
   }
+  strip(result);
   return result;
 }
 
@@ -156,7 +178,6 @@ const AisPoint AisBitset::ToAisPoint(const size_t start,
   return AisPoint(lng_deg / divisor, lat_deg / divisor);
 }
 
-
 // static private
 
 void AisBitset::InitNmeaOrd() {
@@ -176,7 +197,7 @@ void AisBitset::InitNmeaOrd() {
   nmea_ord_initialized_ = true;
 }
 
-bitset<6> AisBitset::Reverse(const bitset<6> &bits) {
+bitset<6> AisBitset::Reverse(const bitset<6>& bits) {
   bitset<6> out;
   for (size_t i = 0; i < 6; i++)
     out[5 - i] = bits[i];
@@ -186,7 +207,8 @@ bitset<6> AisBitset::Reverse(const bitset<6> &bits) {
 bool AisBitset::nmea_ord_initialized_ = false;
 bitset<6> AisBitset::nmea_ord_[128];
 // For decoding str bits inside of a binary message.
-const char AisBitset::bits_to_char_tbl_[] = "@ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+const char AisBitset::bits_to_char_tbl_[] =
+    "@ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     "[\\]^- !\"#$%&`()*+,-./0123456789:;<=>?";
 
 }  // namespace libais

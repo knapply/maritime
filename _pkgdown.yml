@@ -9,10 +9,11 @@ template:
 reference:
     - title: AIS
       contents:
+      - ais_msgs
       - ais_decode_filter
       - ais_decode_list
-      - ais_version
-    
+      - ais_decode_df
+
     - title: Options
       contents:
       - maritime_options

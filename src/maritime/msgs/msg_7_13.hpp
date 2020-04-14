@@ -1,4 +1,4 @@
-#ifndef MARITIME_MSG_7_23_HPP
+#ifndef MARITIME_MSG_7_13_HPP
 #define MARITIME_MSG_7_13_HPP
 
 #include "msg.hpp"
@@ -9,23 +9,23 @@ class Msgs_7_13 : public AIS_Msgs<libais::Ais7_13> {
 
  public:
   Msgs_7_13(const int n)
-      : AIS_Msgs::AIS_Msgs(n),     //
-        dest_mmsi(n, vec_int(0)),  //
-        seq_num(n, vec_int(0))     //
+      : AIS_Msgs::AIS_Msgs(n),                 //
+        dest_mmsi(n, vec_int(1, NA_INTEGER)),  //
+        seq_num(n, vec_int(1, NA_INTEGER))     //
         {};
 
-  void push(const libais::Ais7_13& msg,
-            const double _time_start,
-            const double _time_end) {
-    const auto row_index = AIS_Msgs::common_row_index;
-    const auto push_success = AIS_Msgs::init_push(msg, _time_start, _time_end);
-
-    if (!push_success) {
+  void push(libais::Ais7_13&& msg,
+            const std::size_t _line_number,
+            const double _time) {
+    if (msg.had_error()) {
       return;
     }
+    const auto row_index = AIS_Msgs::common_row_index;
+    AIS_Msgs::init_push(msg.message_id, msg.repeat_indicator, msg.mmsi,
+                        _line_number, _time);
 
     const auto n_dest_mmsi = msg.dest_mmsi.size();
-    if (n_dest_mmsi > 0) {
+    if (n_dest_mmsi != 0) {
       vec_int _dest_mmsi(n_dest_mmsi, NA_INTEGER);
       vec_int _seq_num(n_dest_mmsi, NA_INTEGER);
 

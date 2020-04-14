@@ -21,23 +21,11 @@ ais_version <- function() {
     .Call(`_maritime_ais_decode_file`, file_path, as_df, verbose)
 }
 
-.nmea_df <- function(file_path, n_max) {
-    .Call(`_maritime_nmea_df`, file_path, n_max)
+.ais_decode_filter_file <- function(file_path, msg_type, verbose) {
+    .Call(`_maritime_cpp_ais_decode_filter_file`, file_path, msg_type, verbose)
 }
 
-.nest_test <- function(file_path) {
-    .Call(`_maritime_nest_test`, file_path)
-}
-
-.ais_decode_file_filter <- function(file_path, msg_type, verbose) {
-    .Call(`_maritime_decode_filter_file_impl`, file_path, msg_type, verbose)
-}
-
-.ais_decode_file_list <- function(file_path, verbose) {
-    .Call(`_maritime_decode_list_file_impl`, file_path, verbose)
-}
-
-.ais_unwrap_msg <- function(ais_ptr) {
-    .Call(`_maritime_unwrap_ais_ptr`, ais_ptr)
+.ais_decode_list_file <- function(file_path, verbose) {
+    .Call(`_maritime_cpp_ais_decode_list_file`, file_path, verbose)
 }
 

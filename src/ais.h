@@ -503,6 +503,7 @@ class Ais1_2_3 : public AisMsg {
   bool keep_flag;  // 3.3.7.3.2 Annex 2 ITDMA.  Table 20
 
   Ais1_2_3(const char *nmea_payload, const size_t pad);
+  Ais1_2_3() = default;
 };
 ostream& operator<< (ostream &o, const Ais1_2_3 &msg);
 
@@ -543,6 +544,7 @@ class Ais4_11 : public AisMsg {
 
   // **NO** ITDMA
   Ais4_11(const char *nmea_payload, const size_t pad);
+  Ais4_11() = default;
 };
 ostream& operator<< (ostream &o, const Ais4_11 &msg);
 
@@ -567,7 +569,9 @@ class Ais5 : public AisMsg {
   int dte;
   int spare;
 
+  Ais5() = default;
   Ais5(const char *nmea_payload, const size_t pad);
+  
 };
 ostream& operator<< (ostream &o, const Ais5 &msg);
 
@@ -859,7 +863,8 @@ class Ais7_13 : public AisMsg {
 
   vector<int> dest_mmsi;
   vector<int> seq_num;
-
+  
+  Ais7_13() = default;
   Ais7_13(const char *nmea_payload, const size_t pad);
 };
 ostream& operator<< (ostream &o, const Ais7_13 &msg);
@@ -2025,7 +2030,8 @@ class Ais9 : public AisMsg {
 
   bool keep_flag_valid;
   bool keep_flag;
-
+  
+  Ais9() = default;
   Ais9(const char *nmea_payload, const size_t pad);
 };
 ostream& operator<< (ostream &o, const Ais9 &msg);
@@ -2037,6 +2043,7 @@ class Ais10 : public AisMsg {
   int dest_mmsi;
   int spare2;
 
+  Ais10() = default;
   Ais10(const char *nmea_payload, const size_t pad);
 };
 ostream& operator<< (ostream &o, const Ais10 &msg);
@@ -2053,6 +2060,7 @@ class Ais12 : public AisMsg {
   string text;
   int spare2;
 
+  Ais12() = default;
   Ais12(const char *nmea_payload, const size_t pad);
 };
 ostream& operator<< (ostream &o, const Ais12 &msg);
@@ -2066,6 +2074,7 @@ class Ais14 : public AisMsg {
   string text;
   int spare2;
 
+  Ais14() = default;
   Ais14(const char *nmea_payload, const size_t pad);
 };
 ostream& operator<< (ostream &o, const Ais14 &msg);
@@ -2088,6 +2097,7 @@ class Ais15 : public AisMsg {
   int slot_offset_2;
   int spare4;
 
+  Ais15() = default;
   Ais15(const char *nmea_payload, const size_t pad);
 };
 ostream& operator<< (ostream &o, const Ais15 &msg);
@@ -2104,6 +2114,7 @@ class Ais16 : public AisMsg {
   int inc_b;
   int spare2;
 
+  Ais16() = default;
   Ais16(const char *nmea_payload, const size_t pad);
 };
 ostream& operator<< (ostream &o, const Ais16 &msg);
@@ -2123,6 +2134,7 @@ class Ais17 : public AisMsg {
   int health;
   // TODO(schwehr): Handle payload
 
+  Ais17() = default;
   Ais17(const char *nmea_payload, const size_t pad);
 };
 ostream& operator<< (ostream &o, const Ais17 &msg);
@@ -2184,6 +2196,7 @@ class Ais18 : public AisMsg {
   bool commstate_cs_fill_valid;
   int commstate_cs_fill;
 
+  Ais18() = default;
   Ais18(const char *nmea_payload, const size_t pad);
 };
 ostream& operator<< (ostream &o, const Ais18 &msg);
@@ -2211,6 +2224,7 @@ class Ais19 : public AisMsg {
   int assigned_mode;
   int spare3;
 
+  Ais19() = default;
   Ais19(const char *nmea_payload, const size_t pad);
 };
 ostream& operator<< (ostream &o, const Ais19 &msg);
@@ -2245,6 +2259,7 @@ class Ais20 : public AisMsg {
 
   int spare2;
 
+  Ais20() = default;
   Ais20(const char *nmea_payload, const size_t pad);
 };
 ostream& operator<< (ostream &o, const Ais20 &msg);
@@ -2271,6 +2286,7 @@ class Ais21 : public AisMsg {
   // Extended name goes on the end of name
   int spare2;
 
+  Ais21() = default;
   Ais21(const char *nmea_payload, const size_t pad);
 };
 ostream& operator<< (ostream &o, const Ais21 &msg);
@@ -2300,6 +2316,7 @@ class Ais22 : public AisMsg {
 
   int spare2;  // Lame that they make a huge spare here.  Bad bad bad
 
+  Ais22() = default;
   Ais22(const char *nmea_payload, const size_t pad);
 };
 ostream& operator<< (ostream &o, const Ais22 &msg);
@@ -2320,6 +2337,7 @@ class Ais23 : public AisMsg {
   int quiet;
   int spare3;
 
+  Ais23() = default;
   Ais23(const char *nmea_payload, const size_t pad);
 };
 ostream& operator<< (ostream &o, const Ais23 &msg);
@@ -2344,7 +2362,7 @@ class Ais24 : public AisMsg {
 
   // Part C - Not defined by ITU 1371-5
   // Part D - Not defined by ITU 1371-5
-
+  Ais24() = default;
   Ais24(const char *nmea_payload, const size_t pad);
 };
 ostream& operator<< (ostream &o, const Ais24 &msg);
@@ -2362,7 +2380,7 @@ class Ais25 : public AisMsg {
 
   int dac;  // valid if use_app_id is true
   int fi;
-
+  Ais25() = default;
   Ais25(const char *nmea_payload, const size_t pad);
 };
 ostream& operator<< (ostream &o, const Ais25 &msg);
@@ -2413,6 +2431,7 @@ class Ais26 : public AisMsg {
   bool keep_flag_valid;
   bool keep_flag;
 
+  Ais26() = default;
   Ais26(const char *nmea_payload, const size_t pad);
 };
 ostream& operator<< (ostream &o, const Ais26 &msg);
@@ -2429,6 +2448,7 @@ class Ais27 : public AisMsg {
   bool gnss;  // warning: bits in AIS are flipped sense
   int spare;
 
+  Ais27() = default;
   Ais27(const char *nmea_payload, const size_t pad);
 };
 ostream& operator<< (ostream &o, const Ais27 &msg);

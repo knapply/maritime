@@ -45,15 +45,15 @@ class Msgs_5 : public AIS_Msgs<libais::Ais5> {
         dte(n, NA_INTEGER),
         spare(n, NA_INTEGER){};
 
-  void push(const libais::Ais5& msg,
-            const double _time_start,
-            const double _time_end) {
+  void push(libais::Ais5&& msg,
+            const std::size_t _line_number,
+            const double _time) {
     const auto row_index = AIS_Msgs::common_row_index;
-    const auto push_success = AIS_Msgs::init_push(msg, _time_start, _time_end);
-
-    if (!push_success) {
+    if (msg.had_error()) {
       return;
     }
+    AIS_Msgs::init_push(msg.message_id, msg.repeat_indicator, msg.mmsi,
+                        _line_number, _time);
 
     this->ais_version[row_index] = msg.ais_version;
     this->imo_num[row_index] = msg.imo_num;
@@ -101,6 +101,5 @@ class Msgs_5 : public AIS_Msgs<libais::Ais5> {
     return out;
   };
 };
-
 
 #endif

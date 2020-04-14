@@ -10,7 +10,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
-<script src="pkgdown.js"></script><meta property="og:title" content="Routines for Maritime Data">
+<script src="pkgdown.js"></script><link href="extra.css" rel="stylesheet">
+<meta property="og:title" content="Routines for Maritime Data">
 <meta property="og:description" content="
     Routines for maritime data.">
 <meta name="twitter:card" content="summary">
@@ -74,9 +75,14 @@
 <ul>
 <li><a href="#introduction">Introduction</a></li>
 <li><a href="#installation">Installation</a></li>
-<li><a href="#status">Status</a></li>
 <li><a href="#usage">Usage</a></li>
+<li>
+<a href="#ais-sentence-aivdmaivdo-decoding">AIS Sentence (AIVDM/AIVDO) Decoding</a>
+<ul>
+<li><a href="#status">Status</a></li>
 <li><a href="#performance">Performance</a></li>
+</ul>
+</li>
 <li><a href="#credits">Credits</a></li>
 </ul>
 <!-- README.Rmd generates README.md. --><!-- badges: start -->
@@ -85,7 +91,7 @@
 <h1 class="hasAnchor">
 <a href="#introduction" class="anchor"></a>Introduction</h1>
 <p><code>{maritime}</code> is a toolkit for maritime data.</p>
-<p>Initial focus is building <em>performant</em> and correct AIS decoding routines for R by building on <a href="https://twitter.com/kurtschwehr">Kurt Schwehr</a>’s <a href="https://github.com/schwehr/libais"><strong>libais</strong></a>.</p>
+<p>Initial focus is <em>performant</em> and correct AIS decoding routines for R by building on <a href="https://twitter.com/kurtschwehr">Kurt Schwehr</a>’s <a href="https://github.com/schwehr/libais"><strong>libais</strong></a>.</p>
 </div>
 <div id="installation" class="section level1">
 <h1 class="hasAnchor">
@@ -94,171 +100,352 @@
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="cf">if</span> (<span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/ns-load.html">requireNamespace</a></span>(<span class="st">"remotes"</span>, <span class="dt">quietly =</span> <span class="ot">TRUE</span>)) <span class="kw"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"remotes"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2"></a>remotes<span class="op">::</span><span class="kw"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span>(<span class="st">"knapply/maritime"</span>)</span></code></pre></div>
 </div>
-<div id="status" class="section level1">
-<h1 class="hasAnchor">
-<a href="#status" class="anchor"></a>Status</h1>
-<p>What’s implemented so far?</p>
-<ul>
-<li>
-<em>Fast</em> preprocessing and line normalization.
-<ul>
-<li>Multi-line messages are reconciled and merged <em>automatically</em>.</li>
-</ul>
-</li>
-<li>Message Types:
-<ul>
-<li><code>ais_msgs$msg_1_2_3</code></li>
-<li><code>ais_msgs$msg_4_11</code></li>
-<li><code>ais_msgs$msg_5</code></li>
-<li><code>ais_msgs$msg_7_13</code></li>
-<li><code>ais_msgs$msg_9</code></li>
-<li><code>ais_msgs$msg_10</code></li>
-</ul>
-</li>
-</ul>
-</div>
 <div id="usage" class="section level1">
 <h1 class="hasAnchor">
 <a href="#usage" class="anchor"></a>Usage</h1>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(maritime)</span></code></pre></div>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>nmea_file &lt;-<span class="st"> "inst/example-data/big-files/20181210.log"</span></span>
+</div>
+<div id="ais-sentence-aivdmaivdo-decoding" class="section level1">
+<h1 class="hasAnchor">
+<a href="#ais-sentence-aivdmaivdo-decoding" class="anchor"></a>AIS Sentence (AIVDM/AIVDO) Decoding</h1>
+<div id="status" class="section level2">
+<h2 class="hasAnchor">
+<a href="#status" class="anchor"></a>Status</h2>
+<ul>
+<li>
+<input type="checkbox" disabled checked>
+Automatic sentence validation and line normalization</li>
+<li>Message Types:
+<ul>
+<li>
+<input type="checkbox" disabled checked><code>ais_msgs$msg_1_2_3</code>
+</li>
+<li>
+<input type="checkbox" disabled checked><code>ais_msgs$msg_4_11</code>
+</li>
+<li>
+<input type="checkbox" disabled checked><code>ais_msgs$msg_5</code>
+</li>
+<li>
+<input type="checkbox" disabled><code>ais_msgs$msg_6</code>
+</li>
+<li>
+<input type="checkbox" disabled checked><code>ais_msgs$msg_7_13</code>
+</li>
+<li>
+<input type="checkbox" disabled><code>ais_msgs$msg_8</code>
+</li>
+<li>
+<input type="checkbox" disabled checked><code>ais_msgs$msg_9</code>
+</li>
+<li>
+<input type="checkbox" disabled checked><code>ais_msgs$msg_10</code>
+</li>
+<li>
+<input type="checkbox" disabled checked><code>ais_msgs$msg_11</code>
+</li>
+<li>
+<input type="checkbox" disabled checked><code>ais_msgs$msg_12</code>
+</li>
+<li>
+<input type="checkbox" disabled checked><code>ais_msgs$msg_14</code>
+</li>
+<li>
+<input type="checkbox" disabled checked><code>ais_msgs$msg_15</code>
+</li>
+<li>
+<input type="checkbox" disabled checked><code>ais_msgs$msg_16</code>
+</li>
+<li>
+<input type="checkbox" disabled checked><code>ais_msgs$msg_17</code>
+</li>
+<li>
+<input type="checkbox" disabled checked><code>ais_msgs$msg_18</code>
+</li>
+<li>
+<input type="checkbox" disabled checked><code>ais_msgs$msg_19</code>
+</li>
+<li>
+<input type="checkbox" disabled checked><code>ais_msgs$msg_20</code>
+</li>
+<li>
+<input type="checkbox" disabled checked><code>ais_msgs$msg_21</code>
+</li>
+<li>
+<input type="checkbox" disabled checked><code>ais_msgs$msg_22</code>
+</li>
+<li>
+<input type="checkbox" disabled checked><code>ais_msgs$msg_23</code>
+</li>
+<li>
+<input type="checkbox" disabled checked><code>ais_msgs$msg_24</code>
+</li>
+<li>
+<input type="checkbox" disabled checked><code>ais_msgs$msg_25</code>
+</li>
+<li>
+<input type="checkbox" disabled checked><code>ais_msgs$msg_26</code>
+</li>
+<li>
+<input type="checkbox" disabled checked><code>ais_msgs$msg_27</code>
+</li>
+</ul>
+</li>
+</ul>
+<!-- end list --><div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>nmea_file &lt;-<span class="st"> "inst/example-data/big-files/20181210.log"</span></span>
 <span id="cb3-2"><a href="#cb3-2"></a><span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/file.info.html">file.size</a></span>(nmea_file) <span class="op">/</span><span class="st"> </span><span class="fl">1e9</span>, 2L), <span class="st">"GB"</span>)</span></code></pre></div>
 <div class="sourceCode" id="cb4"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co">#&gt; [1] "1.24 GB"</span></span></code></pre></div>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="kw"><a href="https://rdrr.io/r/base/readLines.html">readLines</a></span>(nmea_file, <span class="dt">n =</span> <span class="dv">10</span>) <span class="co"># quick peak at the data</span></span></code></pre></div>
-<div class="sourceCode" id="cb6"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co">#&gt;  [1] ",1544400000"                                                                            </span></span>
-<span id="cb6-2"><a href="#cb6-2"></a><span class="co">#&gt;  [2] ",1544400000"                                                                            </span></span>
-<span id="cb6-3"><a href="#cb6-3"></a><span class="co">#&gt;  [3] "!SAVDM,1,1,7,A,14WCf2001hr4dE&lt;?joPbHpGh88RM,0*4C,1544400000,1544400000"                 </span></span>
-<span id="cb6-4"><a href="#cb6-4"></a><span class="co">#&gt;  [4] "!AIVDM,2,1,6,B,55Q&gt;TD02AfVC&lt;HD7:20Lht84j055D58UE&gt;222216B0JC871l0&gt;4381i3,0*75,1544400000"</span></span>
-<span id="cb6-5"><a href="#cb6-5"></a><span class="co">#&gt;  [5] "!AIVDM,2,2,6,B,`88888888888880,2*79,1544400000,1544400000"                              </span></span>
-<span id="cb6-6"><a href="#cb6-6"></a><span class="co">#&gt;  [6] "!AIVDM,1,1,,A,B3gsP70007Topd9B8lmVKwu5kP06,0*59,1544400000,1544400000"                  </span></span>
-<span id="cb6-7"><a href="#cb6-7"></a><span class="co">#&gt;  [7] "!SAVDM,1,1,3,A,H52ONqlUCBD6llD00000000h6220,0*50,1544400000,1544400000"                 </span></span>
-<span id="cb6-8"><a href="#cb6-8"></a><span class="co">#&gt;  [8] "!BSVDM,1,1,,A,13n;to000129MwVWqNmm?:Kl0@RJ,0*37,1544400000,1544400000"                  </span></span>
-<span id="cb6-9"><a href="#cb6-9"></a><span class="co">#&gt;  [9] "!ABVDM,1,1,1,B,33u=NqU000QAtkdQsKdN42;n0De:,0*5D,1544400000,1544400000"                 </span></span>
-<span id="cb6-10"><a href="#cb6-10"></a><span class="co">#&gt; [10] "!AIVDM,1,1,,B,H3gi=84N0000000B5elii00P7110,0*36,1544400000,1544400000"</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="kw"><a href="https://rdrr.io/r/base/readLines.html">readLines</a></span>(nmea_file, <span class="dt">n =</span> <span class="dv">20</span>) <span class="co"># real world data, in all its terrible glory</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co">#&gt;  [1] ",1544400000"                                                                                </span></span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="co">#&gt;  [2] ",1544400000"                                                                                </span></span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="co">#&gt;  [3] "!SAVDM,1,1,7,A,14WCf2001hr4dE&lt;?joPbHpGh88RM,0*4C,1544400000,1544400000"                     </span></span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="co">#&gt;  [4] "!AIVDM,2,1,6,B,55Q&gt;TD02AfVC&lt;HD7:20Lht84j055D58UE&gt;222216B0JC871l0&gt;4381i3,0*75,1544400000"    </span></span>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="co">#&gt;  [5] "!AIVDM,2,2,6,B,`88888888888880,2*79,1544400000,1544400000"                                  </span></span>
+<span id="cb6-6"><a href="#cb6-6"></a><span class="co">#&gt;  [6] "!AIVDM,1,1,,A,B3gsP70007Topd9B8lmVKwu5kP06,0*59,1544400000,1544400000"                      </span></span>
+<span id="cb6-7"><a href="#cb6-7"></a><span class="co">#&gt;  [7] "!SAVDM,1,1,3,A,H52ONqlUCBD6llD00000000h6220,0*50,1544400000,1544400000"                     </span></span>
+<span id="cb6-8"><a href="#cb6-8"></a><span class="co">#&gt;  [8] "!BSVDM,1,1,,A,13n;to000129MwVWqNmm?:Kl0@RJ,0*37,1544400000,1544400000"                      </span></span>
+<span id="cb6-9"><a href="#cb6-9"></a><span class="co">#&gt;  [9] "!ABVDM,1,1,1,B,33u=NqU000QAtkdQsKdN42;n0De:,0*5D,1544400000,1544400000"                     </span></span>
+<span id="cb6-10"><a href="#cb6-10"></a><span class="co">#&gt; [10] "!AIVDM,1,1,,B,H3gi=84N0000000B5elii00P7110,0*36,1544400000,1544400000"                      </span></span>
+<span id="cb6-11"><a href="#cb6-11"></a><span class="co">#&gt; [11] "!SAVDM,1,1,3,A,H5NWU?TU653hhhi00000001H;330,0*73,1544400000,1544400000"                     </span></span>
+<span id="cb6-12"><a href="#cb6-12"></a><span class="co">#&gt; [12] "!ABVDM,1,1,0,B,33uB8eU000Q7F2NP8NcBch1n0DbJ,0*42,1544400000,1544400000"                     </span></span>
+<span id="cb6-13"><a href="#cb6-13"></a><span class="co">#&gt; [13] "!SAVDM,1,1,9,B,B52`F8000=qpmg4cW8PWOwu5oP06,0*25,1544400000,1544400000"                     </span></span>
+<span id="cb6-14"><a href="#cb6-14"></a><span class="co">#&gt; [14] "!SAVDM,1,1,4,B,B5NQqW000=ijOF60tMv3Cwu5oP06,0*75,1544400000,1544400000"                     </span></span>
+<span id="cb6-15"><a href="#cb6-15"></a><span class="co">#&gt; [15] "!SAVDM,1,1,5,A,B5MHR&gt;000=ijQ0V0tI2N?wu5oP06,0*6E,1544400000,1544400000"                     </span></span>
+<span id="cb6-16"><a href="#cb6-16"></a><span class="co">#&gt; [16] "!ABVDM,2,1,2,A,53u=I?41r&gt;s5&lt;`uV22084i@T&lt;62222222222221J4hC6674EN:3SlTRp42CQ,0*27,1544400000"</span></span>
+<span id="cb6-17"><a href="#cb6-17"></a><span class="co">#&gt; [17] "!ABVDM,2,2,2,A,p8888888880,2*65,1544400000,1544400000"                                      </span></span>
+<span id="cb6-18"><a href="#cb6-18"></a><span class="co">#&gt; [18] "!AIVDM,2,1,0,A,53b7IP81mbF908=`000@Dv0Lhu8T40000000000Q78?7773E06@hDQ2A,0*60,1544400000"    </span></span>
+<span id="cb6-19"><a href="#cb6-19"></a><span class="co">#&gt; [19] "!AIVDM,2,2,0,A,Q`0000000000000,2*15,1544400000,1544400000"                                  </span></span>
+<span id="cb6-20"><a href="#cb6-20"></a><span class="co">#&gt; [20] "!BSVDM,2,1,2,A,53mFpH01@&lt;V4h5AG&lt;00pu8A=@`E8pDp0000000152Hu&lt;173&gt;0&lt;2lRDm2@CTm,0*16,1544400000"</span></span></code></pre></div>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw"><a href="reference/ais_decode_filter.html">ais_decode_filter</a></span>(<span class="dt">msgs =</span> nmea_file, <span class="dt">msg_type =</span> ais_msgs<span class="op">$</span>msg_<span class="dv">1</span>_<span class="dv">2</span>_<span class="dv">3</span>)</span></code></pre></div>
 <div class="sourceCode" id="cb8"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="co">#&gt; # A tibble: 5,117,490 x 29</span></span>
-<span id="cb8-2"><a href="#cb8-2"></a><span class="co">#&gt;    time_start          time_end            message_id repeat_indicator   mmsi nav_status rot_over_range   rot    sog position_accura… lng_deg lat_deg</span></span>
-<span id="cb8-3"><a href="#cb8-3"></a><span class="co">#&gt;    &lt;dttm&gt;              &lt;dttm&gt;                   &lt;int&gt;            &lt;int&gt;  &lt;int&gt;      &lt;int&gt; &lt;lgl&gt;          &lt;dbl&gt;  &lt;dbl&gt;            &lt;int&gt;   &lt;dbl&gt;   &lt;dbl&gt;</span></span>
-<span id="cb8-4"><a href="#cb8-4"></a><span class="co">#&gt;  1 2018-12-10 00:00:00 2018-12-10 00:00:00          1                0 3.10e8          0 FALSE             0  11.2                  1  -82.9     27.6</span></span>
-<span id="cb8-5"><a href="#cb8-5"></a><span class="co">#&gt;  2 2018-12-10 00:00:00 2018-12-10 00:00:00          1                0 2.58e8          0 FALSE             0   0.100                0   30.0     69.7</span></span>
-<span id="cb8-6"><a href="#cb8-6"></a><span class="co">#&gt;  3 2018-12-10 00:00:00 2018-12-10 00:00:00          3                0 2.66e8          5 FALSE             0   0                    1   17.9     59.3</span></span>
-<span id="cb8-7"><a href="#cb8-7"></a><span class="co">#&gt;  4 2018-12-10 00:00:00 2018-12-10 00:00:00          3                0 2.66e8          5 FALSE             0   0                    1   15.6     56.2</span></span>
-<span id="cb8-8"><a href="#cb8-8"></a><span class="co">#&gt;  5 2018-12-10 00:00:00 2018-12-10 00:00:00          1                0 3.67e8          3 FALSE             0   2.90                 1  -88.9     30.2</span></span>
-<span id="cb8-9"><a href="#cb8-9"></a><span class="co">#&gt;  6 2018-12-10 00:00:00 2018-12-10 00:00:00          1                0 3.05e8          0 FALSE             0  13.7                  1  -79.4     26.6</span></span>
-<span id="cb8-10"><a href="#cb8-10"></a><span class="co">#&gt;  7 2018-12-10 00:00:00 2018-12-10 00:00:00          1                0 2.65e8          0 FALSE             0   0                    0   11.0     58.9</span></span>
-<span id="cb8-11"><a href="#cb8-11"></a><span class="co">#&gt;  8 2018-12-10 00:00:00 2018-12-10 00:00:00          1                0 2.57e8          0 TRUE           -731.  0                    1    7.60    63.1</span></span>
-<span id="cb8-12"><a href="#cb8-12"></a><span class="co">#&gt;  9 2018-12-10 00:00:00 2018-12-10 00:00:00          3                0 2.73e8          5 FALSE             0   0                    0   19.0     69.7</span></span>
-<span id="cb8-13"><a href="#cb8-13"></a><span class="co">#&gt; 10 2018-12-10 00:00:00 2018-12-10 00:00:00          1                0 3.67e8         15 TRUE           -731.  0                    0  -89.6     40.7</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="co">#&gt;    time                first_line_numb… message_id repeat_indicator   mmsi nav_status rot_over_range   rot    sog position_accura… lng_deg lat_deg</span></span>
+<span id="cb8-3"><a href="#cb8-3"></a><span class="co">#&gt;    &lt;dttm&gt;                         &lt;int&gt;      &lt;int&gt;            &lt;int&gt;  &lt;int&gt;      &lt;int&gt; &lt;lgl&gt;          &lt;dbl&gt;  &lt;dbl&gt;            &lt;int&gt;   &lt;dbl&gt;   &lt;dbl&gt;</span></span>
+<span id="cb8-4"><a href="#cb8-4"></a><span class="co">#&gt;  1 2018-12-10 00:00:00                3          1                0 3.10e8          0 FALSE             0  11.2                  1  -82.9     27.6</span></span>
+<span id="cb8-5"><a href="#cb8-5"></a><span class="co">#&gt;  2 2018-12-10 00:00:00                8          1                0 2.58e8          0 FALSE             0   0.100                0   30.0     69.7</span></span>
+<span id="cb8-6"><a href="#cb8-6"></a><span class="co">#&gt;  3 2018-12-10 00:00:00                9          3                0 2.66e8          5 FALSE             0   0                    1   17.9     59.3</span></span>
+<span id="cb8-7"><a href="#cb8-7"></a><span class="co">#&gt;  4 2018-12-10 00:00:00               12          3                0 2.66e8          5 FALSE             0   0                    1   15.6     56.2</span></span>
+<span id="cb8-8"><a href="#cb8-8"></a><span class="co">#&gt;  5 2018-12-10 00:00:00               25          1                0 3.67e8          3 FALSE             0   2.90                 1  -88.9     30.2</span></span>
+<span id="cb8-9"><a href="#cb8-9"></a><span class="co">#&gt;  6 2018-12-10 00:00:00               28          1                0 3.05e8          0 FALSE             0  13.7                  1  -79.4     26.6</span></span>
+<span id="cb8-10"><a href="#cb8-10"></a><span class="co">#&gt;  7 2018-12-10 00:00:00               30          1                0 2.65e8          0 FALSE             0   0                    0   11.0     58.9</span></span>
+<span id="cb8-11"><a href="#cb8-11"></a><span class="co">#&gt;  8 2018-12-10 00:00:00               34          1                0 2.57e8          0 TRUE           -731.  0                    1    7.60    63.1</span></span>
+<span id="cb8-12"><a href="#cb8-12"></a><span class="co">#&gt;  9 2018-12-10 00:00:00               35          3                0 2.73e8          5 FALSE             0   0                    0   19.0     69.7</span></span>
+<span id="cb8-13"><a href="#cb8-13"></a><span class="co">#&gt; 10 2018-12-10 00:00:00               39          1                0 3.67e8         15 TRUE           -731.  0                    0  -89.6     40.7</span></span>
 <span id="cb8-14"><a href="#cb8-14"></a><span class="co">#&gt; # … with 5,117,480 more rows, and 17 more variables: cog &lt;dbl&gt;, true_heading &lt;int&gt;, timestamp &lt;int&gt;, special_manoeuvre &lt;int&gt;, spare &lt;int&gt;,</span></span>
 <span id="cb8-15"><a href="#cb8-15"></a><span class="co">#&gt; #   raim &lt;lgl&gt;, sync_state &lt;int&gt;, slot_timeout &lt;int&gt;, received_stations &lt;int&gt;, slot_number &lt;int&gt;, utc_hour &lt;int&gt;, utc_min &lt;int&gt;, utc_spare &lt;int&gt;,</span></span>
 <span id="cb8-16"><a href="#cb8-16"></a><span class="co">#&gt; #   slot_offset &lt;int&gt;, slot_increment &lt;int&gt;, slots_to_allocate &lt;int&gt;, keep_flag &lt;lgl&gt;</span></span></code></pre></div>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="kw"><a href="reference/ais_decode_filter.html">ais_decode_filter</a></span>(<span class="dt">msgs =</span> nmea_file, <span class="dt">msg_type =</span> ais_msgs<span class="op">$</span>msg_<span class="dv">5</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb10"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="co">#&gt; # A tibble: 3,723,201 x 23</span></span>
-<span id="cb10-2"><a href="#cb10-2"></a><span class="co">#&gt;    time_start          time_end            message_id repeat_indicator   mmsi ais_version imo_num callsign name  type_and_cargo dim_a dim_b dim_c</span></span>
-<span id="cb10-3"><a href="#cb10-3"></a><span class="co">#&gt;    &lt;dttm&gt;              &lt;dttm&gt;                   &lt;int&gt;            &lt;int&gt;  &lt;int&gt;       &lt;int&gt;   &lt;int&gt; &lt;chr&gt;    &lt;chr&gt;          &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;</span></span>
-<span id="cb10-4"><a href="#cb10-4"></a><span class="co">#&gt;  1 2018-12-10 00:00:00 2018-12-10 00:00:00          5                0 3.70e8           0 9550436 "3FEA2 … "GLO…             70   144    26    19</span></span>
-<span id="cb10-5"><a href="#cb10-5"></a><span class="co">#&gt;  2 2018-12-10 00:00:00 2018-12-10 00:00:00          5                0 2.66e8           1 8010673 "SJOY  … "BAL…             90    38    19     6</span></span>
-<span id="cb10-6"><a href="#cb10-6"></a><span class="co">#&gt;  3 2018-12-10 00:00:00 2018-12-10 00:00:00          5                0 2.45e8           2 7711074 "PBCZ@@… "DEO…             33    57    15     7</span></span>
-<span id="cb10-7"><a href="#cb10-7"></a><span class="co">#&gt;  4 2018-12-10 00:00:00 2018-12-10 00:00:00          5                0 2.57e8           0 5255777 "LATU3@… "NOR…             69    19    61    12</span></span>
-<span id="cb10-8"><a href="#cb10-8"></a><span class="co">#&gt;  5 2018-12-10 00:00:00 2018-12-10 00:00:00          5                0 2.66e8           1       0 "SCFR@@… "VAD…             60     8    29     4</span></span>
-<span id="cb10-9"><a href="#cb10-9"></a><span class="co">#&gt;  6 2018-12-10 00:00:00 2018-12-10 00:00:00          5                0 3.67e8           0     220 "WDF650… "COU…             52     7     9     4</span></span>
-<span id="cb10-10"><a href="#cb10-10"></a><span class="co">#&gt;  7 2018-12-10 00:00:00 2018-12-10 00:00:00          5                0 2.58e8           0 9417830 "LFFE  … "SKA…             52    20    67    10</span></span>
-<span id="cb10-11"><a href="#cb10-11"></a><span class="co">#&gt;  8 2018-12-10 00:00:00 2018-12-10 00:00:00          5                0 3.67e8           0 8635863 "WDC280… "RAY…             31     8    12     2</span></span>
-<span id="cb10-12"><a href="#cb10-12"></a><span class="co">#&gt;  9 2018-12-10 00:00:00 2018-12-10 00:00:00          5                0 3.67e8           0       0 "WCZ456… "DOU…              0     5    20     5</span></span>
-<span id="cb10-13"><a href="#cb10-13"></a><span class="co">#&gt; 10 2018-12-10 00:00:00 2018-12-10 00:00:00          5                0 2.15e8           0 9431006 "9HA262… "WIL…             70   105    18     3</span></span>
-<span id="cb10-14"><a href="#cb10-14"></a><span class="co">#&gt; # … with 3,723,191 more rows, and 10 more variables: dim_d &lt;int&gt;, fix_type &lt;int&gt;, eta_month &lt;int&gt;, eta_day &lt;int&gt;, eta_hour &lt;int&gt;, eta_minute &lt;int&gt;,</span></span>
-<span id="cb10-15"><a href="#cb10-15"></a><span class="co">#&gt; #   draught &lt;dbl&gt;, destination &lt;chr&gt;, dte &lt;int&gt;, spare &lt;int&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="kw"><a href="reference/ais_decode_filter.html">ais_decode_list</a></span>(<span class="dt">msgs =</span> nmea_file)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="co">#&gt; $msgs_1_2_3</span></span>
+<span id="cb10-2"><a href="#cb10-2"></a><span class="co">#&gt; # A tibble: 5,117,490 x 29</span></span>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="co">#&gt;    time                first_line_numb… message_id repeat_indicator   mmsi nav_status rot_over_range   rot    sog position_accura… lng_deg lat_deg</span></span>
+<span id="cb10-4"><a href="#cb10-4"></a><span class="co">#&gt;    &lt;dttm&gt;                         &lt;int&gt;      &lt;int&gt;            &lt;int&gt;  &lt;int&gt;      &lt;int&gt; &lt;lgl&gt;          &lt;dbl&gt;  &lt;dbl&gt;            &lt;int&gt;   &lt;dbl&gt;   &lt;dbl&gt;</span></span>
+<span id="cb10-5"><a href="#cb10-5"></a><span class="co">#&gt;  1 2018-12-10 00:00:00                3          1                0 3.10e8          0 FALSE             0  11.2                  1  -82.9     27.6</span></span>
+<span id="cb10-6"><a href="#cb10-6"></a><span class="co">#&gt;  2 2018-12-10 00:00:00                8          1                0 2.58e8          0 FALSE             0   0.100                0   30.0     69.7</span></span>
+<span id="cb10-7"><a href="#cb10-7"></a><span class="co">#&gt;  3 2018-12-10 00:00:00                9          3                0 2.66e8          5 FALSE             0   0                    1   17.9     59.3</span></span>
+<span id="cb10-8"><a href="#cb10-8"></a><span class="co">#&gt;  4 2018-12-10 00:00:00               12          3                0 2.66e8          5 FALSE             0   0                    1   15.6     56.2</span></span>
+<span id="cb10-9"><a href="#cb10-9"></a><span class="co">#&gt;  5 2018-12-10 00:00:00               25          1                0 3.67e8          3 FALSE             0   2.90                 1  -88.9     30.2</span></span>
+<span id="cb10-10"><a href="#cb10-10"></a><span class="co">#&gt;  6 2018-12-10 00:00:00               28          1                0 3.05e8          0 FALSE             0  13.7                  1  -79.4     26.6</span></span>
+<span id="cb10-11"><a href="#cb10-11"></a><span class="co">#&gt;  7 2018-12-10 00:00:00               30          1                0 2.65e8          0 FALSE             0   0                    0   11.0     58.9</span></span>
+<span id="cb10-12"><a href="#cb10-12"></a><span class="co">#&gt;  8 2018-12-10 00:00:00               34          1                0 2.57e8          0 TRUE           -731.  0                    1    7.60    63.1</span></span>
+<span id="cb10-13"><a href="#cb10-13"></a><span class="co">#&gt;  9 2018-12-10 00:00:00               35          3                0 2.73e8          5 FALSE             0   0                    0   19.0     69.7</span></span>
+<span id="cb10-14"><a href="#cb10-14"></a><span class="co">#&gt; 10 2018-12-10 00:00:00               39          1                0 3.67e8         15 TRUE           -731.  0                    0  -89.6     40.7</span></span>
+<span id="cb10-15"><a href="#cb10-15"></a><span class="co">#&gt; # … with 5,117,480 more rows, and 17 more variables: cog &lt;dbl&gt;, true_heading &lt;int&gt;, timestamp &lt;int&gt;, special_manoeuvre &lt;int&gt;, spare &lt;int&gt;,</span></span>
+<span id="cb10-16"><a href="#cb10-16"></a><span class="co">#&gt; #   raim &lt;lgl&gt;, sync_state &lt;int&gt;, slot_timeout &lt;int&gt;, received_stations &lt;int&gt;, slot_number &lt;int&gt;, utc_hour &lt;int&gt;, utc_min &lt;int&gt;, utc_spare &lt;int&gt;,</span></span>
+<span id="cb10-17"><a href="#cb10-17"></a><span class="co">#&gt; #   slot_offset &lt;int&gt;, slot_increment &lt;int&gt;, slots_to_allocate &lt;int&gt;, keep_flag &lt;lgl&gt;</span></span>
+<span id="cb10-18"><a href="#cb10-18"></a><span class="co">#&gt; </span></span>
+<span id="cb10-19"><a href="#cb10-19"></a><span class="co">#&gt; $msgs_4_11</span></span>
+<span id="cb10-20"><a href="#cb10-20"></a><span class="co">#&gt; # A tibble: 160,877 x 26</span></span>
+<span id="cb10-21"><a href="#cb10-21"></a><span class="co">#&gt;    time                first_line_numb… message_id repeat_indicator   mmsi  year month   day  hour minute second position_accura… lng_deg lat_deg</span></span>
+<span id="cb10-22"><a href="#cb10-22"></a><span class="co">#&gt;    &lt;dttm&gt;                         &lt;int&gt;      &lt;int&gt;            &lt;int&gt;  &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;int&gt;  &lt;int&gt;            &lt;int&gt;   &lt;dbl&gt;   &lt;dbl&gt;</span></span>
+<span id="cb10-23"><a href="#cb10-23"></a><span class="co">#&gt;  1 2018-12-09 23:59:59              130          4                3 2.01e6  2018    12     9     0      0      0                1    19.4    41.3</span></span>
+<span id="cb10-24"><a href="#cb10-24"></a><span class="co">#&gt;  2 2018-12-10 00:00:01              142          4                0 2.66e6  2018    12     9    23     59     59                0    22.1    65.6</span></span>
+<span id="cb10-25"><a href="#cb10-25"></a><span class="co">#&gt;  3 2018-12-10 00:00:01              276          4                3 3.16e6  2018    12    10     0      0      0                1   -79.2    42.9</span></span>
+<span id="cb10-26"><a href="#cb10-26"></a><span class="co">#&gt;  4 2018-12-10 00:00:01              277          4                3 3.16e6  2018    12    10     0      0      0                1   -78.1    44.1</span></span>
+<span id="cb10-27"><a href="#cb10-27"></a><span class="co">#&gt;  5 2018-12-10 00:00:01              320          4                0 3.67e6  2018    12    10     0      0      0                1   -93.8    29.7</span></span>
+<span id="cb10-28"><a href="#cb10-28"></a><span class="co">#&gt;  6 2018-12-10 00:00:02              428          4                0 3.67e6  2018    12    10     0      0      0                1   -89.8    29.6</span></span>
+<span id="cb10-29"><a href="#cb10-29"></a><span class="co">#&gt;  7 2018-12-10 00:00:03              493          4                0 2.47e6  2018    12    10     0      0      2                0    10.2    42.8</span></span>
+<span id="cb10-30"><a href="#cb10-30"></a><span class="co">#&gt;  8 2018-12-10 00:00:03              515          4                1 2.62e6  2018    12     9     0      0      0                0    18.2    55.5</span></span>
+<span id="cb10-31"><a href="#cb10-31"></a><span class="co">#&gt;  9 2018-12-10 00:00:03              628          4                0 3.67e6  2018    12    10     0      0      0                1   -95.3    29.7</span></span>
+<span id="cb10-32"><a href="#cb10-32"></a><span class="co">#&gt; 10 2018-12-10 00:00:03              680          4                0 3.67e6  2018    12    10     0      0      1                1   -80.5    25.5</span></span>
+<span id="cb10-33"><a href="#cb10-33"></a><span class="co">#&gt; # … with 160,867 more rows, and 12 more variables: fix_type &lt;int&gt;, transmission_ctl &lt;int&gt;, spare &lt;int&gt;, raim &lt;lgl&gt;, sync_state &lt;int&gt;,</span></span>
+<span id="cb10-34"><a href="#cb10-34"></a><span class="co">#&gt; #   slot_timeout &lt;int&gt;, received_stations &lt;int&gt;, slot_number &lt;int&gt;, utc_hour &lt;int&gt;, utc_min &lt;int&gt;, utc_spare &lt;int&gt;, slot_offset &lt;int&gt;</span></span>
+<span id="cb10-35"><a href="#cb10-35"></a><span class="co">#&gt; </span></span>
+<span id="cb10-36"><a href="#cb10-36"></a><span class="co">#&gt; $msgs_5</span></span>
+<span id="cb10-37"><a href="#cb10-37"></a><span class="co">#&gt; # A tibble: 3,723,202 x 23</span></span>
+<span id="cb10-38"><a href="#cb10-38"></a><span class="co">#&gt;    time                first_line_numb… message_id repeat_indicator   mmsi ais_version imo_num callsign name  type_and_cargo dim_a dim_b dim_c dim_d</span></span>
+<span id="cb10-39"><a href="#cb10-39"></a><span class="co">#&gt;    &lt;dttm&gt;                         &lt;int&gt;      &lt;int&gt;            &lt;int&gt;  &lt;int&gt;       &lt;int&gt;   &lt;int&gt; &lt;chr&gt;    &lt;chr&gt;          &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;</span></span>
+<span id="cb10-40"><a href="#cb10-40"></a><span class="co">#&gt;  1 NA                                 4          5                0 3.70e8           0 9550436 3FEA2    GLOB…             70   144    26    19     8</span></span>
+<span id="cb10-41"><a href="#cb10-41"></a><span class="co">#&gt;  2 NA                                16          5                0 2.66e8           1 8010673 SJOY     BALT…             90    38    19     6     6</span></span>
+<span id="cb10-42"><a href="#cb10-42"></a><span class="co">#&gt;  3 NA                                18          5                0 2.45e8           2 7711074 PBCZ@@@  DEO …             33    57    15     7     7</span></span>
+<span id="cb10-43"><a href="#cb10-43"></a><span class="co">#&gt;  4 NA                                20          5                0 2.57e8           0 5255777 LATU3@@  NORD…             69    19    61    12     1</span></span>
+<span id="cb10-44"><a href="#cb10-44"></a><span class="co">#&gt;  5 NA                                26          5                0 2.66e8           1       0 SCFR@@@  VADD…             60     8    29     4     4</span></span>
+<span id="cb10-45"><a href="#cb10-45"></a><span class="co">#&gt;  6 NA                                32          5                0 3.67e8           0     220 WDF6506  COUN…             52     7     9     4     3</span></span>
+<span id="cb10-46"><a href="#cb10-46"></a><span class="co">#&gt;  7 NA                                42          5                0 2.58e8           0 9417830 LFFE     SKAN…             52    20    67    10    11</span></span>
+<span id="cb10-47"><a href="#cb10-47"></a><span class="co">#&gt;  8 NA                                48          5                0 3.67e8           0 8635863 WDC2804  RAY …             31     8    12     2     6</span></span>
+<span id="cb10-48"><a href="#cb10-48"></a><span class="co">#&gt;  9 NA                                50          5                0 3.67e8           0       0 WCZ4561  DOUG…              0     5    20     5     2</span></span>
+<span id="cb10-49"><a href="#cb10-49"></a><span class="co">#&gt; 10 NA                                58          5                0 2.15e8           0 9431006 9HA2628  WILS…             70   105    18     3    13</span></span>
+<span id="cb10-50"><a href="#cb10-50"></a><span class="co">#&gt; # … with 3,723,192 more rows, and 9 more variables: fix_type &lt;int&gt;, eta_month &lt;int&gt;, eta_day &lt;int&gt;, eta_hour &lt;int&gt;, eta_minute &lt;int&gt;, draught &lt;dbl&gt;,</span></span>
+<span id="cb10-51"><a href="#cb10-51"></a><span class="co">#&gt; #   destination &lt;chr&gt;, dte &lt;int&gt;, spare &lt;int&gt;</span></span>
+<span id="cb10-52"><a href="#cb10-52"></a><span class="co">#&gt; </span></span>
+<span id="cb10-53"><a href="#cb10-53"></a><span class="co">#&gt; $msgs_7_13</span></span>
+<span id="cb10-54"><a href="#cb10-54"></a><span class="co">#&gt; # A tibble: 0 x 0</span></span>
+<span id="cb10-55"><a href="#cb10-55"></a><span class="co">#&gt; </span></span>
+<span id="cb10-56"><a href="#cb10-56"></a><span class="co">#&gt; $msgs_9</span></span>
+<span id="cb10-57"><a href="#cb10-57"></a><span class="co">#&gt; # A tibble: 701 x 29</span></span>
+<span id="cb10-58"><a href="#cb10-58"></a><span class="co">#&gt;    time                first_line_numb… message_id repeat_indicator   mmsi   alt   sog position_accura… lng_deg lat_deg   cog timestamp alt_sensor</span></span>
+<span id="cb10-59"><a href="#cb10-59"></a><span class="co">#&gt;    &lt;dttm&gt;                         &lt;int&gt;      &lt;int&gt;            &lt;int&gt;  &lt;int&gt; &lt;int&gt; &lt;int&gt;            &lt;int&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;int&gt;     &lt;int&gt;      &lt;int&gt;</span></span>
+<span id="cb10-60"><a href="#cb10-60"></a><span class="co">#&gt;  1 2018-12-10 00:06:20            71926          9                0 1.11e8   111     0                1    5.23    60.3   360        18          0</span></span>
+<span id="cb10-61"><a href="#cb10-61"></a><span class="co">#&gt;  2 2018-12-10 00:15:56           176939          9                0 1.11e8    59     0                0    5.23    60.3   360        54          0</span></span>
+<span id="cb10-62"><a href="#cb10-62"></a><span class="co">#&gt;  3 2018-12-10 00:42:12           472425          9                0 1.11e8  1407   172                0  -13.8     29.6   228        13          0</span></span>
+<span id="cb10-63"><a href="#cb10-63"></a><span class="co">#&gt;  4 2018-12-10 01:19:32           890251          9                0 1.11e8   802   200                0  -15.0     28.2   214        33          0</span></span>
+<span id="cb10-64"><a href="#cb10-64"></a><span class="co">#&gt;  5 2018-12-10 01:22:19           921020          9                2 9.07e8  3149   193                1  220.      28.4   131         0          0</span></span>
+<span id="cb10-65"><a href="#cb10-65"></a><span class="co">#&gt;  6 2018-12-10 01:24:53           948208          9                0 1.11e8   311   183                0  -15.2     28.0   239        54          0</span></span>
+<span id="cb10-66"><a href="#cb10-66"></a><span class="co">#&gt;  7 2018-12-10 01:26:46           970814          9                0 1.11e8   777   142                1  128.      34.9     0        43          0</span></span>
+<span id="cb10-67"><a href="#cb10-67"></a><span class="co">#&gt;  8 2018-12-10 01:32:15          1031057          9                0 1.11e8  2303   145                1  128.      35.1   309        12          0</span></span>
+<span id="cb10-68"><a href="#cb10-68"></a><span class="co">#&gt;  9 2018-12-10 01:37:24          1088324          9                0 1.11e8  2376   166                1  127.      35.1   208        22          0</span></span>
+<span id="cb10-69"><a href="#cb10-69"></a><span class="co">#&gt; 10 2018-12-10 01:42:25          1143960          9                0 1.11e8  2374   157                1  127.      34.9   240        22          0</span></span>
+<span id="cb10-70"><a href="#cb10-70"></a><span class="co">#&gt; # … with 691 more rows, and 16 more variables: spare &lt;int&gt;, dte &lt;int&gt;, spare2 &lt;int&gt;, assigned_mode &lt;int&gt;, raim &lt;lgl&gt;, sync_state &lt;int&gt;,</span></span>
+<span id="cb10-71"><a href="#cb10-71"></a><span class="co">#&gt; #   slot_timeout &lt;int&gt;, received_stations &lt;int&gt;, slot_number &lt;int&gt;, utc_hour &lt;int&gt;, utc_min &lt;int&gt;, utc_spare &lt;int&gt;, slot_offset &lt;int&gt;,</span></span>
+<span id="cb10-72"><a href="#cb10-72"></a><span class="co">#&gt; #   slot_increment &lt;int&gt;, slots_to_allocate &lt;int&gt;, keep_flag &lt;lgl&gt;</span></span>
+<span id="cb10-73"><a href="#cb10-73"></a><span class="co">#&gt; </span></span>
+<span id="cb10-74"><a href="#cb10-74"></a><span class="co">#&gt; $msgs_10</span></span>
+<span id="cb10-75"><a href="#cb10-75"></a><span class="co">#&gt; # A tibble: 0 x 0</span></span>
+<span id="cb10-76"><a href="#cb10-76"></a><span class="co">#&gt; </span></span>
+<span id="cb10-77"><a href="#cb10-77"></a><span class="co">#&gt; $msgs_12</span></span>
+<span id="cb10-78"><a href="#cb10-78"></a><span class="co">#&gt; # A tibble: 149 x 10</span></span>
+<span id="cb10-79"><a href="#cb10-79"></a><span class="co">#&gt;    time                first_line_number message_id repeat_indicator      mmsi seq_num dest_mmsi retransmitted spare text                            </span></span>
+<span id="cb10-80"><a href="#cb10-80"></a><span class="co">#&gt;    &lt;dttm&gt;                          &lt;int&gt;      &lt;int&gt;            &lt;int&gt;     &lt;int&gt;   &lt;int&gt;     &lt;int&gt; &lt;lgl&gt;         &lt;int&gt; &lt;chr&gt;                           </span></span>
+<span id="cb10-81"><a href="#cb10-81"></a><span class="co">#&gt;  1 2018-12-10 00:15:12            168933         12                0 366938510       0 374335000 FALSE             0 RECIEVED                        </span></span>
+<span id="cb10-82"><a href="#cb10-82"></a><span class="co">#&gt;  2 2018-12-10 00:16:01            177887         12                0 366938510       1 374335000 FALSE             0 RECIEVED                        </span></span>
+<span id="cb10-83"><a href="#cb10-83"></a><span class="co">#&gt;  3 2018-12-10 00:16:42            185395         12                0 366938510       2 374335000 FALSE             0 RECIEVED                        </span></span>
+<span id="cb10-84"><a href="#cb10-84"></a><span class="co">#&gt;  4 2018-12-10 00:16:47            186473         12                0 366938510       2 374335000 TRUE              0 RECIEVED                        </span></span>
+<span id="cb10-85"><a href="#cb10-85"></a><span class="co">#&gt;  5 2018-12-10 00:17:41            196782         12                0 366938510       3 374335000 FALSE             0 RECIEVED                        </span></span>
+<span id="cb10-86"><a href="#cb10-86"></a><span class="co">#&gt;  6 2018-12-10 00:19:21            215311         12                0 366938510       1  37433500 FALSE             0 RECIEVED                        </span></span>
+<span id="cb10-87"><a href="#cb10-87"></a><span class="co">#&gt;  7 2018-12-10 01:39:17           1110135         12                0 209011000       1 636017419 TRUE              0 </span><span class="al">TEST</span><span class="co"> ACK OK                     </span></span>
+<span id="cb10-88"><a href="#cb10-88"></a><span class="co">#&gt;  8 2018-12-10 01:49:03           1218664         12                0 366938510       2 374335000 FALSE             0 RECIEVED HAD PROBLEMN WITH REPLY</span></span>
+<span id="cb10-89"><a href="#cb10-89"></a><span class="co">#&gt;  9 2018-12-10 01:58:01           1318409         12                0 366938510       3 356352000 FALSE             0 MONTHLY </span><span class="al">TEST</span><span class="co"> PLEASE REPLY       </span></span>
+<span id="cb10-90"><a href="#cb10-90"></a><span class="co">#&gt; 10 2018-12-10 02:10:55           1461361         12                0 314029000       1 244301000 FALSE             0 </span><span class="al">TEST</span><span class="co">*OK*GOOD*WATCH              </span></span>
+<span id="cb10-91"><a href="#cb10-91"></a><span class="co">#&gt; # … with 139 more rows</span></span>
+<span id="cb10-92"><a href="#cb10-92"></a><span class="co">#&gt; </span></span>
+<span id="cb10-93"><a href="#cb10-93"></a><span class="co">#&gt; $msgs_14</span></span>
+<span id="cb10-94"><a href="#cb10-94"></a><span class="co">#&gt; # A tibble: 62 x 8</span></span>
+<span id="cb10-95"><a href="#cb10-95"></a><span class="co">#&gt;    time                first_line_number message_id repeat_indicator      mmsi spare text                                                       spare2</span></span>
+<span id="cb10-96"><a href="#cb10-96"></a><span class="co">#&gt;    &lt;dttm&gt;                          &lt;int&gt;      &lt;int&gt;            &lt;int&gt;     &lt;int&gt; &lt;int&gt; &lt;chr&gt;                                                       &lt;int&gt;</span></span>
+<span id="cb10-97"><a href="#cb10-97"></a><span class="co">#&gt;  1 2018-12-10 00:10:00            111755         14                0 374335000     0 TX </span><span class="al">TEST</span><span class="co"> PLS ACK                                                 0</span></span>
+<span id="cb10-98"><a href="#cb10-98"></a><span class="co">#&gt;  2 2018-12-10 00:20:24            226974         14                0 367483860     0 DIVE OPS REQ HALF MILE CPA                                      0</span></span>
+<span id="cb10-99"><a href="#cb10-99"></a><span class="co">#&gt;  3 2018-12-10 01:31:17           1020180         14                0 367483860     0 DIVE OPS REQ HALF MILE CPA                                      0</span></span>
+<span id="cb10-100"><a href="#cb10-100"></a><span class="co">#&gt;  4 NA                            1353239         14                0   4310704     0 &lt;INFORMATION&gt; 11:00JST TIDAL CURRENT IS W GOING 8 KNOTS I…      0</span></span>
+<span id="cb10-101"><a href="#cb10-101"></a><span class="co">#&gt;  5 NA                            1379656         14                0 244301000     0 AIS </span><span class="al">TEST</span><span class="co"> MSG  PLEASE CONFIRM  THANK YOU  HAVE A GOOD WATC…      0</span></span>
+<span id="cb10-102"><a href="#cb10-102"></a><span class="co">#&gt;  6 NA                            3019339         14                0   2633030     0 FROM ROCA CTRL: IMO MRS REPORTS TO ROCA CONTROL SHOULD BE…      0</span></span>
+<span id="cb10-103"><a href="#cb10-103"></a><span class="co">#&gt;  7 2018-12-10 07:57:58           5365817         14                0 970014447     0 SART </span><span class="al">TEST</span><span class="co">                                                       0</span></span>
+<span id="cb10-104"><a href="#cb10-104"></a><span class="co">#&gt;  8 2018-12-10 08:28:56           5728109         14                0 370377000     0 </span><span class="al">TEST</span><span class="co"> OK                                                         0</span></span>
+<span id="cb10-105"><a href="#cb10-105"></a><span class="co">#&gt;  9 2018-12-10 08:33:36           5783916         14                0 368926095     0 MSG FROM 368926095                                              0</span></span>
+<span id="cb10-106"><a href="#cb10-106"></a><span class="co">#&gt; 10 2018-12-10 08:37:20           5828212         14                0 368926095     0 DO U KNOW DA WAY                                                0</span></span>
+<span id="cb10-107"><a href="#cb10-107"></a><span class="co">#&gt; # … with 52 more rows</span></span>
+<span id="cb10-108"><a href="#cb10-108"></a><span class="co">#&gt; </span></span>
+<span id="cb10-109"><a href="#cb10-109"></a><span class="co">#&gt; $msgs_15</span></span>
+<span id="cb10-110"><a href="#cb10-110"></a><span class="co">#&gt; # A tibble: 0 x 0</span></span>
+<span id="cb10-111"><a href="#cb10-111"></a><span class="co">#&gt; </span></span>
+<span id="cb10-112"><a href="#cb10-112"></a><span class="co">#&gt; $msgs_16</span></span>
+<span id="cb10-113"><a href="#cb10-113"></a><span class="co">#&gt; # A tibble: 0 x 0</span></span>
+<span id="cb10-114"><a href="#cb10-114"></a><span class="co">#&gt; </span></span>
+<span id="cb10-115"><a href="#cb10-115"></a><span class="co">#&gt; $msgs_17</span></span>
+<span id="cb10-116"><a href="#cb10-116"></a><span class="co">#&gt; # A tibble: 0 x 0</span></span>
+<span id="cb10-117"><a href="#cb10-117"></a><span class="co">#&gt; </span></span>
+<span id="cb10-118"><a href="#cb10-118"></a><span class="co">#&gt; $msgs_18</span></span>
+<span id="cb10-119"><a href="#cb10-119"></a><span class="co">#&gt; # A tibble: 1,631,655 x 33</span></span>
+<span id="cb10-120"><a href="#cb10-120"></a><span class="co">#&gt;    time                first_line_numb… message_id repeat_indicator   mmsi spare   sog position_accura… lng_deg lat_deg   cog true_heading timestamp</span></span>
+<span id="cb10-121"><a href="#cb10-121"></a><span class="co">#&gt;    &lt;dttm&gt;                         &lt;int&gt;      &lt;int&gt;            &lt;int&gt;  &lt;int&gt; &lt;int&gt; &lt;dbl&gt;            &lt;int&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;        &lt;int&gt;     &lt;int&gt;</span></span>
+<span id="cb10-122"><a href="#cb10-122"></a><span class="co">#&gt;  1 2018-12-10 00:00:00                6         18                0 2.52e8     0 0                    0  -23.7     64.9 164.           511        58</span></span>
+<span id="cb10-123"><a href="#cb10-123"></a><span class="co">#&gt;  2 2018-12-10 00:00:00               13         18                0 3.38e8     0 0                    1 -117.      32.7  63.1          511        58</span></span>
+<span id="cb10-124"><a href="#cb10-124"></a><span class="co">#&gt;  3 2018-12-10 00:00:00               14         18                0 3.68e8     0 0                    1 -124.      42.0 210            511        58</span></span>
+<span id="cb10-125"><a href="#cb10-125"></a><span class="co">#&gt;  4 2018-12-10 00:00:00               15         18                0 3.66e8     0 0                    1 -124.      42.0 253.           511        58</span></span>
+<span id="cb10-126"><a href="#cb10-126"></a><span class="co">#&gt;  5 2018-12-10 00:00:00               23         18                0 2.57e8     0 0                    1   26.0     71.0 340.           511        58</span></span>
+<span id="cb10-127"><a href="#cb10-127"></a><span class="co">#&gt;  6 2018-12-10 00:00:00               24         18                0 2.66e8     0 0                    0   18.1     59.1   0            511        59</span></span>
+<span id="cb10-128"><a href="#cb10-128"></a><span class="co">#&gt;  7 2018-12-10 00:00:00               38         18                0 3.38e8     0 0                    0  -74.1     40.1 192.           511        59</span></span>
+<span id="cb10-129"><a href="#cb10-129"></a><span class="co">#&gt;  8 2018-12-10 00:00:00               53         18                0 2.58e8     0 0                    1    5.74    59.8 235.           511        59</span></span>
+<span id="cb10-130"><a href="#cb10-130"></a><span class="co">#&gt;  9 2018-12-10 00:00:00               70         18                0 3.38e8     0 0                    0 -122.      47.6 263            511        58</span></span>
+<span id="cb10-131"><a href="#cb10-131"></a><span class="co">#&gt; 10 2018-12-09 23:59:58              100         18                0 7.10e8     0 0.100                1  -46.3    -24.0 284.           511        13</span></span>
+<span id="cb10-132"><a href="#cb10-132"></a><span class="co">#&gt; # … with 1,631,645 more rows, and 20 more variables: spare2 &lt;int&gt;, unit_flag &lt;int&gt;, display_flag &lt;int&gt;, dsc_flag &lt;int&gt;, band_flag &lt;int&gt;,</span></span>
+<span id="cb10-133"><a href="#cb10-133"></a><span class="co">#&gt; #   m22_flag &lt;int&gt;, mode_flag &lt;int&gt;, raim &lt;lgl&gt;, commstate_flag &lt;int&gt;, slot_timeout &lt;int&gt;, slot_offset &lt;int&gt;, utc_hour &lt;int&gt;, utc_min &lt;int&gt;,</span></span>
+<span id="cb10-134"><a href="#cb10-134"></a><span class="co">#&gt; #   utc_spare &lt;int&gt;, slot_number &lt;int&gt;, received_stations &lt;int&gt;, slot_increment &lt;int&gt;, slots_to_allocate &lt;int&gt;, keep_flag &lt;int&gt;,</span></span>
+<span id="cb10-135"><a href="#cb10-135"></a><span class="co">#&gt; #   commstate_cs_fill &lt;int&gt;</span></span>
+<span id="cb10-136"><a href="#cb10-136"></a><span class="co">#&gt; </span></span>
+<span id="cb10-137"><a href="#cb10-137"></a><span class="co">#&gt; $msgs_19</span></span>
+<span id="cb10-138"><a href="#cb10-138"></a><span class="co">#&gt; # A tibble: 5,628 x 25</span></span>
+<span id="cb10-139"><a href="#cb10-139"></a><span class="co">#&gt;    time                first_line_numb… message_id repeat_indicator   mmsi spare   sog position_accura… lng_deg lat_deg   cog true_heading timestamp</span></span>
+<span id="cb10-140"><a href="#cb10-140"></a><span class="co">#&gt;    &lt;dttm&gt;                         &lt;int&gt;      &lt;int&gt;            &lt;int&gt;  &lt;int&gt; &lt;int&gt; &lt;dbl&gt;            &lt;int&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;        &lt;int&gt;     &lt;int&gt;</span></span>
+<span id="cb10-141"><a href="#cb10-141"></a><span class="co">#&gt;  1 2018-12-10 00:00:14             2816         19                0 3.16e8     0 0                    1  -52.7    47.6    0              0        60</span></span>
+<span id="cb10-142"><a href="#cb10-142"></a><span class="co">#&gt;  2 2018-12-10 00:00:18             4101         19                0 3.68e8     0 0.100                0  -44.3   -23.0  214.           214         0</span></span>
+<span id="cb10-143"><a href="#cb10-143"></a><span class="co">#&gt;  3 2018-12-10 00:00:22             4349         19                0 2.19e8     0 0.100                0   12.5    56.0  203.           202         0</span></span>
+<span id="cb10-144"><a href="#cb10-144"></a><span class="co">#&gt;  4 2018-12-10 00:00:41             7874         19                0 9.41e8     0 0.5                  1   30.2    71.1   89.7          511        60</span></span>
+<span id="cb10-145"><a href="#cb10-145"></a><span class="co">#&gt;  5 2018-12-10 00:00:43             8195         19                0 2.57e8     0 0                    0    5.90   62.3  178.             0        60</span></span>
+<span id="cb10-146"><a href="#cb10-146"></a><span class="co">#&gt;  6 2018-12-10 00:01:19            14866         19                0 9.93e8     0 2.20                 0  -13.9    64.4  205.           511        60</span></span>
+<span id="cb10-147"><a href="#cb10-147"></a><span class="co">#&gt;  7 NA                             18509         19                0 1.69e8     0 0.300                0  -21.9     9.71 343              0         0</span></span>
+<span id="cb10-148"><a href="#cb10-148"></a><span class="co">#&gt;  8 2018-12-10 00:02:13            24853         19                0 9.41e8     0 0.100                1   13.5    68.1  135.           511        60</span></span>
+<span id="cb10-149"><a href="#cb10-149"></a><span class="co">#&gt;  9 NA                             27859         19                0 1.69e8     0 0.200                0  -21.8     9.85 355              0         0</span></span>
+<span id="cb10-150"><a href="#cb10-150"></a><span class="co">#&gt; 10 2018-12-10 00:02:42            30445         19                0 9.93e8     0 1.20                 0  -14.2    64.4  277.           511        60</span></span>
+<span id="cb10-151"><a href="#cb10-151"></a><span class="co">#&gt; # … with 5,618 more rows, and 12 more variables: spare2 &lt;int&gt;, name &lt;chr&gt;, type_and_cargo &lt;int&gt;, dim_a &lt;int&gt;, dim_b &lt;int&gt;, dim_c &lt;int&gt;, dim_d &lt;int&gt;,</span></span>
+<span id="cb10-152"><a href="#cb10-152"></a><span class="co">#&gt; #   fix_type &lt;int&gt;, raim &lt;lgl&gt;, dte &lt;int&gt;, assigned_mode &lt;int&gt;, spare3 &lt;int&gt;</span></span>
+<span id="cb10-153"><a href="#cb10-153"></a><span class="co">#&gt; </span></span>
+<span id="cb10-154"><a href="#cb10-154"></a><span class="co">#&gt; $msgs_20</span></span>
+<span id="cb10-155"><a href="#cb10-155"></a><span class="co">#&gt; # A tibble: 0 x 0</span></span>
+<span id="cb10-156"><a href="#cb10-156"></a><span class="co">#&gt; </span></span>
+<span id="cb10-157"><a href="#cb10-157"></a><span class="co">#&gt; $msgs_21</span></span>
+<span id="cb10-158"><a href="#cb10-158"></a><span class="co">#&gt; # A tibble: 0 x 0</span></span>
+<span id="cb10-159"><a href="#cb10-159"></a><span class="co">#&gt; </span></span>
+<span id="cb10-160"><a href="#cb10-160"></a><span class="co">#&gt; $msgs_22</span></span>
+<span id="cb10-161"><a href="#cb10-161"></a><span class="co">#&gt; # A tibble: 0 x 0</span></span>
+<span id="cb10-162"><a href="#cb10-162"></a><span class="co">#&gt; </span></span>
+<span id="cb10-163"><a href="#cb10-163"></a><span class="co">#&gt; $msgs_23</span></span>
+<span id="cb10-164"><a href="#cb10-164"></a><span class="co">#&gt; # A tibble: 0 x 0</span></span>
+<span id="cb10-165"><a href="#cb10-165"></a><span class="co">#&gt; </span></span>
+<span id="cb10-166"><a href="#cb10-166"></a><span class="co">#&gt; $msgs_24</span></span>
+<span id="cb10-167"><a href="#cb10-167"></a><span class="co">#&gt; # A tibble: 0 x 0</span></span>
+<span id="cb10-168"><a href="#cb10-168"></a><span class="co">#&gt; </span></span>
+<span id="cb10-169"><a href="#cb10-169"></a><span class="co">#&gt; $msgs_25</span></span>
+<span id="cb10-170"><a href="#cb10-170"></a><span class="co">#&gt; # A tibble: 0 x 0</span></span>
+<span id="cb10-171"><a href="#cb10-171"></a><span class="co">#&gt; </span></span>
+<span id="cb10-172"><a href="#cb10-172"></a><span class="co">#&gt; $msgs_26</span></span>
+<span id="cb10-173"><a href="#cb10-173"></a><span class="co">#&gt; # A tibble: 0 x 0</span></span>
+<span id="cb10-174"><a href="#cb10-174"></a><span class="co">#&gt; </span></span>
+<span id="cb10-175"><a href="#cb10-175"></a><span class="co">#&gt; $msgs_27</span></span>
+<span id="cb10-176"><a href="#cb10-176"></a><span class="co">#&gt; # A tibble: 0 x 0</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="kw"><a href="reference/ais_decode_filter.html">ais_decode_df</a></span>(<span class="dt">msgs =</span> nmea_file)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="co">#&gt; # A tibble: 10,639,764 x 70</span></span>
+<span id="cb12-2"><a href="#cb12-2"></a><span class="co">#&gt;    time                first_line_numb… message_id repeat_indicator   mmsi nav_status rot_over_range   rot    sog position_accura… lng_deg lat_deg</span></span>
+<span id="cb12-3"><a href="#cb12-3"></a><span class="co">#&gt;    &lt;dttm&gt;                         &lt;int&gt;      &lt;int&gt;            &lt;int&gt;  &lt;int&gt;      &lt;int&gt; &lt;lgl&gt;          &lt;dbl&gt;  &lt;dbl&gt;            &lt;int&gt;   &lt;dbl&gt;   &lt;dbl&gt;</span></span>
+<span id="cb12-4"><a href="#cb12-4"></a><span class="co">#&gt;  1 2018-12-10 00:00:00                3          1                0 3.10e8          0 FALSE              0 11.2                  1   -82.9    27.6</span></span>
+<span id="cb12-5"><a href="#cb12-5"></a><span class="co">#&gt;  2 NA                                 4          5                0 3.70e8         NA NA                NA NA                   NA    NA      NA  </span></span>
+<span id="cb12-6"><a href="#cb12-6"></a><span class="co">#&gt;  3 2018-12-10 00:00:00                6         18                0 2.52e8         NA NA                NA  0                    0   -23.7    64.9</span></span>
+<span id="cb12-7"><a href="#cb12-7"></a><span class="co">#&gt;  4 2018-12-10 00:00:00                8          1                0 2.58e8          0 FALSE              0  0.100                0    30.0    69.7</span></span>
+<span id="cb12-8"><a href="#cb12-8"></a><span class="co">#&gt;  5 2018-12-10 00:00:00                9          3                0 2.66e8          5 FALSE              0  0                    1    17.9    59.3</span></span>
+<span id="cb12-9"><a href="#cb12-9"></a><span class="co">#&gt;  6 2018-12-10 00:00:00               12          3                0 2.66e8          5 FALSE              0  0                    1    15.6    56.2</span></span>
+<span id="cb12-10"><a href="#cb12-10"></a><span class="co">#&gt;  7 2018-12-10 00:00:00               13         18                0 3.38e8         NA NA                NA  0                    1  -117.     32.7</span></span>
+<span id="cb12-11"><a href="#cb12-11"></a><span class="co">#&gt;  8 2018-12-10 00:00:00               14         18                0 3.68e8         NA NA                NA  0                    1  -124.     42.0</span></span>
+<span id="cb12-12"><a href="#cb12-12"></a><span class="co">#&gt;  9 2018-12-10 00:00:00               15         18                0 3.66e8         NA NA                NA  0                    1  -124.     42.0</span></span>
+<span id="cb12-13"><a href="#cb12-13"></a><span class="co">#&gt; 10 NA                                16          5                0 2.66e8         NA NA                NA NA                   NA    NA      NA  </span></span>
+<span id="cb12-14"><a href="#cb12-14"></a><span class="co">#&gt; # … with 10,639,754 more rows, and 58 more variables: cog &lt;dbl&gt;, true_heading &lt;int&gt;, timestamp &lt;int&gt;, special_manoeuvre &lt;int&gt;, spare &lt;int&gt;,</span></span>
+<span id="cb12-15"><a href="#cb12-15"></a><span class="co">#&gt; #   raim &lt;lgl&gt;, sync_state &lt;int&gt;, slot_timeout &lt;int&gt;, received_stations &lt;int&gt;, slot_number &lt;int&gt;, utc_hour &lt;int&gt;, utc_min &lt;int&gt;, utc_spare &lt;int&gt;,</span></span>
+<span id="cb12-16"><a href="#cb12-16"></a><span class="co">#&gt; #   slot_offset &lt;int&gt;, slot_increment &lt;int&gt;, slots_to_allocate &lt;int&gt;, keep_flag &lt;int&gt;, year &lt;int&gt;, month &lt;int&gt;, day &lt;int&gt;, hour &lt;int&gt;, minute &lt;int&gt;,</span></span>
+<span id="cb12-17"><a href="#cb12-17"></a><span class="co">#&gt; #   second &lt;int&gt;, fix_type &lt;int&gt;, transmission_ctl &lt;int&gt;, ais_version &lt;int&gt;, imo_num &lt;int&gt;, callsign &lt;chr&gt;, name &lt;chr&gt;, type_and_cargo &lt;int&gt;,</span></span>
+<span id="cb12-18"><a href="#cb12-18"></a><span class="co">#&gt; #   dim_a &lt;int&gt;, dim_b &lt;int&gt;, dim_c &lt;int&gt;, dim_d &lt;int&gt;, eta_month &lt;int&gt;, eta_day &lt;int&gt;, eta_hour &lt;int&gt;, eta_minute &lt;int&gt;, draught &lt;dbl&gt;,</span></span>
+<span id="cb12-19"><a href="#cb12-19"></a><span class="co">#&gt; #   destination &lt;chr&gt;, dte &lt;int&gt;, alt &lt;int&gt;, alt_sensor &lt;int&gt;, spare2 &lt;int&gt;, assigned_mode &lt;int&gt;, seq_num &lt;int&gt;, dest_mmsi &lt;int&gt;,</span></span>
+<span id="cb12-20"><a href="#cb12-20"></a><span class="co">#&gt; #   retransmitted &lt;lgl&gt;, text &lt;chr&gt;, unit_flag &lt;int&gt;, display_flag &lt;int&gt;, dsc_flag &lt;int&gt;, band_flag &lt;int&gt;, m22_flag &lt;int&gt;, mode_flag &lt;int&gt;,</span></span>
+<span id="cb12-21"><a href="#cb12-21"></a><span class="co">#&gt; #   commstate_flag &lt;int&gt;, commstate_cs_fill &lt;int&gt;, spare3 &lt;int&gt;</span></span></code></pre></div>
 </div>
-<div id="performance" class="section level1">
-<h1 class="hasAnchor">
-<a href="#performance" class="anchor"></a>Performance</h1>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>bench_mark &lt;-<span class="st"> </span>bench<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/bench/man/mark.html">mark</a></span>(</span>
-<span id="cb11-2"><a href="#cb11-2"></a>  <span class="dt">file =</span> decoded &lt;-<span class="st"> </span><span class="kw"><a href="reference/ais_decode_filter.html">ais_decode_list</a></span>(nmea_file, <span class="dt">as_tibble =</span> <span class="ot">FALSE</span>, <span class="dt">verbose =</span> <span class="ot">FALSE</span>),</span>
-<span id="cb11-3"><a href="#cb11-3"></a>  <span class="dt">iterations =</span> <span class="dv">1</span>,</span>
-<span id="cb11-4"><a href="#cb11-4"></a>  <span class="dt">check =</span> <span class="ot">FALSE</span></span>
-<span id="cb11-5"><a href="#cb11-5"></a>)</span>
-<span id="cb11-6"><a href="#cb11-6"></a></span>
-<span id="cb11-7"><a href="#cb11-7"></a>bench_mark</span></code></pre></div>
-<div class="sourceCode" id="cb12"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="co">#&gt; # A tibble: 1 x 6</span></span>
-<span id="cb12-2"><a href="#cb12-2"></a><span class="co">#&gt;   expression      min   median `itr/sec` mem_alloc `gc/sec`</span></span>
-<span id="cb12-3"><a href="#cb12-3"></a><span class="co">#&gt;   &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;</span></span>
-<span id="cb12-4"><a href="#cb12-4"></a><span class="co">#&gt; 1 file          25.2s    25.2s    0.0396    3.03GB    0.278</span></span></code></pre></div>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="kw"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span>(decoded, tibble<span class="op">::</span>as_tibble)</span></code></pre></div>
-<div class="sourceCode" id="cb14"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="co">#&gt; $msgs_1_2_3</span></span>
-<span id="cb14-2"><a href="#cb14-2"></a><span class="co">#&gt; # A tibble: 5,117,490 x 29</span></span>
-<span id="cb14-3"><a href="#cb14-3"></a><span class="co">#&gt;    time_start          time_end            message_id repeat_indicator   mmsi nav_status rot_over_range   rot    sog position_accura… lng_deg lat_deg</span></span>
-<span id="cb14-4"><a href="#cb14-4"></a><span class="co">#&gt;    &lt;dttm&gt;              &lt;dttm&gt;                   &lt;int&gt;            &lt;int&gt;  &lt;int&gt;      &lt;int&gt; &lt;lgl&gt;          &lt;dbl&gt;  &lt;dbl&gt;            &lt;int&gt;   &lt;dbl&gt;   &lt;dbl&gt;</span></span>
-<span id="cb14-5"><a href="#cb14-5"></a><span class="co">#&gt;  1 2018-12-10 00:00:00 2018-12-10 00:00:00          1                0 3.10e8          0 FALSE             0  11.2                  1  -82.9     27.6</span></span>
-<span id="cb14-6"><a href="#cb14-6"></a><span class="co">#&gt;  2 2018-12-10 00:00:00 2018-12-10 00:00:00          1                0 2.58e8          0 FALSE             0   0.100                0   30.0     69.7</span></span>
-<span id="cb14-7"><a href="#cb14-7"></a><span class="co">#&gt;  3 2018-12-10 00:00:00 2018-12-10 00:00:00          3                0 2.66e8          5 FALSE             0   0                    1   17.9     59.3</span></span>
-<span id="cb14-8"><a href="#cb14-8"></a><span class="co">#&gt;  4 2018-12-10 00:00:00 2018-12-10 00:00:00          3                0 2.66e8          5 FALSE             0   0                    1   15.6     56.2</span></span>
-<span id="cb14-9"><a href="#cb14-9"></a><span class="co">#&gt;  5 2018-12-10 00:00:00 2018-12-10 00:00:00          1                0 3.67e8          3 FALSE             0   2.90                 1  -88.9     30.2</span></span>
-<span id="cb14-10"><a href="#cb14-10"></a><span class="co">#&gt;  6 2018-12-10 00:00:00 2018-12-10 00:00:00          1                0 3.05e8          0 FALSE             0  13.7                  1  -79.4     26.6</span></span>
-<span id="cb14-11"><a href="#cb14-11"></a><span class="co">#&gt;  7 2018-12-10 00:00:00 2018-12-10 00:00:00          1                0 2.65e8          0 FALSE             0   0                    0   11.0     58.9</span></span>
-<span id="cb14-12"><a href="#cb14-12"></a><span class="co">#&gt;  8 2018-12-10 00:00:00 2018-12-10 00:00:00          1                0 2.57e8          0 TRUE           -731.  0                    1    7.60    63.1</span></span>
-<span id="cb14-13"><a href="#cb14-13"></a><span class="co">#&gt;  9 2018-12-10 00:00:00 2018-12-10 00:00:00          3                0 2.73e8          5 FALSE             0   0                    0   19.0     69.7</span></span>
-<span id="cb14-14"><a href="#cb14-14"></a><span class="co">#&gt; 10 2018-12-10 00:00:00 2018-12-10 00:00:00          1                0 3.67e8         15 TRUE           -731.  0                    0  -89.6     40.7</span></span>
-<span id="cb14-15"><a href="#cb14-15"></a><span class="co">#&gt; # … with 5,117,480 more rows, and 17 more variables: cog &lt;dbl&gt;, true_heading &lt;int&gt;, timestamp &lt;int&gt;, special_manoeuvre &lt;int&gt;, spare &lt;int&gt;,</span></span>
-<span id="cb14-16"><a href="#cb14-16"></a><span class="co">#&gt; #   raim &lt;lgl&gt;, sync_state &lt;int&gt;, slot_timeout &lt;int&gt;, received_stations &lt;int&gt;, slot_number &lt;int&gt;, utc_hour &lt;int&gt;, utc_min &lt;int&gt;, utc_spare &lt;int&gt;,</span></span>
-<span id="cb14-17"><a href="#cb14-17"></a><span class="co">#&gt; #   slot_offset &lt;int&gt;, slot_increment &lt;int&gt;, slots_to_allocate &lt;int&gt;, keep_flag &lt;lgl&gt;</span></span>
-<span id="cb14-18"><a href="#cb14-18"></a><span class="co">#&gt; </span></span>
-<span id="cb14-19"><a href="#cb14-19"></a><span class="co">#&gt; $msgs_4_11</span></span>
-<span id="cb14-20"><a href="#cb14-20"></a><span class="co">#&gt; # A tibble: 160,877 x 26</span></span>
-<span id="cb14-21"><a href="#cb14-21"></a><span class="co">#&gt;    time_start          time_end            message_id repeat_indicator   mmsi  year month   day  hour minute second position_accura… lng_deg lat_deg</span></span>
-<span id="cb14-22"><a href="#cb14-22"></a><span class="co">#&gt;    &lt;dttm&gt;              &lt;dttm&gt;                   &lt;int&gt;            &lt;int&gt;  &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;int&gt;  &lt;int&gt;            &lt;int&gt;   &lt;dbl&gt;   &lt;dbl&gt;</span></span>
-<span id="cb14-23"><a href="#cb14-23"></a><span class="co">#&gt;  1 2018-12-09 23:59:59 2018-12-10 00:00:00          4                3 2.01e6  2018    12     9     0      0      0                1    19.4    41.3</span></span>
-<span id="cb14-24"><a href="#cb14-24"></a><span class="co">#&gt;  2 2018-12-10 00:00:01 2018-12-10 00:00:00          4                0 2.66e6  2018    12     9    23     59     59                0    22.1    65.6</span></span>
-<span id="cb14-25"><a href="#cb14-25"></a><span class="co">#&gt;  3 2018-12-10 00:00:01 2018-12-10 00:00:02          4                3 3.16e6  2018    12    10     0      0      0                1   -79.2    42.9</span></span>
-<span id="cb14-26"><a href="#cb14-26"></a><span class="co">#&gt;  4 2018-12-10 00:00:01 2018-12-10 00:00:02          4                3 3.16e6  2018    12    10     0      0      0                1   -78.1    44.1</span></span>
-<span id="cb14-27"><a href="#cb14-27"></a><span class="co">#&gt;  5 2018-12-10 00:00:01 2018-12-10 00:00:02          4                0 3.67e6  2018    12    10     0      0      0                1   -93.8    29.7</span></span>
-<span id="cb14-28"><a href="#cb14-28"></a><span class="co">#&gt;  6 2018-12-10 00:00:02 2018-12-10 00:00:02          4                0 3.67e6  2018    12    10     0      0      0                1   -89.8    29.6</span></span>
-<span id="cb14-29"><a href="#cb14-29"></a><span class="co">#&gt;  7 2018-12-10 00:00:03 2018-12-10 00:00:02          4                0 2.47e6  2018    12    10     0      0      2                0    10.2    42.8</span></span>
-<span id="cb14-30"><a href="#cb14-30"></a><span class="co">#&gt;  8 2018-12-10 00:00:03 2018-12-10 00:00:02          4                1 2.62e6  2018    12     9     0      0      0                0    18.2    55.5</span></span>
-<span id="cb14-31"><a href="#cb14-31"></a><span class="co">#&gt;  9 2018-12-10 00:00:03 2018-12-10 00:00:02          4                0 3.67e6  2018    12    10     0      0      0                1   -95.3    29.7</span></span>
-<span id="cb14-32"><a href="#cb14-32"></a><span class="co">#&gt; 10 2018-12-10 00:00:03 2018-12-10 00:00:02          4                0 3.67e6  2018    12    10     0      0      1                1   -80.5    25.5</span></span>
-<span id="cb14-33"><a href="#cb14-33"></a><span class="co">#&gt; # … with 160,867 more rows, and 12 more variables: fix_type &lt;int&gt;, transmission_ctl &lt;int&gt;, spare &lt;int&gt;, raim &lt;lgl&gt;, sync_state &lt;int&gt;,</span></span>
-<span id="cb14-34"><a href="#cb14-34"></a><span class="co">#&gt; #   slot_timeout &lt;int&gt;, received_stations &lt;int&gt;, slot_number &lt;int&gt;, utc_hour &lt;int&gt;, utc_min &lt;int&gt;, utc_spare &lt;int&gt;, slot_offset &lt;int&gt;</span></span>
-<span id="cb14-35"><a href="#cb14-35"></a><span class="co">#&gt; </span></span>
-<span id="cb14-36"><a href="#cb14-36"></a><span class="co">#&gt; $msgs_5</span></span>
-<span id="cb14-37"><a href="#cb14-37"></a><span class="co">#&gt; # A tibble: 3,723,201 x 23</span></span>
-<span id="cb14-38"><a href="#cb14-38"></a><span class="co">#&gt;    time_start          time_end            message_id repeat_indicator   mmsi ais_version imo_num callsign name  type_and_cargo dim_a dim_b dim_c</span></span>
-<span id="cb14-39"><a href="#cb14-39"></a><span class="co">#&gt;    &lt;dttm&gt;              &lt;dttm&gt;                   &lt;int&gt;            &lt;int&gt;  &lt;int&gt;       &lt;int&gt;   &lt;int&gt; &lt;chr&gt;    &lt;chr&gt;          &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;</span></span>
-<span id="cb14-40"><a href="#cb14-40"></a><span class="co">#&gt;  1 2018-12-10 00:00:00 2018-12-10 00:00:00          5                0 3.70e8           0 9550436 "3FEA2 … "GLO…             70   144    26    19</span></span>
-<span id="cb14-41"><a href="#cb14-41"></a><span class="co">#&gt;  2 2018-12-10 00:00:00 2018-12-10 00:00:00          5                0 2.66e8           1 8010673 "SJOY  … "BAL…             90    38    19     6</span></span>
-<span id="cb14-42"><a href="#cb14-42"></a><span class="co">#&gt;  3 2018-12-10 00:00:00 2018-12-10 00:00:00          5                0 2.45e8           2 7711074 "PBCZ@@… "DEO…             33    57    15     7</span></span>
-<span id="cb14-43"><a href="#cb14-43"></a><span class="co">#&gt;  4 2018-12-10 00:00:00 2018-12-10 00:00:00          5                0 2.57e8           0 5255777 "LATU3@… "NOR…             69    19    61    12</span></span>
-<span id="cb14-44"><a href="#cb14-44"></a><span class="co">#&gt;  5 2018-12-10 00:00:00 2018-12-10 00:00:00          5                0 2.66e8           1       0 "SCFR@@… "VAD…             60     8    29     4</span></span>
-<span id="cb14-45"><a href="#cb14-45"></a><span class="co">#&gt;  6 2018-12-10 00:00:00 2018-12-10 00:00:00          5                0 3.67e8           0     220 "WDF650… "COU…             52     7     9     4</span></span>
-<span id="cb14-46"><a href="#cb14-46"></a><span class="co">#&gt;  7 2018-12-10 00:00:00 2018-12-10 00:00:00          5                0 2.58e8           0 9417830 "LFFE  … "SKA…             52    20    67    10</span></span>
-<span id="cb14-47"><a href="#cb14-47"></a><span class="co">#&gt;  8 2018-12-10 00:00:00 2018-12-10 00:00:00          5                0 3.67e8           0 8635863 "WDC280… "RAY…             31     8    12     2</span></span>
-<span id="cb14-48"><a href="#cb14-48"></a><span class="co">#&gt;  9 2018-12-10 00:00:00 2018-12-10 00:00:00          5                0 3.67e8           0       0 "WCZ456… "DOU…              0     5    20     5</span></span>
-<span id="cb14-49"><a href="#cb14-49"></a><span class="co">#&gt; 10 2018-12-10 00:00:00 2018-12-10 00:00:00          5                0 2.15e8           0 9431006 "9HA262… "WIL…             70   105    18     3</span></span>
-<span id="cb14-50"><a href="#cb14-50"></a><span class="co">#&gt; # … with 3,723,191 more rows, and 10 more variables: dim_d &lt;int&gt;, fix_type &lt;int&gt;, eta_month &lt;int&gt;, eta_day &lt;int&gt;, eta_hour &lt;int&gt;, eta_minute &lt;int&gt;,</span></span>
-<span id="cb14-51"><a href="#cb14-51"></a><span class="co">#&gt; #   draught &lt;dbl&gt;, destination &lt;chr&gt;, dte &lt;int&gt;, spare &lt;int&gt;</span></span>
-<span id="cb14-52"><a href="#cb14-52"></a><span class="co">#&gt; </span></span>
-<span id="cb14-53"><a href="#cb14-53"></a><span class="co">#&gt; $msgs_7_13</span></span>
-<span id="cb14-54"><a href="#cb14-54"></a><span class="co">#&gt; # A tibble: 0 x 0</span></span>
-<span id="cb14-55"><a href="#cb14-55"></a><span class="co">#&gt; </span></span>
-<span id="cb14-56"><a href="#cb14-56"></a><span class="co">#&gt; $msgs_9</span></span>
-<span id="cb14-57"><a href="#cb14-57"></a><span class="co">#&gt; # A tibble: 701 x 29</span></span>
-<span id="cb14-58"><a href="#cb14-58"></a><span class="co">#&gt;    time_start          time_end            message_id repeat_indicator   mmsi   alt   sog position_accura… lng_deg lat_deg   cog timestamp alt_sensor</span></span>
-<span id="cb14-59"><a href="#cb14-59"></a><span class="co">#&gt;    &lt;dttm&gt;              &lt;dttm&gt;                   &lt;int&gt;            &lt;int&gt;  &lt;int&gt; &lt;int&gt; &lt;int&gt;            &lt;int&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;int&gt;     &lt;int&gt;      &lt;int&gt;</span></span>
-<span id="cb14-60"><a href="#cb14-60"></a><span class="co">#&gt;  1 2018-12-10 00:06:20 2018-12-10 00:06:58          9                0 1.11e8   111     0                1    5.23    60.3   360        18          0</span></span>
-<span id="cb14-61"><a href="#cb14-61"></a><span class="co">#&gt;  2 2018-12-10 00:15:56 2018-12-10 00:16:06          9                0 1.11e8    59     0                0    5.23    60.3   360        54          0</span></span>
-<span id="cb14-62"><a href="#cb14-62"></a><span class="co">#&gt;  3 2018-12-10 00:42:12 2018-12-10 00:42:14          9                0 1.11e8  1407   172                0  -13.8     29.6   228        13          0</span></span>
-<span id="cb14-63"><a href="#cb14-63"></a><span class="co">#&gt;  4 2018-12-10 01:19:32 2018-12-10 01:19:35          9                0 1.11e8   802   200                0  -15.0     28.2   214        33          0</span></span>
-<span id="cb14-64"><a href="#cb14-64"></a><span class="co">#&gt;  5 2018-12-10 01:22:19 2018-12-10 01:22:18          9                2 9.07e8  3149   193                1  220.      28.4   131         0          0</span></span>
-<span id="cb14-65"><a href="#cb14-65"></a><span class="co">#&gt;  6 2018-12-10 01:24:53 2018-12-10 01:24:59          9                0 1.11e8   311   183                0  -15.2     28.0   239        54          0</span></span>
-<span id="cb14-66"><a href="#cb14-66"></a><span class="co">#&gt;  7 2018-12-10 01:26:46 2018-12-10 01:26:59          9                0 1.11e8   777   142                1  128.      34.9     0        43          0</span></span>
-<span id="cb14-67"><a href="#cb14-67"></a><span class="co">#&gt;  8 2018-12-10 01:32:15 2018-12-10 01:32:16          9                0 1.11e8  2303   145                1  128.      35.1   309        12          0</span></span>
-<span id="cb14-68"><a href="#cb14-68"></a><span class="co">#&gt;  9 2018-12-10 01:37:24 2018-12-10 01:37:22          9                0 1.11e8  2376   166                1  127.      35.1   208        22          0</span></span>
-<span id="cb14-69"><a href="#cb14-69"></a><span class="co">#&gt; 10 2018-12-10 01:42:25 2018-12-10 01:42:24          9                0 1.11e8  2374   157                1  127.      34.9   240        22          0</span></span>
-<span id="cb14-70"><a href="#cb14-70"></a><span class="co">#&gt; # … with 691 more rows, and 16 more variables: spare &lt;int&gt;, dte &lt;int&gt;, spare2 &lt;int&gt;, assigned_mode &lt;int&gt;, raim &lt;lgl&gt;, sync_state &lt;int&gt;,</span></span>
-<span id="cb14-71"><a href="#cb14-71"></a><span class="co">#&gt; #   slot_timeout &lt;int&gt;, received_stations &lt;int&gt;, slot_number &lt;int&gt;, utc_hour &lt;int&gt;, utc_min &lt;int&gt;, utc_spare &lt;int&gt;, slot_offset &lt;int&gt;,</span></span>
-<span id="cb14-72"><a href="#cb14-72"></a><span class="co">#&gt; #   slot_increment &lt;int&gt;, slots_to_allocate &lt;int&gt;, keep_flag &lt;lgl&gt;</span></span>
-<span id="cb14-73"><a href="#cb14-73"></a><span class="co">#&gt; </span></span>
-<span id="cb14-74"><a href="#cb14-74"></a><span class="co">#&gt; $msgs_10</span></span>
-<span id="cb14-75"><a href="#cb14-75"></a><span class="co">#&gt; # A tibble: 0 x 0</span></span></code></pre></div>
+<div id="performance" class="section level2">
+<h2 class="hasAnchor">
+<a href="#performance" class="anchor"></a>Performance</h2>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>bench<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/bench/man/mark.html">mark</a></span>(</span>
+<span id="cb13-2"><a href="#cb13-2"></a>  <span class="st">`</span><span class="dt">ais_decode_list()</span><span class="st">`</span> =<span class="st"> </span>decoded &lt;-<span class="st"> </span><span class="kw"><a href="reference/ais_decode_filter.html">ais_decode_list</a></span>(</span>
+<span id="cb13-3"><a href="#cb13-3"></a>    nmea_file, <span class="dt">as_tibble =</span> <span class="ot">FALSE</span>, <span class="dt">as_sf =</span> <span class="ot">FALSE</span>, <span class="dt">verbose =</span> <span class="ot">FALSE</span></span>
+<span id="cb13-4"><a href="#cb13-4"></a>  )</span>
+<span id="cb13-5"><a href="#cb13-5"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="co">#&gt; # A tibble: 1 x 6</span></span>
+<span id="cb14-2"><a href="#cb14-2"></a><span class="co">#&gt;   expression             min   median `itr/sec` mem_alloc `gc/sec`</span></span>
+<span id="cb14-3"><a href="#cb14-3"></a><span class="co">#&gt;   &lt;bch:expr&gt;        &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;</span></span>
+<span id="cb14-4"><a href="#cb14-4"></a><span class="co">#&gt; 1 ais_decode_list()      16s      16s    0.0627    3.96GB   0.0627</span></span></code></pre></div>
+</div>
 </div>
 <div id="credits" class="section level1">
 <h1 class="hasAnchor">

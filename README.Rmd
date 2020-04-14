@@ -66,28 +66,43 @@ library(maritime)
 ```
 
 
-# AIS
+# AIS Sentence (AIVDM/AIVDO) Decoding
 
 ## Status
 
-What's implemented so far?
-
-* _Fast_ preprocessing and line normalization.
-  + Multi-line messages are reconciled and merged _automatically_.
+* [x] Automatic sentence validation and line normalization
 * Message Types:
-  + `ais_msgs$msg_1_2_3`
-  + `ais_msgs$msg_4_11`
-  + `ais_msgs$msg_5`
-  + `ais_msgs$msg_7_13`
-  + `ais_msgs$msg_9`
-  + `ais_msgs$msg_10`
+  + [x] `ais_msgs$msg_1_2_3`
+  + [x] `ais_msgs$msg_4_11`
+  + [x] `ais_msgs$msg_5`
+  + [ ] `ais_msgs$msg_6`
+  + [x] `ais_msgs$msg_7_13`
+  + [ ] `ais_msgs$msg_8`
+  + [x] `ais_msgs$msg_9`
+  + [x] `ais_msgs$msg_10`
+  + [x] `ais_msgs$msg_11`
+  + [x] `ais_msgs$msg_12`
+  + [x] `ais_msgs$msg_14`
+  + [x] `ais_msgs$msg_15`
+  + [x] `ais_msgs$msg_16`
+  + [x] `ais_msgs$msg_17`
+  + [x] `ais_msgs$msg_18`
+  + [x] `ais_msgs$msg_19`
+  + [x] `ais_msgs$msg_20`
+  + [x] `ais_msgs$msg_21`
+  + [x] `ais_msgs$msg_22`
+  + [x] `ais_msgs$msg_23`
+  + [x] `ais_msgs$msg_24`
+  + [x] `ais_msgs$msg_25`
+  + [x] `ais_msgs$msg_26`
+  + [x] `ais_msgs$msg_27`
   
   
 
 ```{r}
 nmea_file <- "inst/example-data/big-files/20181210.log"
 paste(round(file.size(nmea_file) / 1e9, 2L), "GB")
-readLines(nmea_file, n = 10) # quick peak at the data
+readLines(nmea_file, n = 20) # real world data, in all its terrible glory
 ```
 
 
@@ -95,57 +110,26 @@ readLines(nmea_file, n = 10) # quick peak at the data
 ais_decode_filter(msgs = nmea_file, msg_type = ais_msgs$msg_1_2_3)
 ```
 
+```{r}
+ais_decode_list(msgs = nmea_file)
+```
 
 ```{r}
-ais_decode_filter(msgs = nmea_file, msg_type = ais_msgs$msg_5)
+ais_decode_df(msgs = nmea_file)
 ```
+
+
 
 ## Performance
 
 
 ```{r}
-bench_mark <- bench::mark(
-  file = decoded <- ais_decode_list(nmea_file, as_tibble = FALSE, verbose = FALSE),
-  iterations = 1,
-  check = FALSE
-)
-
-bench_mark
-lapply(decoded, tibble::as_tibble)
-```
-
-
-## Future
-
-
-```{r}
-ptr_df <- tibble::as_tibble(
-  maritime:::.nest_test(nmea_file)
-)
-ptr_df
-```
-
-The `msg` column contains external pointers to decoded __libais__ objects.
-
-```{r}
-tibble::as_tibble(
-  do.call(
-    rbind,
-    lapply(ptr_df[ptr_df$message_id == 1, ]$msg[1:10], 
-           maritime:::.ais_unwrap_msg)
-    )
+bench::mark(
+  `ais_decode_list()` = decoded <- ais_decode_list(
+    nmea_file, as_tibble = FALSE, as_sf = FALSE, verbose = FALSE
+  )
 )
 ```
-
-
-### Inspection Tools
-
-```{r}
-tibble::as_tibble(
-  maritime:::.nmea_df(nmea_file, n_max = -1)
-)
-```
-
 
 
 # Credits

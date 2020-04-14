@@ -1,2 +1,3 @@
+CXX_STD      =     CXX11
 PKG_CPPFLAGS = -I. -DSTRICT_R_HEADERS
 PKG_LIBS     = -L. -lz -lpthread -pthread

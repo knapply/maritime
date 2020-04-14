@@ -1,0 +1,44 @@
+---
+title: "Untitled"
+author: "Brendan Knapp"
+date: "4/13/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(dplyr)
+library(sf)
+
+init <- maritime::ais_decode_list("inst/example-data/big-files/20181210.log")
+df <- data.table::rbindlist(init, use.names = TRUE, fill = TRUE)
+w_coords <- df[!is.na(lng_deg) & !is.na(lat_deg) & lng_deg < 179 & lng_deg > -179 & lat_deg < 89 & lng_deg > -89]
+
+ais_sf <- w_coords %>% 
+    as_tibble() %>% 
+    st_as_sf(coords = c("lng_deg", "lat_deg"), crs = 4326L) %>% 
+    mutate(geometry = st_make_valid(geometry))# %>%
+ais_sf
+
+eez_sf <- read_sf("~/Downloads/eez/eez.shp", as_tibble = TRUE) %>% 
+    st_transform(st_crs(ais_sf))
+
+eez_filled <- eez_sf %>%
+    smoothr::fill_holes(threshold = Inf)
+
+bench::mark(
+    filtered <- st_filter(ais_sf, eez_filled)
+)
+
+library(ggplot2)
+ggplot() +
+    geom_sf(data = eez_filled, fill = "gray") +
+    geom_sf(data = eez_sf, fill = "lightblue") +
+    geom_sf(color = "red", data = filtered) +
+    theme_minimal() +
+    theme(panel.background = element_rect(fill = "blue"))
+```

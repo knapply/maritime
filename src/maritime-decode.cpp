@@ -1,190 +1,144 @@
 #include "ais.h"
-#include "maritime/decoder.hpp"
-#include "maritime/proto_msg_dfs.hpp"
+#include "maritime/stream.hpp"
 
-// [[Rcpp::export(.nmea_df)]]
-SEXP nmea_df(const std::string& file_path, const int n_max) {
-  const auto nmea_stream = NMEA_Stream::from_file(file_path);
-  return nmea_stream.as_df(n_max);
-}
-
-// [[Rcpp::export(.nest_test)]]
-SEXP nest_test(const std::string& file_path) {
-  const auto nmea_stream = NMEA_Stream::from_file(file_path);
-  const Decoder decoder(nmea_stream);
-
-  const auto n_msgs = decoder.nmea_stream.complete.size();
-  const auto total_msgs = decoder.nmea_stream.complete.size();
-
-  Progress progress(total_msgs, true);
-
-  Nest res(n_msgs);
-  for (std::size_t i = 0; i < total_msgs; ++i) {
-    progress.increment();
-    auto nmea = decoder.nmea_stream.complete[i];
-
-    switch (get_msg_type(nmea.payload)) {
-      case MSG_TYPE::msg_1_2_3:
-        res.push(                                                //
-            Rcpp::XPtr<libais::AisMsg>(                          //
-                new libais::Ais1_2_3(nmea.payload.data.c_str(),  //
-                                     nmea.fill_bits),            //
-                true),                                           //
-            nmea.time_start,                                     //
-            nmea.time_end                                        //
-        );                                                       //
-        break;
-
-      case MSG_TYPE::msg_4_11:
-        res.push(                                               //
-            Rcpp::XPtr<libais::AisMsg>(                         //
-                new libais::Ais4_11(nmea.payload.data.c_str(),  //
-                                    nmea.fill_bits),            //
-                true),                                          //
-            nmea.time_start,                                    //
-            nmea.time_end                                       //
-        );                                                      //
-        break;
-
-      case MSG_TYPE::msg_5:
-        res.push(                                            //
-            Rcpp::XPtr<libais::AisMsg>(                      //
-                new libais::Ais5(nmea.payload.data.c_str(),  //
-                                 nmea.fill_bits),            //
-                true),                                       //
-            nmea.time_start,                                 //
-            nmea.time_end                                    //
-        );                                                   //
-        break;
-
-      case MSG_TYPE::msg_7_13:
-        res.push(                                               //
-            Rcpp::XPtr<libais::AisMsg>(                         //
-                new libais::Ais7_13(nmea.payload.data.c_str(),  //
-                                    nmea.fill_bits),            //
-                true),                                          //
-            nmea.time_start,                                    //
-            nmea.time_end                                       //
-        );                                                      //
-        break;
-
-      case MSG_TYPE::msg_9:
-        res.push(                                            //
-            Rcpp::XPtr<libais::AisMsg>(                      //
-                new libais::Ais9(nmea.payload.data.c_str(),  //
-                                 nmea.fill_bits),            //
-                true),                                       //
-            nmea.time_start,                                 //
-            nmea.time_end                                    //
-        );                                                   //
-        break;
-
-      case MSG_TYPE::msg_10:
-        res.push(                                             //
-            Rcpp::XPtr<libais::AisMsg>(                       //
-                new libais::Ais10(nmea.payload.data.c_str(),  //
-                                  nmea.fill_bits),            //
-                true),                                        //
-            nmea.time_start,                                  //
-            nmea.time_end                                     //
-        );                                                    //
-        break;
-
-      default:
-        break;
-    }
+// [[Rcpp::export(.ais_decode_filter_file)]]
+SEXP cpp_ais_decode_filter_file(const std::string& file_path,
+                                const int msg_type,
+                                const bool verbose) {
+  if (msg_type < 1 || msg_type > 27) {
+    Rcpp::stop("bad msg_type");
   }
-  const auto out = res.as_list();
-  return as_df(res);
+  auto enum_msg_type = static_cast<MSG_TYPE>(msg_type);
+
+  auto nmea_stream = NMEA_Stream::from_file(file_path);
+  Progress progress(nmea_stream.count_msgs(enum_msg_type) * 2, verbose);
+
+  return nmea_stream.build_df_impl(enum_msg_type, progress);
 }
 
-SEXP decode_filter_file_switch(const std::string& file_path,
-                               const int msg_type,
-                               const bool verbose) {
-  const auto enum_msg_type = static_cast<MSG_TYPE>(msg_type);
+// [[Rcpp::export(.ais_decode_list_file)]]
+SEXP cpp_ais_decode_list_file(const std::string& file_path,
+                              const bool verbose) {
+  auto nmea_stream = NMEA_Stream::from_file(file_path);
+  Progress progress(nmea_stream.n_total_messages() * 2, verbose);
 
-  switch (enum_msg_type) {
-    case MSG_TYPE::msg_1_2_3:
-      return decode_filter_file<MSG_TYPE::msg_1_2_3, Msgs_1_2_3,  //
-                                libais::Ais1_2_3>(file_path, verbose);
-
-    case MSG_TYPE::msg_4_11:
-      return decode_filter_file<MSG_TYPE::msg_4_11, Msgs_4_11,  //
-                                libais::Ais4_11>(file_path, verbose);
-
-    case MSG_TYPE::msg_5:
-      return decode_filter_file<MSG_TYPE::msg_5, Msgs_5,  //
-                                libais::Ais5>(file_path, verbose);
-      // 6
-      // case MSG_TYPE:::
-      //   return decode_filter_file<MSG_TYPE::, ,  //
-      //                             libais::>(file_path);
-
-    case MSG_TYPE::msg_7_13:
-      return decode_filter_file<MSG_TYPE::msg_7_13, Msgs_7_13,  //
-                                libais::Ais7_13>(file_path, verbose);
-
-      // 8
-      // case MSG_TYPE:::
-      //   return decode_filter_file<MSG_TYPE::, ,  //
-      //                             libais::>(file_path);
-
-    case MSG_TYPE::msg_9:
-      return decode_filter_file<MSG_TYPE::msg_9, Msgs_9,  //
-                                libais::Ais9>(file_path, verbose);
-
-    case MSG_TYPE::msg_10:
-      return decode_filter_file<MSG_TYPE::msg_10, Msgs_10,  //
-                                libais::Ais10>(file_path, verbose);
-
-    default:
-      return R_NilValue;
-  }
+  return nmea_stream.build_df_list(progress);
 }
 
-// [[Rcpp::export(.ais_decode_file_filter)]]
-SEXP decode_filter_file_impl(const std::string& file_path,
-                             const int msg_type,
-                             const bool verbose) {
-  return decode_filter_file_switch(file_path, msg_type, verbose);
-}
-
-// [[Rcpp::export(.ais_decode_file_list)]]
-SEXP decode_list_file_impl(const std::string& file_path, const bool verbose) {
-  return decode_list_file(file_path, verbose);
-}
-
-// [[Rcpp::export(.ais_unwrap_msg)]]
-SEXP unwrap_ais_ptr(const SEXP ais_ptr) {
-  // const auto enum_msg_type = static_cast<MSG_TYPE>(msg_type);
-
-  auto ptr = Rcpp::XPtr<libais::AisMsg>(ais_ptr);
-
-  if (ptr.isNULL()) {
-    return R_NilValue;
-  }
-
-  switch (ptr->message_id) {
-    case 1:
-    case 2:
-    case 3:
-      return ais_wrap(                                           //
-          *reinterpret_cast<const libais::Ais1_2_3*>(ptr.get())  //
-      );
-
-    default:
-      return R_NilValue;
-  }
-  return R_NilValue;
-}
+//
+//
+//
+//
+//
+//
+//
 
 /*** R
-# file_path <- "inst/example-data/big-files/20181210.log"
+library(data.table)
+file_path <- "inst/example-data/big-files/20200131.log"
 file_path <- "inst/example-data/20181101.log"
+# .ais_decode_list(file_path, TRUE)
+
+bench_mark <- bench::mark(
+  # big_df = res1 <- rbindlist(.ais_decode_list2(file_path, TRUE),
+                             # fill = TRUE, use.names = TRUE),
+  # df_list = res <- .ais_decode_list2(file_path, TRUE)
+  res <- .ais_decode_list(file_path, TRUE)
+
+  ,
+  iterations = 1,
+  check = FALSE,
+  filter_gc = FALSE
+); bench_mark
+
+
+res <- .ais_decode_filter(file_path, 1, verbose = TRUE)
+tibble::as_tibble(res)
+
+tibble::as_tibble(data.table::rbindlist(res, use.names = TRUE, fill =
+TRUE)[order(first_line_number)]) lapply(res, tibble::as_tibble) all <-
+data.table::rbindlist(res, idcol = "msg_type", fill = TRUE, use.names = TRUE)
+tibble::as_tibble(res)
+
+tibble::as_tibble(all[, .N, by = msg_type][, N := N / sum(N)])
+
+
+
+all[!is.na(all$time_end), ]
+res <- .ais_full_df(file_path); tibble::as_tibble(res)
+str(res)
+tibble::as_tibble(res)
+tibble::as_tibble(.nmea_df(file_path, -1))
+
+
+
+
+res$msgs_5$name
+
+
+
+res <- .ais_decode_file_list(file_path, verbose = T)
+tibble::as_tibble(data.table::rbindlist(res, fill = TRUE, use.names = TRUE))
+# tibble::as_tibble(dplyr::bind_rows(res))
+# tibble::as_tibble(do.call(rbind.data.frame, res))
+ais_rbind_list <- function(file_path) {
+  data.table::rbindlist(.ais_decode_file_list(file_path, verbose = T),
+                        fill = TRUE, use.names = TRUE)
+}
+
+
+
+
+bench_mark <- bench::mark(
+  # `.ais_decode_file_list()` = .ais_decode_file_list(file_path, verbose = F),
+  `.ais_full_df()` = res1 <-  .ais_full_df(file_path),
+  `rbindlist()` = res2 <- data.table::rbindlist(.ais_decode_file_list(file_path,
+verbose = F), fill = TRUE, use.names = TRUE)
+  ,
+  iterations = 1,
+  filter_gc = FALSE,
+  check = FALSE
+  # times = 10
+); bench_mark
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+res <- bench::mark(
+  # test <- .ais_full_df(file_path),
+  test <- rbindlist(ais_decode_file_list(file_path, verbose = FALSE),
+            use.names = TRUE, fill = TRUE)
+  ,
+  iterations = 1L,
+  filter_gc = FALSE
+); res
+tibble::as_tibble(test)
+
+# res <- .nest_test2(file_path); res
+
+res <- tibble::as_tibble(.nest_test2(file_path)); res
+
 # test_lines <- readr::read_lines(file_path, n_max = 10)
 # test_text <- readr::read_file(file_path)
 # test_lines[1:10]
 # mat <- stringr::str_split(test_lines[1:20], ",",simplify = TRUE)
+
+# test <- tibble::as_tibble(.nmea_df(file_path, n_max = -1)); test
+res <- bench::mark(
+  .nmea_df(file_path, n_max = 0)
+  , iterations = 3
+); res
 
 test <- tibble::as_tibble(.nest_test(file_path))
 
