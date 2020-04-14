@@ -906,6 +906,14 @@ inline void NMEA_Stream::push(NMEA&& nmea) {
 //
 //
 //
+
+inline bool is_valid_simple(const Sentence& sentence) {
+  return sentence.is_valid();
+}
+inline bool is_valid2(const Sentence& sentence) {
+  
+}
+
 //
 inline NMEA_Stream NMEA_Stream::from_file(const std::string& file_path) {
   constexpr auto delim = '\n';

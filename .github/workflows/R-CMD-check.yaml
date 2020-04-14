@@ -65,7 +65,7 @@ jobs:
       - name: Query dependencies
         run: |
           install.packages('remotes')
-          saveRDS(remotes::dev_package_deps(dependencies = TRUE), "depends.Rds", version = 3)
+          saveRDS(remotes::dev_package_deps(dependencies = TRUE), "depends.Rds", version = 4)
         shell: Rscript {0}
 
       - name: Cache R packages
