@@ -44,7 +44,7 @@ options(width = 150)
 
 # Introduction
 
-`{maritime}` is a toolkit for maritime data.
+Tools and routines for `{maritime}` data.
 
 Initial focus is _performant_ and correct AIS decoding routines for R by building on [Kurt Schwehr](https://twitter.com/kurtschwehr)'s [__libais__](https://github.com/schwehr/libais).
 

@@ -108,8 +108,7 @@ struct Payload {
   Payload() = default;
 
   Payload(std::string&& x) {
-    std::move(std::begin(x), std::end(x),  //
-              std::begin(this->data));
+    std::move(std::begin(x), std::end(x), std::begin(this->data));
   };
 
   std::string to_string() const {
