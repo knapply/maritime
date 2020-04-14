@@ -45,7 +45,7 @@ class Sentence {
   Sentence(const char* first, const char* last) noexcept {
     std::size_t i = 0;
     std::copy_if(                                                            //
-        std::make_move_iterator(first), std::make_move_iterator(last),       //
+        first, last,                                                         //
         std::begin(this->data),                                              //
         [&i](const char c) { return i++ < MAX_SENTENCE_SIZE && c != '\r'; }  //
     );
@@ -300,7 +300,7 @@ class NMEA {
 
     if (split[7].size() >= 10  //
         && std::all_of(split[7].begin(), split[7].end(), ::isdigit)) {
-      this->time_start = std::stoll(split[7].data());
+      this->time_start = std::stoll(split[7] + '\0');
     }
   };
 
