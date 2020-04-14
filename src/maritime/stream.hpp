@@ -907,6 +907,17 @@ inline void NMEA_Stream::push(NMEA&& nmea) {
 //
 //
 
+// template <typename T>
+inline bool _TRUE(Sentence sentence) {
+  return true;
+}
+
+std::function<bool(Sentence)> TRUE = _TRUE;
+
+template <typename Predicate = std::function<bool(Sentence)>>
+inline bool is_valid(const Sentence& sentence) {
+  return sentence.is_valid() && Predicate(sentence);
+}
 
 //
 inline NMEA_Stream NMEA_Stream::from_file(const std::string& file_path) {
@@ -953,7 +964,8 @@ inline NMEA_Stream NMEA_Stream::from_file(const std::string& file_path) {
   which_valid.reserve(n_lines);
 
   for (std::size_t i = 0; i < n_lines; ++i) {
-    if (sentences[i].is_valid()) {
+    if (is_valid<TRUE>(sentences[i])) {
+      // if (sentences[i].is_valid()) {
       which_valid.push_back(i);
     }
   }
