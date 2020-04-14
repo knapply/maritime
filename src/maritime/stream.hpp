@@ -17,9 +17,9 @@
 #include "msg_type.hpp"
 #include "openmp.hpp"
 
-constexpr long MIN_SENTENCE_SIZE = 21;
-constexpr std::size_t MAX_SENTENCE_SIZE = 120;
-constexpr std::size_t MAX_PAYLOAD_SIZE = 80;
+static constexpr long MIN_SENTENCE_SIZE = 21;
+static constexpr std::size_t MAX_SENTENCE_SIZE = 150;
+static constexpr std::size_t MAX_PAYLOAD_SIZE = 100;
 
 // Sentence ====================================================================
 
@@ -108,7 +108,13 @@ struct Payload {
   Payload() = default;
 
   Payload(std::string&& x) {
-    std::move(std::begin(x), std::end(x), std::begin(this->data));
+    std::size_t i = 0;
+    std::copy_if(                                              //
+        std::begin(x), std::end(x),                            //
+        std::begin(this->data),                                //
+        [&i](const char c) { return i++ < MAX_PAYLOAD_SIZE; }  //
+    );
+    // std::copy_if(std::begin(x), std::end(x), std::begin(this->data));
   };
 
   std::string to_string() const {
@@ -306,10 +312,11 @@ class NMEA {
   bool are_same_sentence(const NMEA& rhs) const noexcept {
     return  // this->line_number == rhs.line_number - 1       //
             //  &&
-        this->message_id == rhs.message_id             //
-        && this->fragment_count == rhs.fragment_count  //
-        && this->channel == rhs.channel                //
-        && this->talker.data[0] == rhs.talker.data[0]  //
+        this->message_id == rhs.message_id                   //
+        && this->fragment_count == rhs.fragment_count        //
+        && this->fragment_number == rhs.fragment_number - 1  //
+        && this->channel == rhs.channel                      //
+        && this->talker.data[0] == rhs.talker.data[0]        //
         && this->talker.data[1] == rhs.talker.data[1];
   };
 
@@ -965,7 +972,7 @@ inline NMEA_Stream NMEA_Stream::from_file(const std::string& file_path) {
 
   for (std::size_t i = 0; i < n_lines; ++i) {
     // if (is_valid<TRUE>(sentences[i])) {
-      if (sentences[i].is_valid()) {
+    if (sentences[i].is_valid()) {
       which_valid.push_back(i);
     }
   }

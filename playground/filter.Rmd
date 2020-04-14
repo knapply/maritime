@@ -55,3 +55,37 @@ ggplot() +
     theme_minimal() +
     theme(panel.background = element_rect(fill = "blue"))
 ```
+
+
+```{r}
+print.data.table <- function(x) print(tibble::as_tibble(x))
+small_df <- df[1:100]
+dplyr::glimpse(small_df)
+
+df[!is.na(imo_num)][, .N, by = .(mmsi, imo_num)][order(-N)]
+```
+
+
+```{r}
+most_common_mmsi <- w_coords[, .N, by = mmsi][order(-N)]$mmsi[[1]]
+
+most_common_mmsi_sf <- sf::st_as_sf(w_coords[mmsi == most_common_mmsi],
+                                    coords = c("lng_deg", "lat_deg"),
+                                    crs = 4326)
+mapview::mapview(most_common_mmsi_sf)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

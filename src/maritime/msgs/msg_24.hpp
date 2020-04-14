@@ -34,12 +34,8 @@ class Msgs_24 : public AIS_Msgs<libais::Ais24> {
       return;
     }
 
-    if (msg.part_num != 0 || msg.part_num != 1) {  // segfault protection
-      return;                                      // ignore compiler complaints
-      // about "overlapping comparisons always evaluate to true"
-    }
-
     const auto row_index = AIS_Msgs::common_row_index;
+
     AIS_Msgs::init_push(msg.message_id, msg.repeat_indicator, msg.mmsi,
                         _line_number, _time);
 
@@ -61,15 +57,15 @@ class Msgs_24 : public AIS_Msgs<libais::Ais24> {
     auto out = AIS_Msgs::init_as_list();
     const auto seq_out = Rcpp::seq(0, AIS_Msgs::common_row_index - 1);
 
-    out["name"] = out[seq_out];
-    out["type_and_cargo"] = out[seq_out];
-    out["vendor_id"] = out[seq_out];
-    out["callsign"] = out[seq_out];
-    out["dim_a"] = out[seq_out];
-    out["dim_b"] = out[seq_out];
-    out["dim_c"] = out[seq_out];
-    out["dim_d"] = out[seq_out];
-    out["spare"] = out[seq_out];
+    out["name"] = name[seq_out];
+    out["type_and_cargo"] = type_and_cargo[seq_out];
+    out["vendor_id"] = vendor_id[seq_out];
+    out["callsign"] = callsign[seq_out];
+    out["dim_a"] = dim_a[seq_out];
+    out["dim_b"] = dim_b[seq_out];
+    out["dim_c"] = dim_c[seq_out];
+    out["dim_d"] = dim_d[seq_out];
+    out["spare"] = spare[seq_out];
 
     return out;
   };
