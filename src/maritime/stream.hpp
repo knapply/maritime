@@ -894,8 +894,10 @@ inline void NMEA_Stream::push(NMEA&& nmea) {
           std::move(final_payload),        //
           incomplete.back().fill_bits,     //
           incomplete.front().line_number,  //
-          incomplete.front().time_start    //
-          )                                //
+          incomplete.back()
+              .time_start  // this should be incomplete.front().time_start
+          )                // but most msg_5 times get nuked that way...
+                           // I'm screwing up something with std::move()...?
   );
   incomplete.clear();
 };
