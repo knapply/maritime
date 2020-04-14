@@ -41,7 +41,7 @@ class AIS_Msgs {
                  const double _time) {
     // if (_time_start != 0) {
     this->line_number[common_row_index] = _line_number + 1;
-    this->time[common_row_index] = _time != 0 ? _time : NA_REAL;
+    this->time[common_row_index] = std::isnan(_time) ? NA_REAL : _time;
     // }
     // if (_time_end != 0) {
     // this->time_end[common_row_index] = _time_end;
@@ -55,24 +55,24 @@ class AIS_Msgs {
   };
 
   void init_push(Msg_Pack&& msg_pack) {
-    this->line_number[common_row_index] = msg_pack.line_number + 1;
-    this->time[common_row_index] = msg_pack.time != 0 ? msg_pack.time : NA_REAL;
-    this->message_id[common_row_index] = msg_pack.message_id;
-    this->repeat_indicator[common_row_index] = msg_pack.repeat_indicator;
-    this->mmsi[common_row_index] = msg_pack.mmsi;
+    line_number[common_row_index] = msg_pack.line_number + 1;
+    time[common_row_index] = std::isnan(msg_pack.time) ? NA_REAL : msg_pack.time;
+    message_id[common_row_index] = msg_pack.message_id;
+    repeat_indicator[common_row_index] = msg_pack.repeat_indicator;
+    mmsi[common_row_index] = msg_pack.mmsi;
 
-    this->common_row_index++;
+    common_row_index++;
   };
 
   Rcpp::List init_as_list() const {
     const auto seq_out = Rcpp::seq(0, this->common_row_index - 1);
     Rcpp::List out;
 
-    out["time"] = std::move(this->time[seq_out]);
-    out["first_line_number"] = std::move(this->line_number[seq_out]);
-    out["message_id"] = std::move(this->message_id[seq_out]);
-    out["repeat_indicator"] = std::move(this->repeat_indicator[seq_out]);
-    out["mmsi"] = std::move(this->mmsi[seq_out]);
+    out["time"] = this->time[seq_out];
+    out["first_line_number"] = this->line_number[seq_out];
+    out["message_id"] = this->message_id[seq_out];
+    out["repeat_indicator"] = this->repeat_indicator[seq_out];
+    out["mmsi"] = this->mmsi[seq_out];
 
     return out;
   };

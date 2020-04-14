@@ -18,10 +18,12 @@ class Msgs_14 : public AIS_Msgs<libais::Ais14> {
   void push(libais::Ais14&& msg,
             const std::size_t _line_number,
             const double _time) {
+
     if (msg.had_error()) {
       return;
     }
     const auto row_index = AIS_Msgs::common_row_index;
+
     AIS_Msgs::init_push(msg.message_id, msg.repeat_indicator, msg.mmsi,
                         _line_number, _time);
 

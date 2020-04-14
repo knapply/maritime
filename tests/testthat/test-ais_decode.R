@@ -1,7 +1,6 @@
-test_that("ais_decoder_*() don't faily", {
+test_that("ais_decoder_*() don't segfault", {
   expect_error(
     lapply(ais_msgs, function(.x) {
-      # stop(.x)
       ais_decode_filter(example_nmea_file(),
         msg_type = .x,
         verbose = FALSE
@@ -19,4 +18,5 @@ test_that("ais_decoder_*() don't faily", {
     ais_decode_df(example_nmea_file(), verbose = FALSE),
     NA
   )
+
 })

@@ -44,10 +44,13 @@ options(width = 150)
 
 # Introduction
 
-`{maritime}` is a toolkit for maritime data.
+Tools and routines for `{maritime}` data.
 
-Initial focus is _performant_ and correct AIS decoding routines for R by building on [Kurt Schwehr](https://twitter.com/kurtschwehr)'s [__libais__](https://github.com/schwehr/libais).
 
+* [ ] High-performance AIS decoding routines.
+  + built on [Kurt Schwehr](https://twitter.com/kurtschwehr)'s [__libais__](https://github.com/schwehr/libais)
+* [ ] Seavision API wrapper
+* [ ] ? 
 
 # Installation
 
@@ -100,7 +103,7 @@ library(maritime)
   
 
 ```{r}
-nmea_file <- "inst/example-data/big-files/20181210.log"
+nmea_file <- "inst/example-data/big-files/20200131.log"
 paste(round(file.size(nmea_file) / 1e9, 2L), "GB")
 readLines(nmea_file, n = 20) # real world data, in all its terrible glory
 ```
@@ -111,24 +114,22 @@ ais_decode_filter(msgs = nmea_file, msg_type = ais_msgs$msg_1_2_3)
 ```
 
 ```{r}
-ais_decode_list(msgs = nmea_file)
-```
-
-```{r}
 ais_decode_df(msgs = nmea_file)
 ```
 
 
-
 ## Performance
-
 
 ```{r}
 bench::mark(
-  `ais_decode_list()` = decoded <- ais_decode_list(
+  `ais_decode_list()` = decoded_list <- ais_decode_list(
     nmea_file, as_tibble = FALSE, as_sf = FALSE, verbose = FALSE
   )
 )
+```
+
+```{r}
+lapply(decoded_list, tibble::as_tibble)
 ```
 
 
