@@ -65,30 +65,30 @@ library(maritime)
 
   - [x] Automatic sentence validation and line normalization
   - Message Types:
-      - [x] ais\_msgs$msg\_1\_2\_3
-      - [x] ais\_msgs$msg\_4\_11
-      - [x] ais\_msgs$msg\_5
-      - [ ] ais\_msgs$msg\_6
-      - [x] ais\_msgs$msg\_7\_13
-      - [ ] ais\_msgs$msg\_8
-      - [x] ais\_msgs$msg\_9
-      - [x] ais\_msgs$msg\_10
-      - [x] ais\_msgs$msg\_11
-      - [x] ais\_msgs$msg\_12
-      - [x] ais\_msgs$msg\_14
-      - [x] ais\_msgs$msg\_15
-      - [x] ais\_msgs$msg\_16
-      - [x] ais\_msgs$msg\_17
-      - [x] ais\_msgs$msg\_18
-      - [x] ais\_msgs$msg\_19
-      - [x] ais\_msgs$msg\_20
-      - [x] ais\_msgs$msg\_21
-      - [x] ais\_msgs$msg\_22
-      - [x] ais\_msgs$msg\_23
-      - [x] ais\_msgs$msg\_24
-      - [x] ais\_msgs$msg\_25
-      - [x] ais\_msgs$msg\_26
-      - [x] ais\_msgs$msg\_27
+      - [x] `ais_msgs$msg_1_2_3`
+      - [x] `ais_msgs$msg_4_11`
+      - [x] `ais_msgs$msg_5`
+      - [ ] `ais_msgs$msg_6`
+      - [x] `ais_msgs$msg_7_13`
+      - [ ] `ais_msgs$msg_8`
+      - [x] `ais_msgs$msg_9`
+      - [x] `ais_msgs$msg_10`
+      - [x] `ais_msgs$msg_11`
+      - [x] `ais_msgs$msg_12`
+      - [x] `ais_msgs$msg_14`
+      - [x] `ais_msgs$msg_15`
+      - [x] `ais_msgs$msg_16`
+      - [x] `ais_msgs$msg_17`
+      - [x] `ais_msgs$msg_18`
+      - [x] `ais_msgs$msg_19`
+      - [x] `ais_msgs$msg_20`
+      - [x] `ais_msgs$msg_21`
+      - [x] `ais_msgs$msg_22`
+      - [x] `ais_msgs$msg_23`
+      - [x] `ais_msgs$msg_24`
+      - [x] `ais_msgs$msg_25`
+      - [x] `ais_msgs$msg_26`
+      - [x] `ais_msgs$msg_27`
 
 <!-- end list -->
 
@@ -365,7 +365,7 @@ bench::mark(
     #> # A tibble: 1 x 6
     #>   expression             min   median `itr/sec` mem_alloc `gc/sec`
     #>   <bch:expr>        <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-    #> 1 ais_decode_list()    17.8s    17.8s    0.0563    3.96GB   0.0563
+    #> 1 ais_decode_list()      16s      16s    0.0627    3.96GB   0.0627
 
 # Credits
 

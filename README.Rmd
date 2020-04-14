@@ -72,30 +72,30 @@ library(maritime)
 
 * [x] Automatic sentence validation and line normalization
 * Message Types:
-  + [x] ais_msgs$msg_1_2_3
-  + [x] ais_msgs$msg_4_11
-  + [x] ais_msgs$msg_5
-  + [ ] ais_msgs$msg_6
-  + [x] ais_msgs$msg_7_13
-  + [ ] ais_msgs$msg_8
-  + [x] ais_msgs$msg_9
-  + [x] ais_msgs$msg_10
-  + [x] ais_msgs$msg_11
-  + [x] ais_msgs$msg_12
-  + [x] ais_msgs$msg_14
-  + [x] ais_msgs$msg_15
-  + [x] ais_msgs$msg_16
-  + [x] ais_msgs$msg_17
-  + [x] ais_msgs$msg_18
-  + [x] ais_msgs$msg_19
-  + [x] ais_msgs$msg_20
-  + [x] ais_msgs$msg_21
-  + [x] ais_msgs$msg_22
-  + [x] ais_msgs$msg_23
-  + [x] ais_msgs$msg_24
-  + [x] ais_msgs$msg_25
-  + [x] ais_msgs$msg_26
-  + [x] ais_msgs$msg_27
+  + [x] `ais_msgs$msg_1_2_3`
+  + [x] `ais_msgs$msg_4_11`
+  + [x] `ais_msgs$msg_5`
+  + [ ] `ais_msgs$msg_6`
+  + [x] `ais_msgs$msg_7_13`
+  + [ ] `ais_msgs$msg_8`
+  + [x] `ais_msgs$msg_9`
+  + [x] `ais_msgs$msg_10`
+  + [x] `ais_msgs$msg_11`
+  + [x] `ais_msgs$msg_12`
+  + [x] `ais_msgs$msg_14`
+  + [x] `ais_msgs$msg_15`
+  + [x] `ais_msgs$msg_16`
+  + [x] `ais_msgs$msg_17`
+  + [x] `ais_msgs$msg_18`
+  + [x] `ais_msgs$msg_19`
+  + [x] `ais_msgs$msg_20`
+  + [x] `ais_msgs$msg_21`
+  + [x] `ais_msgs$msg_22`
+  + [x] `ais_msgs$msg_23`
+  + [x] `ais_msgs$msg_24`
+  + [x] `ais_msgs$msg_25`
+  + [x] `ais_msgs$msg_26`
+  + [x] `ais_msgs$msg_27`
   
   
 
