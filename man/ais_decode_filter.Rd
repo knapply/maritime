@@ -3,6 +3,7 @@
 \name{ais_decode_filter}
 \alias{ais_decode_filter}
 \alias{ais_decode_list}
+\alias{ais_decode_df}
 \title{Decode NMEA Messages}
 \usage{
 ais_decode_filter(
@@ -17,6 +18,15 @@ ais_decode_filter(
 ais_decode_list(
   msgs,
   data_type = c("auto", "file", "strings", "text"),
+  as_sf = maritime_as_sf(),
+  as_tibble = maritime_as_tibble(),
+  verbose = maritime_verbose()
+)
+
+ais_decode_df(
+  msgs,
+  data_type = c("auto", "file", "strings", "text"),
+  sort_by_line_number = TRUE,
   as_sf = maritime_as_sf(),
   as_tibble = maritime_as_tibble(),
   verbose = maritime_verbose()
@@ -65,6 +75,8 @@ messages
 \item Whether print status and diagnostic messages.
 \item \code{maritime_verbose()} defaults to \code{TRUE}.
 }}
+
+\item{sort_by_line_number}{Whether rows are in the same order as line occurrence.}
 }
 \description{
 National Marine Electronics Association (NMEA) messages are comma separated
@@ -83,11 +95,12 @@ nmea_lines[1:10]
 
 # decoding a file, filter by messgage type ==================================
 ais_decode_filter(nmea_file, msg_type = ais_msgs$msg_1_2_3)
-ais_decode_filter(nmea_file, msg_type = ais_msgs$msg_4_11)
-ais_decode_filter(nmea_file, msg_type = ais_msgs$msg_5)
 
-# decoding a file, keeping everything (WIP) =================================
+# return all messages as list of data frames ================================
 ais_decode_list(nmea_file)
+
+# return all messages, combined into a single data frame ====================
+ais_decode_df(nmea_file)
 }
 \author{
 Brendan Knapp \email{brendan.knapp@nps.edu}

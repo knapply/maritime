@@ -19,7 +19,9 @@ class Msgs_20 : public AIS_Msgs<libais::Ais20> {
     AIS_Msgs::init_push(msg.message_id, msg.repeat_indicator, msg.mmsi,
                         _line_number, _time);
 
-    Rcpp::IntegerMatrix temp(4, 4, NA_INTEGER);
+    Rcpp::IntegerMatrix temp(4, 4);
+    temp.fill(NA_INTEGER);
+
     temp(0, 0) = msg.offset_1;
     temp(1, 0) = msg.num_slots_1;
     temp(2, 0) = msg.timeout_1;
@@ -37,7 +39,7 @@ class Msgs_20 : public AIS_Msgs<libais::Ais20> {
       temp(2, 2) = msg.timeout_3;
       temp(3, 2) = msg.incr_3;
     }
-    if (msg.group_valid_2) {
+    if (msg.group_valid_4) {
       temp(0, 3) = msg.offset_4;
       temp(1, 3) = msg.num_slots_4;
       temp(2, 3) = msg.timeout_4;

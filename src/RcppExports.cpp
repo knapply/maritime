@@ -41,15 +41,28 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// decode_list2
-SEXP decode_list2(const std::string& file_path, const bool verbose);
-RcppExport SEXP _maritime_decode_list2(SEXP file_pathSEXP, SEXP verboseSEXP) {
+// cpp_ais_decode_filter_file
+SEXP cpp_ais_decode_filter_file(const std::string& file_path, const int msg_type, const bool verbose);
+RcppExport SEXP _maritime_cpp_ais_decode_filter_file(SEXP file_pathSEXP, SEXP msg_typeSEXP, SEXP verboseSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::string& >::type file_path(file_pathSEXP);
+    Rcpp::traits::input_parameter< const int >::type msg_type(msg_typeSEXP);
+    Rcpp::traits::input_parameter< const bool >::type verbose(verboseSEXP);
+    rcpp_result_gen = Rcpp::wrap(cpp_ais_decode_filter_file(file_path, msg_type, verbose));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cpp_ais_decode_list_file
+SEXP cpp_ais_decode_list_file(const std::string& file_path, const bool verbose);
+RcppExport SEXP _maritime_cpp_ais_decode_list_file(SEXP file_pathSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const std::string& >::type file_path(file_pathSEXP);
     Rcpp::traits::input_parameter< const bool >::type verbose(verboseSEXP);
-    rcpp_result_gen = Rcpp::wrap(decode_list2(file_path, verbose));
+    rcpp_result_gen = Rcpp::wrap(cpp_ais_decode_list_file(file_path, verbose));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -58,7 +71,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_maritime_ais_version", (DL_FUNC) &_maritime_ais_version, 0},
     {"_maritime_ais_decode_strings", (DL_FUNC) &_maritime_ais_decode_strings, 3},
     {"_maritime_ais_decode_file", (DL_FUNC) &_maritime_ais_decode_file, 3},
-    {"_maritime_decode_list2", (DL_FUNC) &_maritime_decode_list2, 2},
+    {"_maritime_cpp_ais_decode_filter_file", (DL_FUNC) &_maritime_cpp_ais_decode_filter_file, 3},
+    {"_maritime_cpp_ais_decode_list_file", (DL_FUNC) &_maritime_cpp_ais_decode_list_file, 2},
     {NULL, NULL, 0}
 };
 

@@ -33,6 +33,7 @@ LinkingTo:
     RcppProgress,
     rmio
 Imports:
+    data.table,
     Rcpp
 Suggests:
     covr,

@@ -21,7 +21,11 @@ ais_version <- function() {
     .Call(`_maritime_ais_decode_file`, file_path, as_df, verbose)
 }
 
-.ais_decode_list2 <- function(file_path, verbose) {
-    .Call(`_maritime_decode_list2`, file_path, verbose)
+.ais_decode_filter_file <- function(file_path, msg_type, verbose) {
+    .Call(`_maritime_cpp_ais_decode_filter_file`, file_path, msg_type, verbose)
+}
+
+.ais_decode_list_file <- function(file_path, verbose) {
+    .Call(`_maritime_cpp_ais_decode_list_file`, file_path, verbose)
 }
 
