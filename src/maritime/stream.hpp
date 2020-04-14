@@ -907,11 +907,20 @@ inline void NMEA_Stream::push(NMEA&& nmea) {
 //
 //
 
+template<typename T>
+constexpr bool TRUE(const T&) {
+  return true;
+  
+}
+
+
 inline bool is_valid_simple(const Sentence& sentence) {
   return sentence.is_valid();
 }
-inline bool is_valid2(const Sentence& sentence) {
-  
+
+template <typename T, typename Predicate>
+inline bool is_valid(const Sentence& sentence) {
+  return sentence.is_valid() && Predicate(sentence);
 }
 
 //
