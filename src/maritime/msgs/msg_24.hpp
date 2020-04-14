@@ -34,8 +34,9 @@ class Msgs_24 : public AIS_Msgs<libais::Ais24> {
       return;
     }
 
-    if (msg.part_num != 0 || msg.part_num != 1) {
-      return;
+    if (msg.part_num != 0 || msg.part_num != 1) {  // segfault protection
+      return;                                      // ignore compiler complaints
+      // about "overlapping comparisons always evaluate to true"
     }
 
     const auto row_index = AIS_Msgs::common_row_index;
