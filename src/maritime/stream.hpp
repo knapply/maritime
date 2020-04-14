@@ -36,7 +36,7 @@ class Sentence {
       : line_number(_line_number) {
     std::size_t i = 0;
     std::copy_if(                                                            //
-        std::make_move_iterator(first), std::make_move_iterator(last),       //
+        first, last,                                                         //
         std::begin(this->data),                                              //
         [&i](const char c) { return i++ < MAX_SENTENCE_SIZE && c != '\r'; }  //
     );
