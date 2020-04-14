@@ -25,7 +25,7 @@ constexpr std::size_t MAX_PAYLOAD_SIZE = 80;
 
 class Sentence {
  public:
-  std::array<char, MAX_SENTENCE_SIZE> data{'\0'};
+  std::array<char, MAX_SENTENCE_SIZE> data{{'\0'}};
   std::size_t line_number;
 
   Sentence() = default;
@@ -103,7 +103,7 @@ class Sentence {
 // Payload =====================================================================
 
 struct Payload {
-  std::array<char, MAX_PAYLOAD_SIZE> data{'\0'};
+  std::array<char, MAX_PAYLOAD_SIZE> data{{'\0'}};
 
   Payload() = default;
 
